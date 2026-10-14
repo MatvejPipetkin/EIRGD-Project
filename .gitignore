@@ -2302,3 +2302,7 @@ GarrysModDS/garrysmod/gameinfo.txt
 GarrysModDS/garrysmod/download/user_custom/88/882ab71a.dat
 GarrysModDS/bin/win64/vstdlib.dll
 GarrysModDS/config/config.vdf
+/GarrysModDS/garrysmod/data
+/GarrysModDS/garrysmod/data/helix
+GarrysModDS/garrysmod/data/helix/militaryrp/gm_construct/saveitems.txt
+GarrysModDS/garrysmod/clientside_errors.txt
