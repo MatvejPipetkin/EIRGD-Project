@@ -1,8 +1,50 @@
+-- общий стиль меню (тот же акцентный цвет, что и accentColor в cl_character.lua)
+ix.menuStyle = ix.menuStyle or {accent = Color(90, 160, 235), projectName = "EIRGD"}
 
 local buttonPadding = ScreenScale(14) * 0.5
-local animationTime = 0.5
 
--- base menu button
+-- масштаб под разрешение (за основу взято 1080p)
+local function S(value)
+	return math.floor(value * ScrH() / 1080 + 0.5)
+end
+
+local function GetAccent()
+	return ix.menuStyle.accent or ix.config.Get("color") or Color(90, 160, 235)
+end
+
+local function EaseOutCubic(x)
+	return 1 - (1 - x) ^ 3
+end
+
+-- плавное приближение к цели, не зависит от FPS
+local function Smooth(current, target, speed)
+	return Lerp(1 - math.exp(-RealFrameTime() * speed), current, target)
+end
+
+local function PlayUI(path, pitch, volume)
+	local ply = LocalPlayer()
+
+	if (IsValid(ply)) then
+		ply:EmitSound(path, 75, pitch, volume, CHAN_AUTO)
+	end
+end
+
+local function CreateMenuFonts()
+	local h = ScrH()
+
+	surface.CreateFont("ixMenuTabFont", {font = "Roboto", size = math.max(14, math.floor(h * 0.0185)), weight = 500, extended = true, antialias = true})
+	surface.CreateFont("ixMenuTabFontSmall", {font = "Roboto", size = math.max(11, math.floor(h * 0.0135)), weight = 500, extended = true, antialias = true})
+	surface.CreateFont("ixMenuLinkFont", {font = "Roboto", size = math.max(12, math.floor(h * 0.0155)), weight = 500, extended = true, antialias = true})
+	surface.CreateFont("ixMenuTinyFont", {font = "Roboto", size = math.max(10, math.floor(h * 0.0115)), weight = 500, extended = true, antialias = true})
+end
+
+CreateMenuFonts()
+hook.Add("OnScreenSizeChanged", "ixMenuButtonFonts", CreateMenuFonts)
+
+--[[
+	ixMenuButton — базовая кнопка. Оставлена без изменений,
+	чтобы не сломать cl_character.lua (там она стилизуется отдельно).
+]]
 DEFINE_BASECLASS("DButton")
 local PANEL = {}
 
@@ -143,7 +185,11 @@ end
 
 vgui.Register("ixMenuButton", PANEL, "DButton")
 
--- selection menu button
+--[[
+	ixMenuSelectionButton — вкладка верхней панели меню.
+	Только текст: цвет плавно меняется при наведении, активная вкладка
+	подчёркивается общей линией, которая скользит между вкладками (рисуется в cl_menu).
+]]
 DEFINE_BASECLASS("ixMenuButton")
 PANEL = {}
 
@@ -152,16 +198,84 @@ AccessorFunc(PANEL, "selected", "Selected", FORCE_BOOL)
 AccessorFunc(PANEL, "buttonList", "ButtonList")
 
 function PANEL:Init()
-	self.backgroundColor = color_white
+	self:SetFont("ixMenuTabFont")
+	self:SetContentAlignment(5)
+	self:SetTextInset(0, 0)
+
+	self.padding = {S(18), 0, S(18), 0}
+	self.backgroundColor = GetAccent()
 	self.selected = false
 	self.buttonList = {}
-	self.sectionPanel = nil -- sub-sections this button has; created only if it has any sections
+	self.sectionPanel = nil -- подразделы этой вкладки; создаётся только если они есть
+	self.sectionHost = nil -- панель, в которой размещается строка подразделов (задаётся в cl_menu)
+
+	self.hoverFrac = 0
+	self.activeFrac = 0
+	self.pressFrac = 0
+	self.revealStart = RealTime()
 end
 
-function PANEL:PaintBackground(width, height)
-	local alpha = self.selected and 255 or self.currentBackgroundAlpha
+-- вкладка считается активной, если выбрана она сама или один из её подразделов
+function PANEL:IsActive()
+	if (self.selected) then
+		return true
+	end
 
-	derma.SkinFunc("DrawImportantBackground", 0, 0, width, height, ColorAlpha(self.backgroundColor, alpha))
+	if (self.sectionPanel) then
+		for _, v in ipairs(self.buttonList) do
+			if (IsValid(v) and v.selected and v.sectionParent == self) then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+function PANEL:Paint(width, height)
+	local hover = self:IsHovered() and 1 or 0
+	local active = self:IsActive()
+
+	self.hoverFrac = Smooth(self.hoverFrac, hover, 14)
+	self.activeFrac = Smooth(self.activeFrac, active and 1 or 0, 10)
+	self.pressFrac = Smooth(self.pressFrac, 0, 9)
+
+	local hf, af, pf = self.hoverFrac, self.activeFrac, self.pressFrac
+	local reveal = EaseOutCubic(math.Clamp((RealTime() - self.revealStart) / 0.6, 0, 1))
+	local color = self.backgroundColor or GetAccent()
+
+	self:SetTextColorInternal(Color(255, 255, 255, math.floor(math.Clamp(140 + 65 * hf + 50 * af - 50 * pf, 0, 255) * reveal)))
+
+	draw.NoTexture()
+
+	-- тонкие разделители между вкладками (у вкладки с bSeparator, например settings, заметнее)
+	if (self.bSeparator or (self.tabIndex and self.tabIndex > 1)) then
+		local tall = self.bSeparator and math.floor(height * 0.6) or math.floor(height * 0.3)
+
+		surface.SetDrawColor(255, 255, 255, (self.bSeparator and 60 or 25) * reveal)
+		surface.DrawRect(0, math.floor((height - tall) * 0.5), 1, tall)
+	end
+
+	if (hf > 0.01) then
+		-- едва заметная подложка
+		surface.SetDrawColor(color.r, color.g, color.b, 14 * hf * reveal)
+		surface.DrawRect(0, 0, width, height)
+
+		-- тонкая линия, расходящаяся от центра (только у неактивных)
+		local inset = self.padding[1]
+		local lineWidth = math.floor((width - inset * 2) * EaseOutCubic(hf))
+
+		surface.SetDrawColor(color.r, color.g, color.b, 120 * hf * reveal * (1 - af))
+		surface.DrawRect(math.floor((width - lineWidth) * 0.5), height - 1, lineWidth, 1)
+	end
+
+	-- подразделы подчёркиваем сами (у основных вкладок это делает скользящая линия)
+	if (self.sectionParent and af > 0.01) then
+		local inset = self.padding[1]
+
+		surface.SetDrawColor(color.r, color.g, color.b, 200 * af * reveal)
+		surface.DrawRect(inset, height - 1, width - inset * 2, 1)
+	end
 end
 
 function PANEL:SetSelected(bValue, bSelectedSection)
@@ -194,13 +308,23 @@ end
 
 function PANEL:AddSection(name)
 	if (!IsValid(self.sectionPanel)) then
-		-- add section panel to regular button list
-		self.sectionPanel = vgui.Create("ixMenuSelectionList", self:GetParent())
-		self.sectionPanel:Dock(self:GetDock())
+		local host = IsValid(self.sectionHost) and self.sectionHost or self:GetParent()
+
+		self.sectionPanel = vgui.Create("ixMenuSelectionList", host)
 		self.sectionPanel:SetParentButton(self)
 	end
 
 	return self.sectionPanel:AddButton(name, self.buttonList)
+end
+
+function PANEL:OnCursorEntered()
+	PlayUI("buttons/blip1.wav", 115, 0.2)
+end
+
+function PANEL:OnCursorExited()
+end
+
+function PANEL:OnMouseReleased()
 end
 
 function PANEL:OnMousePressed(key)
@@ -211,7 +335,15 @@ function PANEL:OnMousePressed(key)
 	end
 
 	self:SetSelected(true)
-	BaseClass.OnMousePressed(self, key)
+
+	self.pressFrac = 1
+	PlayUI("buttons/button15.wav", 100, 0.28)
+
+	if (key == MOUSE_LEFT and self.DoClick) then
+		self:DoClick(self)
+	elseif (key == MOUSE_RIGHT and self.DoRightClick) then
+		self:DoRightClick(self)
+	end
 end
 
 function PANEL:OnSelected()
@@ -219,18 +351,23 @@ end
 
 vgui.Register("ixMenuSelectionButton", PANEL, "ixMenuButton")
 
--- collapsable list for menu button sections
+--[[
+	ixMenuSelectionList — строка подразделов под вкладкой.
+	Появляется плавным fade-in с лёгким сдвигом и встаёт под родительскую вкладку.
+]]
 PANEL = {}
 AccessorFunc(PANEL, "parent", "ParentButton")
 
 function PANEL:Init()
-	self.parent = nil -- button that is responsible for controlling this list
-	self.height = 0
-	self.targetHeight = 0
+	self.parent = nil -- кнопка, которая управляет этим списком
+	self.targetWidth = 0
+	self.fade = 0
 
-	self:DockPadding(0, 1, 0, 1)
+	local host = self:GetParent()
+
+	self:SetTall(IsValid(host) and host:GetTall() or 0)
 	self:SetVisible(false)
-	self:SetTall(0)
+	self:SetAlpha(0)
 end
 
 function PANEL:AddButton(name, buttonList)
@@ -239,45 +376,54 @@ function PANEL:AddButton(name, buttonList)
 
 	local button = self:Add("ixMenuSelectionButton")
 	button.sectionParent = self.parent
-	button:SetTextInset(buttonPadding * 2, 0)
-	button:SetPadding(nil, 8, nil, 8)
-	button:SetFont("ixMenuButtonFontSmall")
-	button:Dock(TOP)
+	button:SetFont("ixMenuTabFontSmall")
+	button:SetPadding(S(14), 0, S(14), 0)
+	button:Dock(LEFT)
 	button:SetText(name)
 	button:SizeToContents()
 	button:SetButtonList(buttonList)
 	button:SetBackgroundColor(self.parent:GetBackgroundColor())
 
-	self.targetHeight = self.targetHeight + button:GetTall()
+	self.targetWidth = self.targetWidth + button:GetWide()
+	self:SetWide(self.targetWidth)
+
 	return button
+end
+
+-- ставим список под родительскую вкладку и не даём ему выйти за границы строки
+function PANEL:UpdatePosition()
+	local host = self:GetParent()
+	local x = IsValid(self.parent) and self.parent:GetX() or 0
+
+	x = math.max(math.min(x, host:GetWide() - self:GetWide()), 0)
+	self:SetPos(x, math.floor((1 - self.fade) * -S(6)))
 end
 
 function PANEL:Show()
 	self:SetVisible(true)
+	self:UpdatePosition()
 
-	self:CreateAnimation(animationTime, {
+	self:CreateAnimation(0.35, {
 		index = 1,
-		target = {
-			height = self.targetHeight + 2 -- +2 for padding
-		},
+		target = {fade = 1},
 		easing = "outQuart",
 
 		Think = function(animation, panel)
-			panel:SetTall(panel.height)
+			panel:SetAlpha(255 * panel.fade)
+			panel:UpdatePosition()
 		end
 	})
 end
 
 function PANEL:Hide()
-	self:CreateAnimation(animationTime, {
+	self:CreateAnimation(0.15, {
 		index = 1,
-		target = {
-			height = 0
-		},
+		target = {fade = 0},
 		easing = "outQuint",
 
 		Think = function(animation, panel)
-			panel:SetTall(panel.height)
+			panel:SetAlpha(255 * panel.fade)
+			panel:UpdatePosition()
 		end,
 
 		OnComplete = function(animation, panel)
@@ -286,10 +432,111 @@ function PANEL:Hide()
 	})
 end
 
-function PANEL:Paint(width, height)
-	surface.SetDrawColor(Color(255, 255, 255, 33))
-	surface.DrawRect(0, 0, width, 1)
-	surface.DrawRect(0, height - 1, width, 1)
+vgui.Register("ixMenuSelectionList", PANEL, "Panel")
+
+--[[
+	ixMenuLinkButton — маленькая текстовая кнопка для действий (вернуться, персонажи).
+	Слева тонкая линия: при наведении она удлиняется и плавно сдвигает текст вправо.
+]]
+DEFINE_BASECLASS("DButton")
+PANEL = {}
+
+function PANEL:Init()
+	self:SetPaintBackground(false)
+	self:SetCursor("hand")
+
+	self.label = ""
+	self.font = "ixMenuLinkFont"
+	self.hoverFrac = 0
+	self.pressFrac = 0
+	self.revealStart = RealTime()
 end
 
-vgui.Register("ixMenuSelectionList", PANEL, "Panel")
+function PANEL:SetText(text, noTranslation)
+	text = tostring(text or "")
+
+	if (text == "" or noTranslation) then
+		self.label = text:utf8upper()
+	else
+		self.label = L(text):utf8upper()
+	end
+
+	BaseClass.SetText(self, "")
+end
+
+function PANEL:SizeToContents()
+	surface.SetFont(self.font)
+
+	local textWidth, textHeight = surface.GetTextSize(self.label)
+
+	self:SetSize(S(30) + S(10) + textWidth + 2, textHeight + S(16))
+end
+
+function PANEL:Paint(width, height)
+	local disabled = self:GetDisabled()
+
+	self.hoverFrac = Smooth(self.hoverFrac, (!disabled and self:IsHovered()) and 1 or 0, 12)
+	self.pressFrac = Smooth(self.pressFrac, 0, 9)
+
+	local hf, pf = self.hoverFrac, self.pressFrac
+	local ef = EaseOutCubic(hf)
+	local reveal = EaseOutCubic(math.Clamp((RealTime() - self.revealStart) / 0.6, 0, 1))
+	local accent = GetAccent()
+	local k = disabled and 0.35 or 1
+
+	local lineLength = math.floor(Lerp(ef, S(12), S(30)))
+	local centerY = math.floor(height * 0.5)
+
+	draw.NoTexture()
+	surface.SetDrawColor(accent.r, accent.g, accent.b, (170 + 85 * hf) * reveal * k)
+	surface.DrawRect(0, centerY, lineLength, 1)
+
+	-- угловые скобки вокруг кнопки при наведении
+	if (hf > 0.02) then
+		local len = S(5)
+		local bx = -S(8)
+		local bw = width + S(8)
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 200 * hf * reveal * k)
+		surface.DrawRect(bx, 0, len, 1)
+		surface.DrawRect(bx, 0, 1, len)
+		surface.DrawRect(bx + bw - len, 0, len, 1)
+		surface.DrawRect(bx + bw - 1, 0, 1, len)
+		surface.DrawRect(bx, height - 1, len, 1)
+		surface.DrawRect(bx, height - len, 1, len)
+		surface.DrawRect(bx + bw - len, height - 1, len, 1)
+		surface.DrawRect(bx + bw - 1, height - len, 1, len)
+	end
+
+	draw.SimpleText(
+		self.label, self.font, lineLength + S(10), centerY,
+		Color(255, 255, 255, math.floor(math.Clamp(160 + 95 * hf - 70 * pf, 0, 255) * reveal * k)),
+		TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER
+	)
+end
+
+function PANEL:OnCursorEntered()
+	if (!self:GetDisabled()) then
+		PlayUI("buttons/blip1.wav", 115, 0.2)
+	end
+end
+
+function PANEL:OnMousePressed(code)
+	if (self:GetDisabled()) then
+		return
+	end
+
+	self.pressFrac = 1
+	PlayUI("buttons/button15.wav", 100, 0.28)
+
+	if (code == MOUSE_LEFT and self.DoClick) then
+		self:DoClick(self)
+	elseif (code == MOUSE_RIGHT and self.DoRightClick) then
+		self:DoRightClick(self)
+	end
+end
+
+function PANEL:OnMouseReleased()
+end
+
+vgui.Register("ixMenuLinkButton", PANEL, "DButton")
