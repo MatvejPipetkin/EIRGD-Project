@@ -1,1 +1,1 @@
-[{"allowPersonalFootstepVolume":false,"thirdperson":true,"silentCrouching":true,"day":2,"allowVoice":true,"inventoryHeight":5,"allowBusiness":false,"weaponAlwaysRaised":true,"inventoryWidth":8,"minDescriptionLength":0}]
+[{"inventoryHeight":5,"silentCrouching":true,"day":2,"allowBusiness":false,"allowPersonalFootstepVolume":false,"allowVoice":true,"weaponAlwaysRaised":true,"inventoryWidth":8,"minDescriptionLength":0}]
