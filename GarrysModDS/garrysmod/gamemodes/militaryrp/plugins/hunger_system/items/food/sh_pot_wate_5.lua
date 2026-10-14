@@ -1,0 +1,17 @@
+ITEM.name = "Вода коллаборационист"
+ITEM.model = "models/props_cunk/popcan01a.mdl"
+ITEM.description = "Очень необычная банка воды с очень сладким вкусом. Почему-то это заставляет вас чувствовать себя счастливее..."
+ITEM.category = "Еда"
+ITEM.useSound = "food/can.wav"
+ITEM.skin = 1
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 15
+ITEM.hunger_amount = 0
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

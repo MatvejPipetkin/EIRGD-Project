@@ -1,0 +1,16 @@
+ITEM.name = "Вино"
+ITEM.model = "models/hlvr/props/bottles/garbage_glassbottle003a.mdl"
+ITEM.description = "Один из немногих алкогольных напитков которые остались после прихода Альянса. На старой пошарпанной этикетке ели видное название (Каберне Совиньон)"
+ITEM.category = "Еда"
+ITEM.useSound = "food/drinking.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 2
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 5
+ITEM.hunger_amount = -5
+ITEM.drunk_amount = 10
+ITEM.staminaAmount = -5
+ITEM.quantity = 7

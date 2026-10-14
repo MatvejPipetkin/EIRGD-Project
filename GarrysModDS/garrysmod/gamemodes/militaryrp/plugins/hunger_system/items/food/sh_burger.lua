@@ -1,0 +1,15 @@
+ITEM.name = "Бургер"
+ITEM.model = "models/props/cryts_food/meal_cheeseburger.mdl"
+ITEM.description = "Вкусно и сытно марка коллабрационизм и точка делаю хорошие явства."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 2
+ITEM.hunger_amount = 10
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

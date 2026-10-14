@@ -1,0 +1,16 @@
+ITEM.name = "Банка воды"
+ITEM.model = "models/props_lunk/popcan01a.mdl"
+ITEM.description = "На этикетке со знаком Альянса написано: [Вода] сделано Гражданским Союзом Рабочих."
+ITEM.useSound = "food/can.wav"
+ITEM.skin = 0
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 8
+ITEM.hunger_amount = 0
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

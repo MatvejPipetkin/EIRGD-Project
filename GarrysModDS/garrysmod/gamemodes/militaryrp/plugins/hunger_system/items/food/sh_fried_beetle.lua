@@ -1,0 +1,15 @@
+ITEM.name = "Жареное мясо жука"
+ITEM.model = "models/swas/swas_plate_food2.mdl"
+ITEM.description = "Жареное мясо жука, выглядит хоть и очень плохо, но на что не пойдешь ради насыщения."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 0
+ITEM.hunger_amount = 8
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 12

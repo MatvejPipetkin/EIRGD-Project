@@ -1,0 +1,16 @@
+ITEM.name = "Фруктовая Вода"
+ITEM.model = "models/props_lunk/popcan01a.mdl"
+ITEM.description = "На этикетке написано: Мягкий фруктовый вкус! Сделано из искусственного винограда и пропитано грязной, похожей на песок пастой!"
+ITEM.useSound = "food/can.wav"
+ITEM.skin = 1
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 10
+ITEM.hunger_amount = 0
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

@@ -1,0 +1,16 @@
+ITEM.name = "Пивко"
+ITEM.model = "models/hlvr/props/bottles/garbage_glassbottle001a.mdl"
+ITEM.description = "Пиво обычная бутылка слегка пошарпанная но для времени, приятно пахнет хмелем."
+ITEM.category = "Еда"
+ITEM.useSound = "food/drinking.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 2
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 5
+ITEM.hunger_amount = -5
+ITEM.drunk_amount = 10
+ITEM.staminaAmount = -5
+ITEM.quantity = 7

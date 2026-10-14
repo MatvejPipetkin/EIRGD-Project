@@ -1,0 +1,15 @@
+ITEM.name = "Упаковка Сахар"
+ITEM.model = "models/illusion/eftcontainers/sugar.mdl"
+ITEM.description = "Самый известный продовольственный продукт - сахар. Он используется практически во всех продуктах, и даже лекарствах. Самое интересное: сахар не виноват в том, что у вас может быть кариес, или того похуже - диабет."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = -1
+ITEM.hunger_amount = 2
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 20

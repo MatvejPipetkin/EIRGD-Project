@@ -1,0 +1,15 @@
+ITEM.name = "Питательная Жижа C-1"
+ITEM.model = "models/foodnhouseholdaaaaa/combirationa.mdl"
+ITEM.description = "На вкус отвратительно как помои но питательно"
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 10
+ITEM.hunger_amount = 10
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

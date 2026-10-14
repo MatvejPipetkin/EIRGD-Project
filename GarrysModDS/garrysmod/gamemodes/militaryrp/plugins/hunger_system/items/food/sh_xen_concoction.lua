@@ -1,0 +1,16 @@
+ITEM.name = "Жидкий экстракт"
+ITEM.model = "models/willardnetworks/food/concoction.mdl"
+ITEM.description = "Выпив это, вы познаете миллионы миллионов галактик и безграничность своего сознания. Ну или наебенитесь в пизду."
+ITEM.category = "Еда"
+ITEM.useSound = "food/champagne.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 100
+ITEM.hunger_amount = 0
+ITEM.drunk_amount = 100
+ITEM.staminaAmount = -100
+ITEM.quantity = 7

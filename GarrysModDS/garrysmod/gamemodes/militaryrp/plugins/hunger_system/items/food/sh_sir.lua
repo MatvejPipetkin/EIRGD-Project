@@ -1,0 +1,15 @@
+ITEM.name = "Сыр"
+ITEM.model = "models/props/cryts_food/meal_cheese01c.mdl"
+ITEM.description = "Большой сыр"
+ITEM.category = "Еда"
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 2
+ITEM.height = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = -3
+ITEM.hunger_amount = 5
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

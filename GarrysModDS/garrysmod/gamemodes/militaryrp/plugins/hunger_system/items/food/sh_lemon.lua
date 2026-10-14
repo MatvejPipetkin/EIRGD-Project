@@ -1,0 +1,15 @@
+ITEM.name = "Лемон"
+ITEM.model = "models/props/cryts_food/fruit_lemon.mdl"
+ITEM.description = "Кислый на вкус фрукт, раньше считали что именно из-за обилия солнечного света он приобретает свой цвет."
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 1
+ITEM.hunger_amount = 2
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

@@ -1,0 +1,15 @@
+ITEM.name = "Бутылка молока"
+ITEM.model = "models/mosi/fallout4/props/drink/milkbottle.mdl"
+ITEM.description = "Белая жидкость, напоминающее молоко, но к сожалению, не натуральное, а обычное будто покупное из магазина. Надеюсь вы переносите лактозу?"
+ITEM.useSound = "food/can.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 9
+ITEM.hunger_amount = 1
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 8

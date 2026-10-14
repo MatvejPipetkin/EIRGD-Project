@@ -1,0 +1,15 @@
+ITEM.name = "Печенька"
+ITEM.model = "models/props/cryts_food/sweets_chipcookie.mdl"
+ITEM.description = "Сделанное из теста с кусочками шоколада, маленькая, но вкусная радость в этом мире."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = -1
+ITEM.hunger_amount = 5
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 3

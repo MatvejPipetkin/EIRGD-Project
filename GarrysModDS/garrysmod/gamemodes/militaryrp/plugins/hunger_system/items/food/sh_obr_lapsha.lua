@@ -1,0 +1,15 @@
+ITEM.name = "Приготовленная лапша"
+ITEM.model = "models/willardnetworks/food/noodles.mdl"
+ITEM.description = "Именно такой и должна быть лапша."
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 9
+ITEM.hunger_amount = 9
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 7

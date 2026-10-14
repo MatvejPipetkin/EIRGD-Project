@@ -1,0 +1,16 @@
+ITEM.name = "Газированая вода"
+ITEM.model = "models/props_cunk/popcan01a.mdl"
+ITEM.description = "Вода наполненная газом."
+ITEM.useSound = "food/soda.wav"
+ITEM.skin = 2
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 12
+ITEM.hunger_amount = 0
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

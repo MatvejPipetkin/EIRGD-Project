@@ -1,0 +1,15 @@
+ITEM.name = "Чипсы"
+ITEM.model = Model("models/bioshockinfinite/bag_of_hhips.mdl")
+ITEM.description = "Бумажная пачка набитая сухой закуской монетной формы."
+ITEM.useSound = "food/chips.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = -1
+ITEM.hunger_amount = 2
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 20

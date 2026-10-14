@@ -1,0 +1,15 @@
+ITEM.name = "Банан"
+ITEM.model = "models/props/cryts_food/fruit_banana.mdl"
+ITEM.description = "Экзотический фрукт, который выращивается далеко не на каждой грядке и не на каждом дереве"
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 5
+ITEM.hunger_amount = 2
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

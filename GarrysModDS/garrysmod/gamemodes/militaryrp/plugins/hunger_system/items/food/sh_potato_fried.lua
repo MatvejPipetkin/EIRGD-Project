@@ -1,0 +1,15 @@
+ITEM.name = "Жареная картошка"
+ITEM.model = "models/willardnetworks/food/eggmix.mdl"
+ITEM.description = "Вкусная, маслянистая и такая знакомая всем жаренная картошечка, что так и манит своим ароматом."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 0
+ITEM.hunger_amount = 12
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 6

@@ -1,0 +1,15 @@
+ITEM.name = "Ананас"
+ITEM.model = "models/willardnetworks/food/pineapple.mdl"
+ITEM.description = "Их редко можно встретить в наши дни."
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 3
+ITEM.hunger_amount = 5
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 15

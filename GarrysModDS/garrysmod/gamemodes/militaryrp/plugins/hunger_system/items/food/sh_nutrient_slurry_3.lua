@@ -1,0 +1,15 @@
+ITEM.name = "Питательная Жижа C-3"
+ITEM.model = "models/foodnhouseholdaaaaa/combirationc.mdl"
+ITEM.description = "Жижа со вкусом сливочного пирога!"
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 30
+ITEM.hunger_amount = 30
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

@@ -1,0 +1,15 @@
+ITEM.name = "Лайм"
+ITEM.model = "models/props/cryts_food/fruit_lime.mdl"
+ITEM.description = "В старые времена он шел в комплекте с текилой, но в данный момент просто элитный фрукт."
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 1
+ITEM.hunger_amount = 2
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

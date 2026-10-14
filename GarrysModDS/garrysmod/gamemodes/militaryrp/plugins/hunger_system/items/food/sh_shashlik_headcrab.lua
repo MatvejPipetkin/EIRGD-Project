@@ -1,0 +1,15 @@
+ITEM.name = "Шашлык из хедкраба"
+ITEM.model = "models/willardnetworks/food/meatskewer2.mdl"
+ITEM.description = "Шашлык из паразита, на вкус как дешевое и нежирное мясо. Хотя пахнет на удивление не мерзко."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 0
+ITEM.hunger_amount = 15
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 3

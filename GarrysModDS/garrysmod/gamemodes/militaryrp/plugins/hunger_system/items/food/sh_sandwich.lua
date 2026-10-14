@@ -1,0 +1,15 @@
+ITEM.name = "Сэндвич"
+ITEM.model = "models/willardnetworks/food/sandwich.mdl"
+ITEM.description = "Крупный сэндвич с большим количеством овощей. Говорят, что первый кто придумал такое сочетание имел Степень по Русской литературе и крупное телосложение."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 0
+ITEM.hunger_amount = 10
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

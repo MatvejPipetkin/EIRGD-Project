@@ -1,0 +1,15 @@
+ITEM.name = "Помидор"
+ITEM.model = "models/union/props/market_tomato_2.mdl"
+ITEM.description = "Известный красный сочный плод. Единственный вопрос: это овощ или ягода?"
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 30
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 4
+ITEM.hunger_amount = 4
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

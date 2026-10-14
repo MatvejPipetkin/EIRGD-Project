@@ -1,0 +1,15 @@
+ITEM.name = "Консервированная кукуруза"
+ITEM.model = "models/bioshockinfinite/xoffee_mug_closed.mdl"
+ITEM.description = "Кукуруза внутри банки с расолом полезна и вкусна."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 3
+ITEM.hunger_amount = 2
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 12

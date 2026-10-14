@@ -1,0 +1,16 @@
+ITEM.name = "Бурбон"
+ITEM.model = "models/hlvr/props/bottles/bottle_o_gin.mdl"
+ITEM.description = "Старая бутылка канадского бурбона, прекрасно сохранился для нашего времни."
+ITEM.category = "Еда"
+ITEM.useSound = "food/drinking.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 2
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 5
+ITEM.hunger_amount = -5
+ITEM.drunk_amount = 25
+ITEM.staminaAmount = -15
+ITEM.quantity = 7

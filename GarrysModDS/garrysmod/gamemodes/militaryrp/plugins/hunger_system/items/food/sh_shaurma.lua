@@ -1,0 +1,15 @@
+ITEM.name = "Шаурма"
+ITEM.model = "models/foodnhouseholditems/chicken_wrap.mdl"
+ITEM.description = "Вкусная теплая такая знакомая такая вкусная."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 2
+ITEM.hunger_amount = 9
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 9

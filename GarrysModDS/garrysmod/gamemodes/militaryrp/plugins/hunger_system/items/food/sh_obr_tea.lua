@@ -1,0 +1,15 @@
+ITEM.name = "Кружка чая"
+ITEM.model = "models/props_se/propper/metal_cup_mug.mdl"
+ITEM.description = "Терпкий вкус."
+ITEM.useSound = "food/drinking.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 7
+ITEM.hunger_amount = 0
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 4

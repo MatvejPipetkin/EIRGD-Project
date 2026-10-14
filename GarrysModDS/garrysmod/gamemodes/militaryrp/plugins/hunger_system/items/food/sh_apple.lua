@@ -1,0 +1,15 @@
+ITEM.name = "Яблоко"
+ITEM.model = "models/props/cryts_food/fruit_apple.mdl"
+ITEM.description = "Красное, сладкое, интересно, почему после употребления хочется спать вечно."
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 4
+ITEM.hunger_amount = 4
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 8

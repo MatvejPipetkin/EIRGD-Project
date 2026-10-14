@@ -1,0 +1,16 @@
+ITEM.name = "Самогон"
+ITEM.model = "models/willardnetworks/food/wine4.mdl"
+ITEM.description = "Старая заплесневелая бутылка с множеством трещин, внутри полупрозрачная жидкость, от которой сильно отдает спиртом."
+ITEM.category = "Еда"
+ITEM.useSound = "food/drinking.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 2
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 5
+ITEM.hunger_amount = -10
+ITEM.drunk_amount = 50
+ITEM.staminaAmount = -15
+ITEM.quantity = 7

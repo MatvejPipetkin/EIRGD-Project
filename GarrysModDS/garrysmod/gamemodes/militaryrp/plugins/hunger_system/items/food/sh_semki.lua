@@ -1,0 +1,15 @@
+ITEM.name = "Семечки"
+ITEM.model = "models/gibs/props_canteen/vm_sneckol.mdl"
+ITEM.description = "Упаковка с с черными зернышками которые можно очистить и есть."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 0
+ITEM.hunger_amount = 1
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 50

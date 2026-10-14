@@ -1,0 +1,15 @@
+ITEM.name = "Жареная гнилая плоть"
+ITEM.model = "models/willardnetworks/food/steak2.mdl"
+ITEM.description = "Жареная плоть, обработка толком не помогла, кусок полностью пригорел и отдал свой вонючий сок наружу, такое мясо могут есть только отбитые или отчаянные до невыносимости."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 0
+ITEM.hunger_amount = 10
+ITEM.drunk_amount = 10
+ITEM.staminaAmount = -10
+ITEM.quantity = 3

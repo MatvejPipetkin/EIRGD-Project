@@ -1,0 +1,15 @@
+ITEM.name = "Консервированная фасоль"
+ITEM.description = "Консервы с фасолью в томатном соусе."
+ITEM.model = "models/swas/swas_can_open01.mdl"
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10000
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 6
+ITEM.hunger_amount = 7
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

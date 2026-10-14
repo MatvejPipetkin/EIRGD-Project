@@ -1,1 +1,1 @@
-[{"allowPersonalFootstepVolume":false,"silentCrouching":true}]
+[{"allowPersonalFootstepVolume":false,"thirdperson":true,"silentCrouching":true,"day":2,"allowVoice":true,"inventoryHeight":5,"allowBusiness":false,"weaponAlwaysRaised":true,"inventoryWidth":8,"minDescriptionLength":0}]

@@ -1,0 +1,15 @@
+ITEM.name = "Апельсин"
+ITEM.model = "models/props/cryts_food/fruit_orange.mdl"
+ITEM.description = "Я знаю пароль, я вижу апельсин, я съем их три мешка и умру молодым."
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 3
+ITEM.hunger_amount = 3
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 6

@@ -1,0 +1,15 @@
+ITEM.name = "Сухарики"
+ITEM.model = "models/mosi/fallout4/props/food/squirrelcrispybits.mdl"
+ITEM.description = "Высушенные и разломленные куски хлеба. В целом будет сытнее, чем обычный хлеб. Может, у кого найдется сметанки и немного лука?"
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = -2
+ITEM.hunger_amount = 4
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 10

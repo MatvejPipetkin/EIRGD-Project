@@ -1,0 +1,15 @@
+ITEM.name = "Жареное мясо стража"
+ITEM.model = "models/willardnetworks/food/meat4.mdl"
+ITEM.description = "Жареное мясо стража, на вкус как дорогое мясо со старого мира: жилистое и сочное, такой деликатес подают только дорогим гостям."
+ITEM.useSound = "food/crunchy_double.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 0
+ITEM.hunger_amount = 15
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5

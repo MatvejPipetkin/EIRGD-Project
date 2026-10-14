@@ -1,0 +1,16 @@
+ITEM.name = "Водка"
+ITEM.model = "models/willardnetworks/food/alcohol_bottle.mdl"
+ITEM.description = "Алкоголь, который производят на территории Союза, на этикетке написано 40 градусов. Один из многих ликеров из глубины Родины."
+ITEM.category = "Еда"
+ITEM.useSound = "food/drinking.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 2
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 5
+ITEM.hunger_amount = -10
+ITEM.drunk_amount = 50
+ITEM.staminaAmount = -15
+ITEM.quantity = 7

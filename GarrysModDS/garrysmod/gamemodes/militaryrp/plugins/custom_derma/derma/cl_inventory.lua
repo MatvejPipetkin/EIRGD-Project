@@ -1,5 +1,127 @@
-
 local RECEIVER_NAME = "ixInventoryItem"
+
+-- общий стиль меню (тот же, что в cl_menu.lua / cl_character.lua)
+ix.menuStyle = ix.menuStyle or {accent = Color(90, 160, 235), projectName = "EIRGD"}
+
+--[[
+	НАСТРОЙКИ
+	Дизайн инвентаря: тёмная панель с акцентными линиями и уголками как в cl_menu,
+	сетка и предметы в стиле Escape from Tarkov (цветная подложка по категории,
+	короткое имя в левом верхнем углу, количество в правом нижнем).
+]]
+local CFG = {
+	cellSize = 110, -- размер одной ячейки в пикселях при высоте экрана 1080 (масштабируется под разрешение; было 64)
+	showNames = true, -- короткое название предмета в левом верхнем углу
+	showCount = true, -- количество / стак в правом нижнем углу
+	itemFillAlpha = 55, -- сила цветной подложки предмета
+	gridAlpha = 16, -- прозрачность линий сетки
+	columnMinWidth = 0, -- минимальная ширина правой колонки в долях ширины контента (0 = ровно по ширине инвентаря)
+	characterOverview = true -- показывать персонажа слева, пока открыта вкладка инвентаря
+}
+
+local function S(value)
+	return math.floor(value * ScrH() / 1080 + 0.5)
+end
+
+local function GetAccent()
+	return ix.menuStyle.accent or ix.config.Get("color") or Color(90, 160, 235)
+end
+
+-- цвета подложки предметов по категории (ключ — категория в нижнем регистре).
+-- Для отдельного предмета можно задать ITEM.invColor = Color(r, g, b)
+local DEFAULT_COLOR = Color(125, 140, 160)
+local CATEGORY_COLORS = {
+	["weapons"] = Color(205, 85, 75),
+	["weapon"] = Color(205, 85, 75),
+	["оружие"] = Color(205, 85, 75),
+	["ammo"] = Color(215, 165, 60),
+	["ammunition"] = Color(215, 165, 60),
+	["боеприпасы"] = Color(215, 165, 60),
+	["medical"] = Color(95, 200, 120),
+	["медицина"] = Color(95, 200, 120),
+	["consumables"] = Color(150, 190, 90),
+	["food"] = Color(150, 190, 90),
+	["еда"] = Color(150, 190, 90),
+	["clothing"] = Color(90, 150, 225),
+	["одежда"] = Color(90, 150, 225),
+	["tools"] = Color(170, 130, 215),
+	["инструменты"] = Color(170, 130, 215)
+}
+
+local COLOR_SHADOW = Color(0, 0, 0, 210)
+local COLOR_TEXT = Color(255, 255, 255, 235)
+local COLOR_GOOD = Color(110, 210, 130)
+local COLOR_BAD = Color(225, 85, 80)
+
+local function GetItemColor(item)
+	if (!item) then
+		return DEFAULT_COLOR
+	end
+
+	if (IsColor(item.invColor)) then
+		return item.invColor
+	end
+
+	if (item.isBag) then
+		return GetAccent()
+	end
+
+	local category = item.category
+
+	if (isstring(category)) then
+		category = category.utf8lower and category:utf8lower() or category:lower()
+
+		return CATEGORY_COLORS[category] or DEFAULT_COLOR
+	end
+
+	return DEFAULT_COLOR
+end
+
+-- количество предметов в стаке (если схема его поддерживает)
+local function GetItemAmount(item)
+	if (!item) then
+		return
+	end
+
+	local amount
+
+	if (isfunction(item.GetQuantity)) then
+		amount = item:GetQuantity()
+	end
+
+	if (!amount and isfunction(item.GetData)) then
+		amount = item:GetData("quantity") or item:GetData("amount") or item:GetData("stack")
+	end
+
+	amount = tonumber(amount or item.quantity)
+
+	if (amount and amount > 1) then
+		return math.floor(amount)
+	end
+end
+
+-- обрезает текст по ширине с многоточием (с учётом UTF-8)
+local function FitText(text, font, maxWidth)
+	surface.SetFont(font)
+
+	if (surface.GetTextSize(text) <= maxWidth) then
+		return text
+	end
+
+	local length = utf8.len(text) or #text
+
+	while (length > 1) do
+		length = length - 1
+
+		local cut = text:sub(1, (utf8.offset(text, length + 1) or (#text + 1)) - 1) .. "…"
+
+		if (surface.GetTextSize(cut) <= maxWidth) then
+			return cut
+		end
+	end
+
+	return "…"
+end
 
 -- The queue for the rendered icons.
 ICON_RENDER_QUEUE = ICON_RENDER_QUEUE or {}
@@ -253,10 +375,62 @@ function PANEL:Move(newX, newY, givenInventory, bNoSend)
 	end
 end
 
+-- короткое имя предмета, обрезанное по ширине иконки (кэшируется)
+function PANEL:GetShortName(maxWidth)
+	local item = self.itemTable
+	local name = item and (item.GetName and item:GetName() or item.name) or ""
+	local key = name .. "|" .. math.floor(maxWidth)
+
+	if (self.nameKey != key) then
+		self.nameKey = key
+		self.shortName = FitText(name, "ixMenuTinyFont", maxWidth)
+	end
+
+	return self.shortName
+end
+
+-- верхний слой: рамка, название, количество (поверх иконки модели)
 function PANEL:PaintOver(width, height)
 	local itemTable = self.itemTable
 
-	if (itemTable and itemTable.PaintOver) then
+	if (!itemTable) then
+		return
+	end
+
+	local color = GetItemColor(itemTable)
+	local accent = GetAccent()
+
+	draw.NoTexture()
+
+	if (self:IsHovered()) then
+		surface.SetDrawColor(255, 255, 255, 18)
+		surface.DrawRect(1, 1, width - 2, height - 2)
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 255)
+	else
+		surface.SetDrawColor(color.r, color.g, color.b, 150)
+	end
+
+	surface.DrawOutlinedRect(0, 0, width, height, 1)
+
+	if (CFG.showNames) then
+		local name = self:GetShortName(width - S(8))
+
+		draw.SimpleText(name, "ixMenuTinyFont", S(4) + 1, S(3) + 1, COLOR_SHADOW, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+		draw.SimpleText(name, "ixMenuTinyFont", S(4), S(3), COLOR_TEXT, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+	end
+
+	if (CFG.showCount) then
+		local amount = GetItemAmount(itemTable)
+
+		if (amount) then
+			local text = amount .. "x"
+
+			draw.SimpleText(text, "ixMenuTinyFont", width - S(4) + 1, height - S(3) + 1, COLOR_SHADOW, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			draw.SimpleText(text, "ixMenuTinyFont", width - S(4), height - S(3), COLOR_TEXT, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+		end
+	end
+
+	if (itemTable.PaintOver) then
 		itemTable.PaintOver(self, itemTable, width, height)
 	end
 end
@@ -264,9 +438,17 @@ end
 function PANEL:ExtraPaint(width, height)
 end
 
+-- подложка предмета: тёмная основа + цветная заливка по категории
 function PANEL:Paint(width, height)
-	surface.SetDrawColor(0, 0, 0, 85)
-	surface.DrawRect(2, 2, width - 4, height - 4)
+	local color = GetItemColor(self.itemTable)
+
+	draw.NoTexture()
+
+	surface.SetDrawColor(0, 0, 0, 110)
+	surface.DrawRect(1, 1, width - 2, height - 2)
+
+	surface.SetDrawColor(color.r, color.g, color.b, CFG.itemFillAlpha)
+	surface.DrawRect(1, 1, width - 2, height - 2)
 
 	self:ExtraPaint(width, height)
 end
@@ -280,7 +462,9 @@ AccessorFunc(PANEL, "iconSize", "IconSize", FORCE_NUMBER)
 AccessorFunc(PANEL, "bHighlighted", "Highlighted", FORCE_BOOL)
 
 function PANEL:Init()
-	self:SetIconSize(64)
+	self.headerH = S(34)
+
+	self:SetIconSize(S(CFG.cellSize))
 	self:ShowCloseButton(false)
 	self:SetDraggable(true)
 	self:SetSizable(true)
@@ -292,28 +476,49 @@ function PANEL:Init()
 	self.btnMaxim:SetVisible(false)
 	self.btnMaxim:SetMouseInputEnabled(false)
 
+	-- кнопка закрытия в стиле меню (используется у сумок)
+	self.btnClose:SetText("")
+	self.btnClose.Paint = function(button, width, height)
+		local accent = GetAccent()
+		local cx, cy, r = width * 0.5, height * 0.5, S(5)
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, button:IsHovered() and 255 or 150)
+		surface.DrawLine(cx - r, cy - r, cx + r, cy + r)
+		surface.DrawLine(cx - r, cy + r, cx + r, cy - r)
+	end
+
 	self.panels = {}
+end
+
+-- показываем только кнопку закрытия, кнопки сворачивания остаются скрытыми
+function PANEL:ShowCloseButton(bShow)
+	self.btnClose:SetVisible(bShow)
 end
 
 function PANEL:GetPadding(index)
 	return select(index, self:GetDockPadding())
 end
 
+-- заголовок рисуем сами в Paint, поэтому стандартную надпись DFrame скрываем
 function PANEL:SetTitle(text)
+	self.headerH = self.headerH or S(34)
+
 	if (text == nil) then
-		self.oldPadding = {self:GetDockPadding()}
+		self.titleText = nil
 
 		self.lblTitle:SetText("")
 		self.lblTitle:SetVisible(false)
 
-		self:DockPadding(5, 5, 5, 5)
+		self:DockPadding(4, 4, 4, 4)
 	else
-		if (self.oldPadding) then
-			self:DockPadding(unpack(self.oldPadding))
-			self.oldPadding = nil
-		end
+		local title = tostring(text)
 
-		BaseClass.SetTitle(self, text)
+		self.titleText = title.utf8upper and title:utf8upper() or title:upper()
+
+		self.lblTitle:SetText(title)
+		self.lblTitle:SetVisible(false)
+
+		self:DockPadding(4, self.headerH, 4, 4)
 	end
 end
 
@@ -420,9 +625,17 @@ end
 function PANEL:PerformLayout(width, height)
 	BaseClass.PerformLayout(self, width, height)
 
+	-- кнопка закрытия — квадрат в правой части шапки
+	if (IsValid(self.btnClose)) then
+		local size = self.headerH or S(34)
+
+		self.btnClose:SetSize(size, size)
+		self.btnClose:SetPos(width - size, 0)
+	end
+
 	if (self.Sizing and self.gridW and self.gridH) then
 		local newWidth = (width - 8) / self.gridW
-		local newHeight = (height - self:GetPadding(2) + self:GetPadding(4)) / self.gridH
+		local newHeight = (height - self:GetPadding(2) - self:GetPadding(4)) / self.gridH
 
 		self:SetIconSize((newWidth + newHeight) / 2)
 		self:RebuildItems()
@@ -452,9 +665,9 @@ function PANEL:BuildSlots()
 			slot.gridY = y
 			slot:SetPos((x - 1) * iconSize + 4, (y - 1) * iconSize + self:GetPadding(2))
 			slot:SetSize(iconSize, iconSize)
-			slot.Paint = function(panel, width, height)
-				derma.SkinFunc("PaintInventorySlot", panel, width, height)
-			end
+
+			-- сетка рисуется целиком в Paint инвентаря, сами ячейки ничего не рисуют
+			slot.Paint = function() end
 
 			self.slots[x][y] = slot
 		end
@@ -481,16 +694,32 @@ function PANEL:RebuildItems()
 	end
 end
 
+-- сколько ячеек занято предметами
+function PANEL:GetUsedSlots()
+	local used = 0
+
+	for _, icon in pairs(self.panels) do
+		if (IsValid(icon) and icon.gridW and icon.gridH) then
+			used = used + icon.gridW * icon.gridH
+		end
+	end
+
+	return used
+end
+
 function PANEL:PaintDragPreview(width, height, mouseX, mouseY, itemPanel)
 	local iconSize = self.iconSize
+	local half = iconSize * 0.5
 	local item = itemPanel:GetItemTable()
 
 	if (item) then
 		local inventory = ix.item.inventories[self.invID]
-		local dropX = math.ceil((mouseX - 4 - (itemPanel.gridW - 1) * 32) / iconSize)
-		local dropY = math.ceil((mouseY - self:GetPadding(2) - (itemPanel.gridH - 1) * 32) / iconSize)
+		local dropX = math.ceil((mouseX - 4 - (itemPanel.gridW - 1) * half) / iconSize)
+		local dropY = math.ceil((mouseY - self:GetPadding(2) - (itemPanel.gridH - 1) * half) / iconSize)
 
 		local hoveredPanel = vgui.GetHoveredPanel()
+
+		draw.NoTexture()
 
 		if (IsValid(hoveredPanel) and hoveredPanel != itemPanel and hoveredPanel.GetItemTable) then
 			local hoveredItem = hoveredPanel:GetItemTable()
@@ -499,12 +728,23 @@ function PANEL:PaintDragPreview(width, height, mouseX, mouseY, itemPanel)
 				local info = hoveredItem.functions.combine
 
 				if (info and info.OnCanRun and info.OnCanRun(hoveredItem, {item.id}) != false) then
-					surface.SetDrawColor(ColorAlpha(derma.GetColor("Info", self, Color(200, 0, 0)), 20))
+					local accent = GetAccent()
+
+					surface.SetDrawColor(accent.r, accent.g, accent.b, 40)
 					surface.DrawRect(
 						hoveredPanel.x,
 						hoveredPanel.y,
 						hoveredPanel:GetWide(),
 						hoveredPanel:GetTall()
+					)
+
+					surface.SetDrawColor(accent.r, accent.g, accent.b, 220)
+					surface.DrawOutlinedRect(
+						hoveredPanel.x,
+						hoveredPanel.y,
+						hoveredPanel:GetWide(),
+						hoveredPanel:GetTall(),
+						1
 					)
 
 					self.combineItem = hoveredItem
@@ -544,15 +784,15 @@ function PANEL:PaintDragPreview(width, height, mouseX, mouseY, itemPanel)
 		end
 
 		::finish::
-		local previewColor = ColorAlpha(derma.GetColor(bEmpty and "Success" or "Error", self, Color(200, 0, 0)), 20)
+		local previewColor = bEmpty and COLOR_GOOD or COLOR_BAD
+		local px = (dropX - 1) * iconSize + 4
+		local py = (dropY - 1) * iconSize + self:GetPadding(2)
 
-		surface.SetDrawColor(previewColor)
-		surface.DrawRect(
-			(dropX - 1) * iconSize + 4,
-			(dropY - 1) * iconSize + self:GetPadding(2),
-			itemPanel:GetWide(),
-			itemPanel:GetTall()
-		)
+		surface.SetDrawColor(previewColor.r, previewColor.g, previewColor.b, 40)
+		surface.DrawRect(px, py, itemPanel:GetWide(), itemPanel:GetTall())
+
+		surface.SetDrawColor(previewColor.r, previewColor.g, previewColor.b, 200)
+		surface.DrawOutlinedRect(px, py, itemPanel:GetWide(), itemPanel:GetTall(), 1)
 	end
 end
 
@@ -568,6 +808,90 @@ function PANEL:PaintOver(width, height)
 	end
 
 	self.previewPanel = nil
+end
+
+-- панель контейнера: тёмный фон, шапка с заголовком, сетка в стиле Tarkov, акцентные линии и уголки как в cl_menu
+function PANEL:Paint(width, height)
+	if (!self.bNoBackgroundBlur and ix.util.DrawBlur) then
+		ix.util.DrawBlur(self, 6)
+	end
+
+	local accent = GetAccent()
+	local headerH = self.titleText and self.headerH or 0
+
+	draw.NoTexture()
+
+	-- фон
+	surface.SetDrawColor(8, 11, 16, 215)
+	surface.DrawRect(0, 0, width, height)
+
+	-- сетка ячеек
+	if (self.gridW and self.gridH and self.iconSize) then
+		local iconSize = self.iconSize
+		local gx, gy = 4, self:GetPadding(2)
+		local gw, gh = self.gridW * iconSize, self.gridH * iconSize
+
+		surface.SetDrawColor(22, 27, 34, 235)
+		surface.DrawRect(gx, gy, math.floor(gw), math.floor(gh))
+
+		surface.SetDrawColor(255, 255, 255, CFG.gridAlpha)
+
+		for x = 0, self.gridW do
+			surface.DrawRect(math.floor(gx + x * iconSize), gy, 1, math.floor(gh) + 1)
+		end
+
+		for y = 0, self.gridH do
+			surface.DrawRect(gx, math.floor(gy + y * iconSize), math.floor(gw) + 1, 1)
+		end
+	end
+
+	-- шапка
+	if (headerH > 0) then
+		local centerY = math.floor(headerH * 0.5)
+
+		surface.SetDrawColor(0, 0, 0, 90)
+		surface.DrawRect(0, 0, width, headerH)
+
+		-- мягкое свечение под линией шапки
+		for i = 1, 6 do
+			surface.SetDrawColor(accent.r, accent.g, accent.b, 16 * (1 - i / 6) ^ 2)
+			surface.DrawRect(1, headerH + i - 1, width - 2, 1)
+		end
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 60)
+		surface.DrawRect(0, headerH - 1, width, 1)
+
+		-- яркий отрезок на линии и маркер у заголовка
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 230)
+		surface.DrawRect(S(8), headerH - 2, S(40), 3)
+		surface.DrawRect(S(8), centerY - S(7), 2, S(14))
+
+		draw.SimpleText(self.titleText, "ixMenuTabFontSmall", S(20), centerY, Color(255, 255, 255, 210), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+
+		if (self.gridW and self.gridH) then
+			local rightX = width - S(10) - (IsValid(self.btnClose) and self.btnClose:IsVisible() and headerH or 0)
+			local text = "ЯЧЕЙКИ  " .. self:GetUsedSlots() .. " / " .. (self.gridW * self.gridH)
+
+			draw.SimpleText(text, "ixMenuTinyFont", rightX, centerY, Color(accent.r, accent.g, accent.b, 200), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+		end
+	end
+
+	-- внешняя рамка
+	surface.SetDrawColor(accent.r, accent.g, accent.b, self.bHighlighted and 200 or 45)
+	surface.DrawOutlinedRect(0, 0, width, height, 1)
+
+	-- яркие уголки
+	local corner = S(10)
+
+	surface.SetDrawColor(accent.r, accent.g, accent.b, 230)
+	surface.DrawRect(0, 0, corner, 1)
+	surface.DrawRect(0, 0, 1, corner)
+	surface.DrawRect(width - corner, 0, corner, 1)
+	surface.DrawRect(width - 1, 0, 1, corner)
+	surface.DrawRect(0, height - 1, corner, 1)
+	surface.DrawRect(0, height - corner, 1, corner)
+	surface.DrawRect(width - corner, height - 1, corner, 1)
+	surface.DrawRect(width - 1, height - corner, 1, corner)
 end
 
 function PANEL:IsEmpty(x, y, this)
@@ -723,8 +1047,9 @@ function PANEL:ReceiveDrop(panels, bDropped, menuIndex, x, y)
 		local inventory = ix.item.inventories[self.invID]
 
 		if (inventory and panel.OnDrop) then
-			local dropX = math.ceil((x - 4 - (panel.gridW - 1) * 32) / self.iconSize)
-			local dropY = math.ceil((y - self:GetPadding(2) - (panel.gridH - 1) * 32) / self.iconSize)
+			local half = self.iconSize * 0.5
+			local dropX = math.ceil((x - 4 - (panel.gridW - 1) * half) / self.iconSize)
+			local dropY = math.ceil((y - self:GetPadding(2) - (panel.gridH - 1) * half) / self.iconSize)
 
 			panel:OnDrop(true, self, inventory, dropX, dropY)
 		end
@@ -747,13 +1072,15 @@ hook.Add("CreateMenuButtons", "ixInventory", function(tabs)
 	tabs["inv"] = {
 		bDefault = true,
 		Create = function(info, container)
+			-- колонка прижата к правому краю области контента, слева остаётся место под персонажа
 			local canvas = container:Add("DTileLayout")
 			local canvasLayout = canvas.PerformLayout
 			canvas.PerformLayout = nil -- we'll layout after we add the panels instead of each time one is added
 			canvas:SetBorder(0)
-			canvas:SetSpaceX(2)
-			canvas:SetSpaceY(2)
-			canvas:Dock(FILL)
+			canvas:SetSpaceX(S(6))
+			canvas:SetSpaceY(S(6))
+			canvas:Dock(RIGHT)
+			canvas:DockMargin(0, S(8), 0, 0)
 
 			ix.gui.menuInventoryContainer = canvas
 
@@ -761,7 +1088,7 @@ hook.Add("CreateMenuButtons", "ixInventory", function(tabs)
 			panel:SetPos(0, 0)
 			panel:SetDraggable(false)
 			panel:SetSizable(false)
-			panel:SetTitle(nil)
+			panel:SetTitle(L"inv")
 			panel.bNoBackgroundBlur = true
 			panel.childPanels = {}
 
@@ -772,6 +1099,9 @@ hook.Add("CreateMenuButtons", "ixInventory", function(tabs)
 			end
 
 			ix.gui.inv1 = panel
+
+			-- ширина колонки = ширина основного инвентаря (сумки встают под ним)
+			canvas:SetWide(math.max(panel:GetWide(), math.floor(container:GetWide() * CFG.columnMinWidth)))
 
 			if (inventory and ix.option.Get("openBags", true)) then
 				for k, _ in inventory:Iter() do
@@ -785,6 +1115,19 @@ hook.Add("CreateMenuButtons", "ixInventory", function(tabs)
 
 			canvas.PerformLayout = canvasLayout
 			canvas:Layout()
+		end,
+
+		-- персонаж слева, пока открыт инвентарь
+		OnSelected = function(info, container)
+			if (CFG.characterOverview and IsValid(ix.gui.menu)) then
+				ix.gui.menu:SetCharacterOverview(true)
+			end
+		end,
+
+		OnDeselected = function(info, container)
+			if (CFG.characterOverview and IsValid(ix.gui.menu)) then
+				ix.gui.menu:SetCharacterOverview(false)
+			end
 		end
 	}
 end)

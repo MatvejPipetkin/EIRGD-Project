@@ -1,0 +1,15 @@
+ITEM.name = "Питательная Жижа C-2"
+ITEM.model = "models/foodnhouseholdaaaaa/combirationb.mdl"
+ITEM.description = "Жижа со вкусом безвкустности."
+ITEM.useSound = "food/eating_long.wav"
+ITEM.width = 1
+ITEM.category = "[FOOD] Еда"
+ITEM.height = 1
+ITEM.price = 10
+ITEM.bDropOnDeath = true
+ITEM.destroy_item = true
+ITEM.thirst_amount = 15
+ITEM.hunger_amount = 15
+ITEM.drunk_amount = 0
+ITEM.staminaAmount = 0
+ITEM.quantity = 5
