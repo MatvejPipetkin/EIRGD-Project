@@ -1,0 +1,28 @@
+Тюленчик 🌊|9|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_character.lua:1850: '=' expected near '<eof>'
+  1. IncludeDir - gamemodes/helix/gamemode/core/sh_util.lua:85
+   2. Load - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:49
+    3. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:268
+     4. Initialize - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:256
+      5. Call - gamemodes/helix/gamemode/shared.lua:132
+       6. unknown - lua/includes/modules/gamemode.lua:33
+        7. DeriveGamemode - [C]:-1
+         8. unknown - gamemodes/militaryrp/gamemode/cl_init.lua:2
+
+
+
+Тюленчик 🌊|9|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_character.lua:1850: '=' expected near '<eof>'
+  1. IncludeDir - gamemodes/helix/gamemode/core/sh_util.lua:85
+   2. Load - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:49
+    3. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:268
+     4. Initialize - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:256
+      5. Call - gamemodes/helix/gamemode/shared.lua:132
+       6. unknown - lua/includes/modules/gamemode.lua:33
+        7. DeriveGamemode - [C]:-1
+         8. unknown - gamemodes/militaryrp/gamemode/cl_init.lua:2
+
+
+

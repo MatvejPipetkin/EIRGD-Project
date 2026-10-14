@@ -1,0 +1,8 @@
+"militaryrp"
+{
+	"base"		"helix"
+	"title"		"EIRGD | Military RP"
+	"author"	""
+	"category"	"rp"
+	"menusystem" "1"
+}
