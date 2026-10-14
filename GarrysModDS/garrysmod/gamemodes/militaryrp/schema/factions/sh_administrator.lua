@@ -1,5 +1,5 @@
 
-FACTION.name = "Тест"
+FACTION.name = "Тестовое изменение"
 FACTION.description = "A human Administrator advised by the Universal Union."
 FACTION.color = Color(255, 200, 100, 255)
 FACTION.pay = 50
