@@ -1,8 +1,6 @@
-
-FACTION.name = "Тест"
-FACTION.description = "A human Administrator advised by the Universal Union."
-FACTION.color = Color(255, 200, 100, 255)
-FACTION.pay = 50
+FACTION.name = "Фронт Возрождения Узирской Республики"
+FACTION.description = ""
+FACTION.color = Color(30, 144, 255, 255)
 FACTION.models = {
 	"models/humans/group17/female_01.mdl",
 	"models/humans/group17/female_02.mdl",
@@ -20,7 +18,7 @@ FACTION.models = {
 	"models/humans/group17/male_08.mdl",
 	"models/humans/group17/male_09.mdl"
 }
-FACTION.isDefault = false
-FACTION.isGloballyRecognized = true
+FACTION.isDefault = true
+FACTION.isGloballyRecognized = false
 
-FACTION_ADMIN = FACTION.index
+FACTION_FVUR = FACTION.index
