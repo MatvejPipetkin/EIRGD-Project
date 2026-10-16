@@ -1,5 +1,5 @@
 ITEM.name = "Рация"
-ITEM.model = "models/illusion/eftcontainers/gasanalyser.mdl"
+ITEM.model = "models/props_lab/tpplug.mdl"
 ITEM.description= "Переносное радио с двусторонней связью, которое позволяет общаться между двумя или более людьми на коротких расстояниях"
 ITEM.width = 1
 ITEM.height = 1

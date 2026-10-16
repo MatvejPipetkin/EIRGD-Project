@@ -8,11 +8,9 @@ function PLUGIN:PlayerTick(ply)
 	if not ply.NextStaminaBreathe or ply.NextStaminaBreathe <= CurTime() then
 		local stamina = ply:GetNetVar("stm", 100)
 		if stamina <= 25 then -- change the '10' to whatever you want for a reasonable number.
-			ply:EmitSound("player/heartbeat1.wav", 40)
 			ply:EmitSound("player/breathe1.wav", 40)
 			ix.StaminaBreathe = true
 			timer.Simple(3.9, function()
-				ply:StopSound("player/heartbeat1.wav")
 				ply:StopSound("player/breathe1.wav")
 				ix.StaminaBreathe = false
 			end)

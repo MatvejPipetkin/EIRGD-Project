@@ -1150,3 +1150,987 @@ Class 'elite_overwatch_soldier' does not have a valid faction!
 Class 'metropolice_recruit' does not have a valid faction!
 
 
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/plugins/wepselect.lua:773: attempt to index local 'draw' (a number value)
+  1. DrawSwitch - gamemodes/helix/plugins/wepselect.lua:773
+   2. v - gamemodes/helix/plugins/wepselect.lua:805
+    3. unknown - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:347
+
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|13|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|13|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|13|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|13|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|13|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+

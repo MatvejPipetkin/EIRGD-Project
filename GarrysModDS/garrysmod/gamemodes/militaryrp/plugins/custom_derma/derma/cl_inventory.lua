@@ -1100,6 +1100,9 @@ hook.Add("CreateMenuButtons", "ixInventory", function(tabs)
 
 			ix.gui.inv1 = panel
 
+			-- точка расширения: плагины могут добавить свою панель сразу под основной сеткой (до сумок)
+			hook.Run("CreateInventoryFooter", canvas, panel)
+
 			-- ширина колонки = ширина основного инвентаря (сумки встают под ним)
 			canvas:SetWide(math.max(panel:GetWide(), math.floor(container:GetWide() * CFG.columnMinWidth)))
 

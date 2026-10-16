@@ -112,16 +112,6 @@ if (CLIENT) then
 			ix.util.DrawBlurAt(0, 0, ScrW(), ScrH(), blur)
 		end
 	end
-	
-	do
-		ix.bar.Add(function()
-			return (1 - LocalPlayer():GetHungerPercent())
-		end, Color(0, 153, 51), nil, "hunger")
-		
-		ix.bar.Add(function()
-			return (1 - LocalPlayer():GetThirstPercent())
-		end, Color(0, 255, 255), nil, "thirst")
-	end
 end
 
 --[[ Clockwork ]]

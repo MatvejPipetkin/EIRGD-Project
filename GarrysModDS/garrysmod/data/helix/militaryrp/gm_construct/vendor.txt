@@ -1,1 +1,1 @@
-[[{"scale":0.5,"angles":"{0 187.608 0}","factions":[],"bubble":false,"classes":[],"pos":"[-1234.823 341.3875 -148]","skin":0,"items":[],"model":"models/mossman.mdl","bodygroups":{"0":0},"name":"John Doe","description":""}]]
+[[]]
