@@ -4,6 +4,7 @@ ITEM.model = Model("models/items/healthkit.mdl")
 ITEM.description = "A white packet filled with medication."
 ITEM.category = "Medical"
 ITEM.price = 65
+ITEM.bDropOnDeath = true
 
 ITEM.functions.Apply = {
 	sound = "items/medshot4.wav",

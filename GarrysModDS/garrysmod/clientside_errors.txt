@@ -2454,3 +2454,1440 @@ Class 'elite_overwatch_soldier' does not have a valid faction!
 Class 'metropolice_recruit' does not have a valid faction!
 
 
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|3|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] vgui.Create failed to create the VGUI component (ixMilTablet)
+  1. func - gamemodes/militaryrp/plugins/military_tablet/cl_tabletnet.lua:20
+   2. unknown - lua/includes/extensions/net.lua:34
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/military_tablet/cl_tabletnet.lua:21: attempt to index local 'panel' (a nil value)
+  1. func - gamemodes/militaryrp/plugins/military_tablet/cl_tabletnet.lua:21
+   2. unknown - lua/includes/extensions/net.lua:34
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] vgui.Create failed to create the VGUI component (ixMilTablet)
+  1. func - gamemodes/militaryrp/plugins/military_tablet/cl_tabletnet.lua:20
+   2. unknown - lua/includes/extensions/net.lua:34
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/military_tablet/cl_tabletnet.lua:21: attempt to index local 'panel' (a nil value)
+  1. func - gamemodes/militaryrp/plugins/military_tablet/cl_tabletnet.lua:21
+   2. unknown - lua/includes/extensions/net.lua:34
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. unknown - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:462
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. unknown - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:462
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. unknown - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:462
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. unknown - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:462
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. unknown - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:462
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/helix/gamemode/core/sh_util.lua:568: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawPrecachedArc - gamemodes/helix/gamemode/core/sh_util.lua:568
+    3. DrawArc - gamemodes/helix/gamemode/core/sh_util.lua:563
+     4. DrawItemPickup - gamemodes/helix/gamemode/core/libs/cl_hud.lua:33
+      5. DrawAll - gamemodes/helix/gamemode/core/libs/cl_hud.lua:87
+       6. unknown - gamemodes/helix/gamemode/core/hooks/cl_hooks.lua:661
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415
+   2. Update - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1513
+    3. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1643
+     4. TransitionSubpanel - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:256
+      5. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:403
+       6. SetSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:285
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:337
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1446
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415
+   2. Update - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1513
+    3. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1643
+     4. TransitionSubpanel - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:256
+      5. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:403
+       6. SetSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:285
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:337
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1415
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1446
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:166: initial position is a continuation byte
+  1. error - [C]:-1
+   2. offset - lua/includes/modules/utf8.lua:260
+    3. FitText - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:166
+     4. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:783
+      5. PaintManual - [C]:-1
+       6. PaintSubpanels - gamemodes/militaryrp/plugins/custom_derma/derma/cl_subpanel.lua:303
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:780
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:166: initial position is a continuation byte
+  1. error - [C]:-1
+   2. offset - lua/includes/modules/utf8.lua:260
+    3. FitText - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:166
+     4. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:783
+      5. PaintManual - [C]:-1
+       6. PaintSubpanels - gamemodes/militaryrp/plugins/custom_derma/derma/cl_subpanel.lua:303
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:780
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:166: initial position is a continuation byte
+  1. error - [C]:-1
+   2. offset - lua/includes/modules/utf8.lua:260
+    3. FitText - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:166
+     4. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:783
+      5. PaintManual - [C]:-1
+       6. PaintSubpanels - gamemodes/militaryrp/plugins/custom_derma/derma/cl_subpanel.lua:303
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:780
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. Update - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1285
+    3. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1413
+     4. TransitionSubpanel - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:256
+      5. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:403
+       6. SetSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:285
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:337
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. Update - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1285
+    3. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1413
+     4. TransitionSubpanel - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:256
+      5. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:403
+       6. SetSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:285
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:337
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. Update - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1285
+    3. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1413
+     4. TransitionSubpanel - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:256
+      5. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:403
+       6. SetSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:285
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:337
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. Update - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1285
+    3. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1413
+     4. TransitionSubpanel - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:256
+      5. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:403
+       6. SetSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:285
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:337
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. Update - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1285
+    3. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1413
+     4. TransitionSubpanel - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:256
+      5. OnSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menu.lua:403
+       6. SetSelected - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:285
+        7. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_menubutton.lua:337
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183: attempt to call method 'TimeConnected' (a nil value)
+  1. UpdateLive - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1183
+   2. unknown - gamemodes/militaryrp/plugins/custom_derma/derma/cl_information.lua:1216
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'citizen' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'cwu' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_metropolice' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'elite_overwatch_soldier' does not have a valid faction!
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+Class 'metropolice_recruit' does not have a valid faction!
+
+

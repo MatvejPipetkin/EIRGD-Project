@@ -1,4 +1,3 @@
-
 --- Various useful helper functions.
 -- @module ix.util
 
@@ -565,7 +564,10 @@ if (CLIENT) then
 
 	function ix.util.DrawPrecachedArc(arc) -- Draw a premade arc.
 		for _, v in ipairs(arc) do
-			surface.DrawPoly(v)
+			-- DrawPoly errors out if given fewer than three vertices.
+			if (#v >= 3) then
+				surface.DrawPoly(v)
+			end
 		end
 	end
 
@@ -579,6 +581,12 @@ if (CLIENT) then
 		-- Define step
 		-- roughness = roughness or 1
 		local diff = abs(startang - endang)
+
+		-- Nothing to draw (also avoids log(0) and a zero step).
+		if (diff == 0) then
+			return quadarc
+		end
+
 		local smoothness = log(diff, 2) / 2
 		local step = diff / (pow(2, smoothness))
 
@@ -615,19 +623,14 @@ if (CLIENT) then
 			ct = ct + 1
 		end
 
-		-- QUAD the points.
-		for tri = 1, ct do
-			local p1, p2, p3, p4
+		-- QUAD the points. (ct - 1 points give ct - 2 quads; going further produces polygons with nil vertices)
+		for tri = 1, ct - 2 do
 			local t = tri + 1
-			p1 = outer[tri]
-			p2 = outer[t]
-			p3 = inner[t]
-			p4 = inner[tri]
 
-			quadarc[tri] = {p1, p2, p3, p4}
+			quadarc[tri] = {outer[tri], outer[t], inner[t], inner[tri]}
 		end
 
-		-- Return a table of triangles to draw.
+		-- Return a table of quads to draw.
 		return quadarc
 	end
 
