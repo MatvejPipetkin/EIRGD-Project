@@ -71,5 +71,106 @@ ix.command.Add("TabletIssue", {
 	end
 })
 
+-- ----- Админские команды: боец ищется по нику (можно часть ника, регистр не важен). -----
+-- Ник идёт последним аргументом, поэтому кавычки при пробелах не нужны.
+
+ix.command.Add("TabletResetAccount", {
+	description = "Удалить аккаунт планшета (логин и пароль) у бойца по нику. Использование: /TabletResetAccount <ник>",
+	adminOnly = true,
+	arguments = ix.type.text,
+	OnRun = function(self, client, name)
+		local id, entry, err = PLUGIN:FindRosterByName(name, client)
+
+		if (!id) then return err end
+
+		local _, msg = PLUGIN:AdminResetAccount(client, id, entry)
+
+		return msg
+	end
+})
+
+ix.command.Add("TabletRemove", {
+	description = "ПОЛНОСТЬЮ удалить бойца из планшета: аккаунт, звание, выговоры, поощрения, сообщения и записки. Использование: /TabletRemove <ник>",
+	adminOnly = true,
+	arguments = ix.type.text,
+	OnRun = function(self, client, name)
+		local id, entry, err = PLUGIN:FindRosterByName(name, client)
+
+		if (!id) then return err end
+
+		local _, msg = PLUGIN:AdminRemove(client, id, entry)
+
+		return msg
+	end
+})
+
+ix.command.Add("TabletRestore", {
+	description = "Вернуть исключённого бойца в состав планшета (начнёт со звания 1). Использование: /TabletRestore <ник персонажа на сервере>",
+	adminOnly = true,
+	arguments = ix.type.character,
+	OnRun = function(self, client, target)
+		local _, msg = PLUGIN:AdminRestore(client, target)
+
+		return msg
+	end
+})
+
+ix.command.Add("TabletSetRank", {
+	description = "Установить звание бойцу (номером или названием). Использование: /TabletSetRank <звание> <ник>",
+	adminOnly = true,
+	arguments = {ix.type.string, ix.type.text},
+	OnRun = function(self, client, rank, name)
+		local id, entry, err = PLUGIN:FindRosterByName(name, client)
+
+		if (!id) then return err end
+
+		local _, msg = PLUGIN:AdminSetRank(client, id, entry, rank)
+
+		return msg
+	end
+})
+
+local CLEAR_KINDS = {
+	rep = "rep", reprimands = "rep", ["выговоры"] = "rep", ["выговор"] = "rep",
+	com = "com", commends = "com", ["поощрения"] = "com", ["поощрение"] = "com",
+	all = "all", ["все"] = "all"
+}
+
+ix.command.Add("TabletClearRecords", {
+	description = "Очистить записи бойца: rep (выговоры), com (поощрения) или all. Использование: /TabletClearRecords <rep|com|all> <ник>",
+	adminOnly = true,
+	arguments = {ix.type.string, ix.type.text},
+	OnRun = function(self, client, kind, name)
+		local mode = CLEAR_KINDS[string.lower(kind)]
+
+		if (!mode) then
+			return "Укажите, что очистить: rep (выговоры), com (поощрения) или all."
+		end
+
+		local id, entry, err = PLUGIN:FindRosterByName(name, client)
+
+		if (!id) then return err end
+
+		local _, msg = PLUGIN:AdminClearRecords(client, id, entry, mode)
+
+		return msg
+	end
+})
+
+ix.command.Add("TabletInfo", {
+	description = "Показать данные бойца в планшете: звание, аккаунт, устройство, записи. Использование: /TabletInfo <ник>",
+	adminOnly = true,
+	arguments = ix.type.text,
+	OnRun = function(self, client, name)
+		local id, entry, err = PLUGIN:FindRosterByName(name, client)
+
+		if (!id) then return err end
+
+		for _, line in ipairs(PLUGIN:AdminInfoLines(id, entry)) do
+			client:ChatPrint(line)
+		end
+	end
+})
+
 ix.util.Include("sv_tablet.lua")
 ix.util.Include("cl_tabletnet.lua")

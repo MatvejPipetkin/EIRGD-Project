@@ -28,6 +28,42 @@ local function DateLong()
 	return string.format("%s, %d %s %d", DAYS[t.wday], t.day, MONTHS[t.month], t.year)
 end
 
+-- Сглаженная линия: два прохода (широкий полупрозрачный + тонкий плотный),
+-- чтобы убрать "лесенку" на диагоналях. Вершины идут по часовой (требование DrawPoly).
+local function SoftLine(x1, y1, x2, y2, thick, col)
+	local dx, dy = x2 - x1, y2 - y1
+	local len = math.sqrt(dx * dx + dy * dy)
+
+	if (len < 0.01) then return end
+
+	dx, dy = dx / len, dy / len
+
+	draw.NoTexture()
+
+	for pass = 1, 2 do
+		local hw = (pass == 1 and thick + 1.2 or thick) * 0.5
+		local nx, ny = -dy * hw, dx * hw
+
+		surface.SetDrawColor(col.r, col.g, col.b, pass == 1 and col.a * 0.3 or col.a)
+		surface.DrawPoly({
+			{x = x1 - nx, y = y1 - ny},
+			{x = x2 - nx, y = y2 - ny},
+			{x = x2 + nx, y = y2 + ny},
+			{x = x1 + nx, y = y1 + ny}
+		})
+	end
+end
+
+-- Контур замкнутого многоугольника из сглаженных линий + круглые стыки.
+local function SoftOutline(pts, thick, col)
+	for i = 1, #pts do
+		local a, b = pts[i], pts[i % #pts + 1]
+
+		SoftLine(a.x, a.y, b.x, b.y, thick, col)
+		Circle(a.x, a.y, thick * 0.5, col, 16)
+	end
+end
+
 local function Greeting()
 	local h = tonumber(os.date("%H"))
 
@@ -146,8 +182,6 @@ function PANEL:Init()
 
 	-- Блики стекла и всплывающие уведомления.
 	self.screen.PaintOver = function(_, sw, sh)
-		Poly(Color(255, 255, 255, 5), {{x = 0, y = 0}, {x = sw * 0.5, y = 0}, {x = 0, y = sh * 0.7}})
-		Poly(Color(255, 255, 255, 3), {{x = sw * 0.55, y = 0}, {x = sw * 0.62, y = 0}, {x = 0, y = sh * 0.9}, {x = 0, y = sh * 0.78}})
 		Outline(0, 0, sw, sh, Color(0, 0, 0, 160))
 
 		local t = self.toast
@@ -213,7 +247,13 @@ end
 function PANEL:Paint(w, h)
 	surface.SetDrawColor(255, 255, 255, 255)
 	surface.SetMaterial(self.frame)
+
+	-- Анизотропная фильтрация убирает пикселизацию рамки при масштабировании.
+	render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+	render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 	surface.DrawTexturedRect(0, 0, w, h)
+	render.PopFilterMin()
+	render.PopFilterMag()
 end
 
 function PANEL:Think()
@@ -331,16 +371,13 @@ function PANEL:ShowLogin()
 		local sy = h * 0.2 + S(140)
 		local sh = S(46)
 
-		Poly(ColorAlpha(fcol, 60), {
+		local shield = {
 			{x = lx, y = sy}, {x = lx + sh, y = sy}, {x = lx + sh, y = sy + sh * 0.55},
 			{x = lx + sh / 2, y = sy + sh * 1.1}, {x = lx, y = sy + sh * 0.55}
-		})
-		surface.SetDrawColor(fcol)
-		surface.DrawLine(lx, sy, lx + sh, sy)
-		surface.DrawLine(lx + sh, sy, lx + sh, sy + sh * 0.55)
-		surface.DrawLine(lx + sh, sy + sh * 0.55, lx + sh / 2, sy + sh * 1.1)
-		surface.DrawLine(lx + sh / 2, sy + sh * 1.1, lx, sy + sh * 0.55)
-		surface.DrawLine(lx, sy + sh * 0.55, lx, sy)
+		}
+
+		Poly(ColorAlpha(fcol, 60), shield)
+		SoftOutline(shield, S(2), ColorAlpha(fcol, 255))
 
 		draw.SimpleText(fname, "ixTabletM", lx + sh + S(16), sy + S(4), C.text)
 		draw.SimpleText("Служебный терминал", "ixTabletS", lx + sh + S(16), sy + S(28), C.dim)
@@ -423,11 +460,11 @@ function PANEL:StartBoot()
 		Ring(cx, cy, S(34), ColorAlpha(C.accent, 70))
 		Circle(cx, cy, S(5), C.accent)
 
-		for i = 0, 10 do
-			local a1, a2 = t * 4 + i * 0.1, t * 4 + (i + 1) * 0.1
+		-- Дуга спиннера: много коротких сегментов со сглаженной толщиной.
+		for i = 0, 29 do
+			local a1, a2 = t * 4 + i * 0.04, t * 4 + (i + 1) * 0.04
 
-			surface.SetDrawColor(ColorAlpha(C.accent, 255 - i * 22))
-			surface.DrawLine(cx + math.cos(a1) * S(34), cy + math.sin(a1) * S(34), cx + math.cos(a2) * S(34), cy + math.sin(a2) * S(34))
+			SoftLine(cx + math.cos(a1) * S(34), cy + math.sin(a1) * S(34), cx + math.cos(a2) * S(34), cy + math.sin(a2) * S(34), S(2), ColorAlpha(C.accent, 255 - i * 8))
 		end
 
 		local bw = S(240)
@@ -461,7 +498,7 @@ function PANEL:ShowMain()
 
 		Box(0, 0, w, h, C.panel)
 		Box(0, h - 1, w, 1, C.line)
-		draw.RoundedBox(4, S(16), h / 2 - S(4), S(8), S(8), me.color)
+		Circle(S(20), h / 2, S(4), me.color, 32)
 		draw.SimpleText(me.factionName, "ixTabletS", S(32), h / 2, C.text, 0, 1)
 		draw.SimpleText(me.rankName .. " — " .. me.name, "ixTabletS", w - S(110), h / 2, C.dim, TEXT_ALIGN_RIGHT, 1)
 	end
@@ -711,7 +748,7 @@ function PANEL:Tab_home(p)
 		r:DockMargin(0, 0, S(6), 0)
 
 		r.Paint = function(_, w, h)
-			Circle(S(6), h / 2, S(4), C.ok, 12)
+			Circle(S(6), h / 2, S(4), C.ok, 32)
 			draw.SimpleText(Trunc(e.name, w - S(50), "ixTabletS"), "ixTabletS", S(18), h / 2 - S(7), C.text, 0, 1)
 			draw.SimpleText(st.ranks[e.rank] or "?", "ixTabletT", S(18), h / 2 + S(9), C.dim, 0, 1)
 			Chevrons(w - S(24), h / 2 - S(8), math.min(e.rank, 3), C.dim, S(14))
@@ -725,7 +762,7 @@ function PANEL:Tab_profile(p)
 	local st = ix.tablet.state
 	local me = st.me
 
-	PageHeader(p, "Профиль", "логин: " .. me.login)
+	PageHeader(p, "Профиль", "логин: " .. me.login .. "   |   ID: " .. tostring(me.id))
 
 	local info = p:Add("EditablePanel")
 	info:Dock(TOP)
@@ -887,8 +924,8 @@ function PANEL:Tab_roster(p)
 		head.Paint = function(_, w)
 			draw.SimpleText(Trunc(e.name, w - S(170), "ixTabletL"), "ixTabletL", S(88), S(2), C.text)
 			draw.SimpleText((st.ranks[e.rank] or "?") .. "  (" .. e.rank .. "/" .. #st.ranks .. ")", "ixTabletS", S(88), S(34), C.accent)
-			draw.SimpleText("В составе с " .. os.date("%d.%m.%Y", e.since or 0), "ixTabletT", S(88), S(54), C.dim)
-			draw.SimpleText(e.online and "На связи" or ("Был(а) в сети: " .. (e.seen and Ago(e.seen) or "давно")), "ixTabletT", S(88), S(68), e.online and C.ok or C.dim)
+			draw.SimpleText("В составе с " .. os.date("%d.%m.%Y", e.since or 0) .. "   |   ID: " .. tostring(e.id), "ixTabletT", S(88), S(54), C.dim)
+			draw.SimpleText(e.online and "На связи" or ("Не в сети  |  был(а) в сети: " .. (e.seen and Ago(e.seen) or "давно")), "ixTabletT", S(88), S(68), e.online and C.ok or C.dim)
 
 			Chevrons(w - S(40), S(8), e.rank, C.accent, S(26))
 		end
@@ -1049,9 +1086,19 @@ function PANEL:Tab_roster(p)
 				Box(0, 0, w, h, ColorAlpha(C.accent, sel and 28 or s.hover * 14))
 				Outline(0, 0, w, h, sel and C.accent or C.line)
 
-				Circle(S(14), h / 2, S(4), e.online and C.ok or C.line, 12)
+				Circle(S(14), h / 2, S(4), e.online and C.ok or C.line, 32)
 				draw.SimpleText(Trunc(e.name, w - S(110), "ixTabletS"), "ixTabletS", S(28), h / 2 - S(8), C.text, 0, 1)
-				draw.SimpleText(st.ranks[e.rank] or "?", "ixTabletT", S(28), h / 2 + S(9), C.dim, 0, 1)
+				local rankText = st.ranks[e.rank] or "?"
+
+				draw.SimpleText(rankText, "ixTabletT", S(28), h / 2 + S(9), C.dim, 0, 1)
+
+				-- Подпись для игроков, которых нет на сервере.
+				if (!e.online) then
+					surface.SetFont("ixTabletT")
+					local rw = surface.GetTextSize(rankText)
+
+					draw.SimpleText("·  Не в сети", "ixTabletT", S(28) + rw + S(6), h / 2 + S(9), C.danger, 0, 1)
+				end
 
 				Chevrons(w - S(26), h / 2 - S(10), math.min(e.rank, 4), C.dim, S(14))
 
@@ -1302,7 +1349,7 @@ function PANEL:Tab_messages(p)
 				Box(0, 0, w, h, ColorAlpha(C.accent, sel and 28 or s.hover * 14))
 				Outline(0, 0, w, h, sel and C.accent or C.line)
 
-				if (!m.read) then Circle(S(12), S(14), S(4), C.warn, 12) end
+				if (!m.read) then Circle(S(12), S(14), S(4), C.warn, 32) end
 
 				draw.SimpleText(Trunc(m.fromName, w - S(24), "ixTabletS"), "ixTabletS", S(24), S(14), m.read and C.dim or C.text, 0, 1)
 				draw.SimpleText(Trunc(m.text, w - S(20), "ixTabletT"), "ixTabletT", S(12), S(32), C.dim, 0, 1)
@@ -1422,7 +1469,7 @@ function PANEL:Tab_messages(p)
 
 				Box(0, 0, w, h, ColorAlpha(C.accent, sel and 28 or s.hover * 14))
 				Outline(0, 0, w, h, sel and C.accent or C.line)
-				Circle(S(12), h / 2, S(4), e.online and C.ok or C.line, 12)
+				Circle(S(12), h / 2, S(4), e.online and C.ok or C.line, 32)
 				draw.SimpleText(Trunc(e.name, w - S(30), "ixTabletS"), "ixTabletS", S(24), h / 2 - S(6), C.text, 0, 1)
 				draw.SimpleText(st.ranks[e.rank] or "?", "ixTabletT", S(24), h / 2 + S(9), C.dim, 0, 1)
 			end
