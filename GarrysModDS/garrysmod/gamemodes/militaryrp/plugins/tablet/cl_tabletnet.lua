@@ -10,6 +10,7 @@ end
 
 net.Receive("ixTablet.Open", function()
 	local hasAccount = net.ReadBool()
+	local info = net.ReadTable()
 
 	if (IsValid(ix.tablet.panel)) then
 		ix.tablet.panel:Remove()
@@ -19,6 +20,7 @@ net.Receive("ixTablet.Open", function()
 
 	local panel = vgui.Create("ixMilTablet")
 	panel.hasAccount = hasAccount
+	panel.regLogin = info and info.login
 	panel:ShowLogin()
 
 	ix.tablet.panel = panel

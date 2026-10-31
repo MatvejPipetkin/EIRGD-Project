@@ -13,20 +13,33 @@ end
 
 -- ========== Хранилище ==========
 
+-- После загрузки из JSON ключи вида "123" превращаются в числа 123.
+-- Возвращаем их обратно в строки, иначе db.accounts[id] не находит записи
+-- и после перезапуска сервера снова открывается окно регистрации.
+local function StringKeys(tbl)
+	local out = {}
+
+	for k, v in pairs(tbl or {}) do
+		out[tostring(k)] = v
+	end
+
+	return out
+end
+
 local function BuildDB(saved)
 	saved = saved or {}
 
 	return {
-		accounts = saved.accounts or {},
-		roster = saved.roster or {},
-		notes = saved.notes or {},
-		markers = saved.markers or {},
-		orders = saved.orders or {},
-		messages = saved.messages or {},
+		accounts = StringKeys(saved.accounts),
+		roster = StringKeys(saved.roster),
+		notes = StringKeys(saved.notes),
+		markers = StringKeys(saved.markers),
+		orders = StringKeys(saved.orders),
+		messages = StringKeys(saved.messages),
 		log = saved.log or {},
 		nextID = saved.nextID or 1,
 		serial = saved.serial or 0,
-		removed = saved.removed or {}
+		removed = StringKeys(saved.removed)
 	}
 end
 
@@ -61,6 +74,55 @@ end
 
 local function Clean(value, max)
 	return string.sub(string.Trim(tostring(value or "")), 1, max)
+end
+
+-- Нижний регистр с учётом кириллицы (string.lower её не понижает).
+local function LowerName(text)
+	return (string.gsub(string.lower(tostring(text or "")), utf8.charpattern, function(ch)
+		local ok, cp = pcall(utf8.codepoint, ch)
+
+		if (!ok) then return ch end
+		if (cp >= 0x410 and cp <= 0x42F) then return utf8.char(cp + 32) end
+		if (cp == 0x401) then return utf8.char(0x451) end
+
+		return ch
+	end))
+end
+
+-- Приведение логина к единому виду: без регистра, без лишних пробелов, не длиннее max символов.
+local function NormalizeLogin(text, max)
+	text = LowerName(string.Trim(tostring(text or "")))
+	text = string.gsub(text, "%s+", " ")
+	max = max or 80
+
+	local len = utf8.len(text)
+
+	if (len and len > max) then
+		text = string.sub(text, 1, utf8.offset(text, max + 1) - 1)
+	elseif (!len) then
+		text = string.sub(text, 1, max)
+	end
+
+	return string.Trim(text)
+end
+
+-- Логин при регистрации = ник персонажа. Если такой логин уже занят
+-- другим аккаунтом (одинаковые ники), добавляется ID персонажа.
+function PLUGIN:MakeLogin(char)
+	local id = tostring(char:GetID())
+	local login = NormalizeLogin(char:GetName(), 64)
+
+	if (login == "") then
+		login = "user"
+	end
+
+	for accID, other in pairs(self.db.accounts) do
+		if (accID != id and other.login == login) then
+			return login .. "_" .. id
+		end
+	end
+
+	return login
 end
 
 local function Send(client, action, data)
@@ -383,6 +445,7 @@ function ix.tablet.Open(client, item)
 	net.Start("ixTablet.Open")
 		net.WriteBool(acc != nil)
 		net.WriteTable({
+			login = (acc == nil and owner == id) and PLUGIN:MakeLogin(char) or nil,
 			serial = item:GetData("serial"),
 			owner = item:GetData("ownerName") or entry.name or "?",
 			issued = item:GetData("issued"),
@@ -692,7 +755,7 @@ function PLUGIN:HandleRequest(client, action, data)
 			return Err(client, "Слишком много попыток. Подождите.")
 		end
 
-		local login = string.lower(Clean(data.login, 24))
+		local login = NormalizeLogin(data.login)
 		local pass = Clean(data.pass, 32)
 		local acc = db.accounts[id]
 		local registered = false
@@ -711,19 +774,12 @@ function PLUGIN:HandleRequest(client, action, data)
 				return Err(client, "Зарегистрировать доступ может только владелец планшета.")
 			end
 
-			if (#login < 3 or !string.match(login, "^[%w_%.%-]+$")) then
-				return Err(client, "Логин: 3–24 символа, латиница, цифры, _ . -")
-			end
-
 			if (#pass < 4) then
 				return Err(client, "Пароль должен быть не короче 4 символов.")
 			end
 
-			for _, other in pairs(db.accounts) do
-				if (other.login == login) then
-					return Err(client, "Этот логин уже занят.")
-				end
-			end
+			-- Логин не вводится игроком: он берётся из ника персонажа.
+			login = self:MakeLogin(char)
 
 			local salt = util.SHA1(tostring(SysTime()) .. math.random())
 			-- Пока только в памяти: на диск уходит после успешной отправки данных клиенту.
@@ -1188,19 +1244,6 @@ end
 
 -- ========== Админские команды ==========
 -- Сами команды объявлены в sh_plugin.lua, вся логика — здесь.
-
--- Нижний регистр с учётом кириллицы (string.lower её не понижает).
-local function LowerName(text)
-	return (string.gsub(string.lower(tostring(text or "")), utf8.charpattern, function(ch)
-		local ok, cp = pcall(utf8.codepoint, ch)
-
-		if (!ok) then return ch end
-		if (cp >= 0x410 and cp <= 0x42F) then return utf8.char(cp + 32) end
-		if (cp == 0x401) then return utf8.char(0x451) end
-
-		return ch
-	end))
-end
 
 local function AdminName(admin)
 	return IsValid(admin) and admin:Name() or "Консоль"

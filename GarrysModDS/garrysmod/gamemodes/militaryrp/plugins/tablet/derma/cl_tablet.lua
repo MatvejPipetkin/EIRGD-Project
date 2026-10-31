@@ -64,6 +64,232 @@ local function SoftOutline(pts, thick, col)
 	end
 end
 
+-- ----- Значки званий -----
+-- Рисуются кодом (картинки не нужны). Описание значка каждого звания лежит в
+-- ix.tablet.factions[<фракция>].icons (см. sh_plugin.lua). Значок вписан в квадрат size x size.
+
+-- Закрашенный треугольник. DrawPoly требует обход по часовой, поэтому порядок вершин правим сами.
+local function Tri(x1, y1, x2, y2, x3, y3, col)
+	if ((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1) < 0) then
+		x2, y2, x3, y3 = x3, y3, x2, y2
+	end
+
+	draw.NoTexture()
+	surface.SetDrawColor(col)
+	surface.DrawPoly({{x = x1, y = y1}, {x = x2, y = y2}, {x = x3, y = y3}})
+end
+
+-- Закрашенный выпуклый четырёхугольник.
+local function Quad(x1, y1, x2, y2, x3, y3, x4, y4, col)
+	Tri(x1, y1, x2, y2, x3, y3, col)
+	Tri(x1, y1, x3, y3, x4, y4, col)
+end
+
+-- Закрашенная звезда (острие смотрит вверх): веер треугольников от центра.
+local function Star(cx, cy, ro, ri, points, col)
+	local n = points * 2
+
+	for k = 0, n - 1 do
+		local a1 = -math.pi / 2 + k * math.pi * 2 / n
+		local a2 = -math.pi / 2 + (k + 1) * math.pi * 2 / n
+		local r1 = (k % 2 == 0) and ro or ri
+		local r2 = ((k + 1) % 2 == 0) and ro or ri
+
+		Tri(cx, cy, cx + math.cos(a1) * r1, cy + math.sin(a1) * r1, cx + math.cos(a2) * r2, cy + math.sin(a2) * r2, col)
+	end
+end
+
+-- Кольцо (контур окружности из сглаженных линий).
+local function RingLine(cx, cy, r, thick, col)
+	local pts = {}
+
+	for k = 0, 23 do
+		local a = k * math.pi * 2 / 24
+
+		pts[#pts + 1] = {x = cx + math.cos(a) * r, y = cy + math.sin(a) * r}
+	end
+
+	SoftOutline(pts, thick, col)
+end
+
+-- Позиции звёзд на погоне (доля высоты) и их радиус (доля size) по числу звёзд.
+local STAR_V = {
+	[1] = {0.5},
+	[2] = {0.34, 0.66},
+	[3] = {0.24, 0.5, 0.76},
+	[4] = {0.18, 0.39, 0.61, 0.82}
+}
+
+local STAR_R = {0.2, 0.16, 0.125, 0.095}
+
+local ICON_DRAW = {}
+
+-- Рядовой: точка.
+ICON_DRAW.dot = function(x, y, s, spec, col)
+	Circle(x + s / 2, y + s / 2, s * 0.14, col, 24)
+end
+
+-- Лычки: n горизонтальных полосок.
+ICON_DRAW.bar = function(x, y, s, spec, col)
+	local n = spec.n or 1
+	local th = math.max(2, s * 0.12)
+	local gap = s * 0.2
+	local total = th + (n - 1) * gap
+	local w = s * 0.62
+	local top = y + (s - total) / 2
+
+	for i = 0, n - 1 do
+		Box(math.floor(x + (s - w) / 2), math.floor(top + i * gap), math.floor(w), math.ceil(th), col)
+	end
+end
+
+-- Сержантские шевроны (острие вверх), опционально с планкой снизу (старшина).
+ICON_DRAW.chev = function(x, y, s, spec, col)
+	local n = spec.n or 1
+	local th = math.max(1.6, s * 0.085)
+	local ch, sp = s * 0.2, s * 0.25
+	local w = s * 0.78
+	local barH = spec.bar and (s * 0.1 + th) or 0
+	local total = (n - 1) * sp + ch + barH
+	local top = y + (s - total) / 2
+	local cx = x + s / 2
+
+	for i = 0, n - 1 do
+		local ty = top + i * sp
+
+		SoftLine(cx - w / 2, ty + ch, cx, ty, th, col)
+		SoftLine(cx, ty, cx + w / 2, ty + ch, th, col)
+		Circle(cx, ty, th * 0.5, col, 12)
+	end
+
+	if (spec.bar) then
+		local by = top + (n - 1) * sp + ch + s * 0.1
+
+		SoftLine(cx - w / 2, by, cx + w / 2, by, th, col)
+	end
+end
+
+-- Погон: stars звёзд. gaps задаёт вид погона:
+-- 1 - простой (младшие офицеры), 2 - с двумя продольными линиями (старшие офицеры),
+-- 0 - залитый погон с крупными звёздами (высший офицерский состав).
+ICON_DRAW.pogon = function(x, y, s, spec, col)
+	local stars = math.Clamp(spec.stars or 1, 1, 4)
+	local gaps = spec.gaps or 0
+	local bw, bh = s * 0.62, s * 0.96
+	local bx, by = x + (s - bw) / 2, y + (s - bh) / 2
+	local cx = x + s / 2
+	local th = math.max(1.2, s * 0.06)
+
+	Box(bx, by, bw, bh, ColorAlpha(col, gaps == 0 and 90 or 34))
+	SoftOutline({
+		{x = bx, y = by}, {x = bx + bw, y = by},
+		{x = bx + bw, y = by + bh}, {x = bx, y = by + bh}
+	}, th, col)
+
+	if (gaps == 2) then
+		for _, u in ipairs({0.3, 0.7}) do
+			local lx = bx + bw * u
+
+			SoftLine(lx, by + th, lx, by + bh - th, math.max(1, th * 0.8), col)
+		end
+	end
+
+	-- Звёзды.
+	if (gaps == 0) then
+		local pos = stars == 1 and {0.5} or {0.28, 0.72}
+		local r = stars == 1 and 0.27 or 0.19
+
+		for _, v in ipairs(pos) do
+			Star(cx, by + bh * v, s * r, s * r * 0.45, 5, col)
+		end
+	else
+		for _, v in ipairs(STAR_V[stars]) do
+			Star(cx, by + bh * v, s * STAR_R[stars], s * STAR_R[stars] * 0.45, 5, col)
+		end
+	end
+end
+
+-- ОПГ: кольцо.
+ICON_DRAW.ring = function(x, y, s, spec, col)
+	RingLine(x + s / 2, y + s / 2, s * 0.32, math.max(1.5, s * 0.1), col)
+end
+
+-- ОПГ: скрещённые ножи.
+ICON_DRAW.cross = function(x, y, s, spec, col)
+	local th = math.max(2, s * 0.13)
+
+	SoftLine(x + s * 0.2, y + s * 0.2, x + s * 0.8, y + s * 0.8, th, col)
+	SoftLine(x + s * 0.8, y + s * 0.2, x + s * 0.2, y + s * 0.8, th, col)
+	Circle(x + s / 2, y + s / 2, th * 0.55, col, 12)
+end
+
+-- ОПГ: стрела / торпеда (остриём вверх).
+ICON_DRAW.arrow = function(x, y, s, spec, col)
+	Tri(x + s * 0.5, y + s * 0.06, x + s * 0.86, y + s * 0.52, x + s * 0.14, y + s * 0.52, col)
+	Box(math.floor(x + s * 0.38), math.floor(y + s * 0.52), math.ceil(s * 0.24), math.ceil(s * 0.4), col)
+end
+
+-- ОПГ: ромб (inner = true - с вложенным закрашенным ромбом).
+ICON_DRAW.diamond = function(x, y, s, spec, col)
+	local th = math.max(1.6, s * 0.09)
+	local cx, cy = x + s / 2, y + s / 2
+
+	SoftOutline({
+		{x = cx, y = y + s * 0.06}, {x = x + s * 0.94, y = cy},
+		{x = cx, y = y + s * 0.94}, {x = x + s * 0.06, y = cy}
+	}, th, col)
+
+	if (spec.inner) then
+		local r = s * 0.2
+
+		Quad(cx, cy - r, cx + r, cy, cx, cy + r, cx - r, cy, col)
+	end
+end
+
+-- ОПГ: восьмиконечная звезда (ring = true - в кольце).
+ICON_DRAW.star8 = function(x, y, s, spec, col)
+	local cx, cy = x + s / 2, y + s / 2
+
+	if (spec.ring) then
+		RingLine(cx, cy, s * 0.43, math.max(1.4, s * 0.07), col)
+		Star(cx, cy, s * 0.3, s * 0.12, 8, col)
+	else
+		Star(cx, cy, s * 0.46, s * 0.19, 8, col)
+	end
+end
+
+-- ОПГ: корона.
+ICON_DRAW.crown = function(x, y, s, spec, col)
+	Box(math.floor(x + s * 0.12), math.floor(y + s * 0.5), math.ceil(s * 0.76), math.ceil(s * 0.3), col)
+	Tri(x + s * 0.12, y + s * 0.5, x + s * 0.12, y + s * 0.22, x + s * 0.35, y + s * 0.5, col)
+	Tri(x + s * 0.35, y + s * 0.5, x + s * 0.5, y + s * 0.16, x + s * 0.65, y + s * 0.5, col)
+	Tri(x + s * 0.65, y + s * 0.5, x + s * 0.88, y + s * 0.22, x + s * 0.88, y + s * 0.5, col)
+
+	Circle(x + s * 0.12, y + s * 0.2, s * 0.06, col, 12)
+	Circle(x + s * 0.5, y + s * 0.13, s * 0.06, col, 12)
+	Circle(x + s * 0.88, y + s * 0.2, s * 0.06, col, 12)
+end
+
+-- Значок звания rank (номер) фракции игрока в квадрате size x size с левым верхним углом (x, y).
+local function RankIcon(x, y, size, rank, col)
+	local char = LocalPlayer():GetCharacter()
+	local faction = char and ix.faction.indices[char:GetFaction()]
+	local def = faction and ix.tablet.factions[faction.uniqueID]
+	local spec = def and def.icons and def.icons[rank]
+	local fn = spec and ICON_DRAW[spec.type]
+
+	if (!fn) then
+		-- Значок не задан: запасной вариант - обычные шевроны.
+		Chevrons(x, y, math.min(rank, 4), col, size)
+
+		return
+	end
+
+	fn(x, y, size, spec, col)
+end
+
+UI.RankIcon = RankIcon
+
 local function Greeting()
 	local h = tonumber(os.date("%H"))
 
@@ -393,7 +619,7 @@ function PANEL:ShowLogin()
 
 	box.Paint = function(_, w)
 		draw.SimpleText(register and "Регистрация" or "Авторизация", "ixTabletL", 0, 0, C.text)
-		draw.SimpleText(register and "Создайте логин и пароль для персонажа" or "Введите данные доступа", "ixTabletS", 0, S(32), C.dim)
+		draw.SimpleText(register and "Логин назначен автоматически — придумайте пароль" or "Введите данные доступа", "ixTabletS", 0, S(32), C.dim)
 		Box(0, S(60), S(44), 1, C.accent)
 	end
 
@@ -407,6 +633,12 @@ function PANEL:ShowLogin()
 	StyleEntry(login, "ixTabletM")
 	login.ph = "Логин"
 
+	-- При регистрации логин берётся из ника персонажа и не редактируется.
+	if (register) then
+		login:SetText(self.regLogin or "")
+		login:SetEditable(false)
+	end
+
 	local pass = box:Add("DTextEntry")
 	pass:SetPos(0, S(132))
 	pass:SetSize(S(320), S(42))
@@ -417,7 +649,7 @@ function PANEL:ShowLogin()
 	local y = S(188)
 
 	if (register) then
-		local hint = Label(box, "Логин: 3–24 символа (латиница, цифры, _ . -).\nПароль: от 4 символов. Данные привязаны\nк вашему персонажу.", "ixTabletT", C.dim)
+		local hint = Label(box, "Логин — ник вашего персонажа, он понадобится\nдля входа. Пароль: от 4 символов. Данные\nпривязаны к вашему персонажу.", "ixTabletT", C.dim)
 		hint:SetPos(0, y)
 		y = y + S(58)
 	end
@@ -428,14 +660,22 @@ function PANEL:ShowLogin()
 	go:SetLabel(register and "Зарегистрироваться" or "Войти")
 
 	local function Submit()
-		ix.tablet.Send(register and "register" or "login", {login = login:GetValue(), pass = pass:GetValue()})
+		if (register) then
+			ix.tablet.Send("register", {pass = pass:GetValue()})
+		else
+			ix.tablet.Send("login", {login = login:GetValue(), pass = pass:GetValue()})
+		end
 	end
 
 	go.DoClick = Submit
 	login.OnEnter = function() pass:RequestFocus() end
 	pass.OnEnter = Submit
 
-	login:RequestFocus()
+	if (register) then
+		pass:RequestFocus()
+	else
+		login:RequestFocus()
+	end
 end
 
 -- ----- Экран загрузки после входа -----
@@ -625,7 +865,7 @@ function PANEL:Tab_home(p)
 		draw.SimpleText(me.name, "ixTabletL", S(110), S(34), C.text)
 		draw.SimpleText(me.rankName .. "  |  " .. me.factionName, "ixTabletS", S(110), S(70), C.accent)
 
-		Chevrons(w - S(64), S(20), me.rank, C.accent, S(34))
+		RankIcon(w - S(69), S(16), S(44), me.rank, C.accent)
 		draw.SimpleText("звание " .. me.rank .. "/" .. #st.ranks, "ixTabletT", w - S(47), h - S(14), C.dim, 1, 1)
 	end
 
@@ -749,9 +989,9 @@ function PANEL:Tab_home(p)
 
 		r.Paint = function(_, w, h)
 			Circle(S(6), h / 2, S(4), C.ok, 32)
-			draw.SimpleText(Trunc(e.name, w - S(50), "ixTabletS"), "ixTabletS", S(18), h / 2 - S(7), C.text, 0, 1)
+			draw.SimpleText(Trunc(e.name, w - S(64), "ixTabletS"), "ixTabletS", S(18), h / 2 - S(7), C.text, 0, 1)
 			draw.SimpleText(st.ranks[e.rank] or "?", "ixTabletT", S(18), h / 2 + S(9), C.dim, 0, 1)
-			Chevrons(w - S(24), h / 2 - S(8), math.min(e.rank, 3), C.dim, S(14))
+			RankIcon(w - S(32), h / 2 - S(12), S(24), e.rank, C.dim)
 		end
 	end
 end
@@ -778,7 +1018,7 @@ function PANEL:Tab_profile(p)
 		draw.SimpleText("В составе с " .. os.date("%d.%m.%Y", me.since), "ixTabletT", S(110), S(66), C.dim)
 		draw.SimpleText("Доступ: " .. (me.canManage and "командный состав" or "стандартный"), "ixTabletT", S(110), S(82), C.dim)
 
-		Chevrons(w - S(60), S(18), me.rank, C.accent, S(32))
+		RankIcon(w - S(66), S(14), S(44), me.rank, C.accent)
 	end
 
 	local av = Avatar(info, me.model, S(76))
@@ -927,7 +1167,7 @@ function PANEL:Tab_roster(p)
 			draw.SimpleText("В составе с " .. os.date("%d.%m.%Y", e.since or 0) .. "   |   ID: " .. tostring(e.id), "ixTabletT", S(88), S(54), C.dim)
 			draw.SimpleText(e.online and "На связи" or ("Не в сети  |  был(а) в сети: " .. (e.seen and Ago(e.seen) or "давно")), "ixTabletT", S(88), S(68), e.online and C.ok or C.dim)
 
-			Chevrons(w - S(40), S(8), e.rank, C.accent, S(26))
+			RankIcon(w - S(52), S(2), S(40), e.rank, C.accent)
 		end
 
 		local av = Avatar(head, e.model, S(76))
@@ -1087,7 +1327,23 @@ function PANEL:Tab_roster(p)
 				Outline(0, 0, w, h, sel and C.accent or C.line)
 
 				Circle(S(14), h / 2, S(4), e.online and C.ok or C.line, 32)
-				draw.SimpleText(Trunc(e.name, w - S(110), "ixTabletS"), "ixTabletS", S(28), h / 2 - S(8), C.text, 0, 1)
+				local nameText = Trunc(e.name, w - S(120), "ixTabletS")
+
+				draw.SimpleText(nameText, "ixTabletS", S(28), h / 2 - S(8), C.text, 0, 1)
+
+				-- Логин в скобках правее ника (если он пришёл с сервера).
+				local loginText = e.login or (e.id == st.me.id and st.me.login) or nil
+
+				if (loginText and loginText != "") then
+					surface.SetFont("ixTabletS")
+					local nw = surface.GetTextSize(nameText)
+					local avail = w - S(120) - nw - S(8)
+
+					if (avail > S(30)) then
+						draw.SimpleText(Trunc("(" .. loginText .. ")", avail, "ixTabletT"), "ixTabletT", S(28) + nw + S(8), h / 2 - S(8), C.dim, 0, 1)
+					end
+				end
+
 				local rankText = st.ranks[e.rank] or "?"
 
 				draw.SimpleText(rankText, "ixTabletT", S(28), h / 2 + S(9), C.dim, 0, 1)
@@ -1100,14 +1356,14 @@ function PANEL:Tab_roster(p)
 					draw.SimpleText("·  Не в сети", "ixTabletT", S(28) + rw + S(6), h / 2 + S(9), C.danger, 0, 1)
 				end
 
-				Chevrons(w - S(26), h / 2 - S(10), math.min(e.rank, 4), C.dim, S(14))
+				RankIcon(w - S(36), h / 2 - S(13), S(26), e.rank, C.dim)
 
 				if (e.count > 0) then
-					draw.SimpleText("В:" .. e.count, "ixTabletT", w - S(40), h / 2 - S(6), C.danger, TEXT_ALIGN_RIGHT, 1)
+					draw.SimpleText("В:" .. e.count, "ixTabletT", w - S(46), h / 2 - S(6), C.danger, TEXT_ALIGN_RIGHT, 1)
 				end
 
 				if (e.commendCount > 0) then
-					draw.SimpleText("П:" .. e.commendCount, "ixTabletT", w - S(40), h / 2 + S(8), C.ok, TEXT_ALIGN_RIGHT, 1)
+					draw.SimpleText("П:" .. e.commendCount, "ixTabletT", w - S(46), h / 2 + S(8), C.ok, TEXT_ALIGN_RIGHT, 1)
 				end
 			end
 
