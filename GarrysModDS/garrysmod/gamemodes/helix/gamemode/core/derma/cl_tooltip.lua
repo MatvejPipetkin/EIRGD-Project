@@ -1,10 +1,4 @@
 
---- Text container for `ixTooltip`.
--- Rows are the main way of interacting with `ixTooltip`s. These derive from
--- [DLabel](https://wiki.garrysmod.com/page/Category:DLabel) panels, which means that making use of this panel
--- will be largely the same as any DLabel panel.
--- @panel ixTooltipRow
-
 local animationTime = 1
 
 -- panel meta

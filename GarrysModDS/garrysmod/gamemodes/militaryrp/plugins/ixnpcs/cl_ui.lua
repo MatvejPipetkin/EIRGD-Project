@@ -144,12 +144,14 @@ UI.TAGS = {
 	quest = {"icon16/exclamation.png", Color(255, 210, 80)},
 	turnin = {"icon16/tick.png", Color(120, 220, 130)},
 	leave = {"icon16/door_out.png", Color(175, 175, 185)},
+	vehicle = {"icon16/car.png", Color(255, 165, 95)},
 	talk = {"icon16/comment.png", Color(205, 205, 215)}
 }
 
 function UI.OptionTag(opt)
 	for _, a in ipairs(opt.actions or {}) do
 		if (a.type == "openShop") then return "shop" end
+		if (a.type == "vehicleMenu" or a.type == "returnVehicle") then return "vehicle" end
 		if (a.type == "completeQuest") then return "turnin" end
 		if (a.type == "startQuest") then return "quest" end
 	end

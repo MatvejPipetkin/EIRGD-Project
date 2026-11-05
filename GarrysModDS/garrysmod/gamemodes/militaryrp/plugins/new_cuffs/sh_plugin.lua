@@ -4,19 +4,6 @@ PLUGIN.name = "Handcuffs"
 PLUGIN.author = "Claude"
 PLUGIN.description = "Наручники: интерактивное надевание/снятие на F1, скованные руки, админ-команды."
 PLUGIN.readme = [[
-Игрок с предметом `handcuffs` в инвентаре подходит к другому игроку и нажимает F1. Открывается мини-игра:
-нужно зажать ЛКМ на каждом отмеченном участке (левое и правое запястье).
-Если в руках оружие, каждый участок обрабатывается дольше (см. конфиг `cuffWeaponMultiplier`).
-
-Скованный игрок:
-- не может использовать предметы инвентаря и брать/выбрасывать их;
-- не может выбирать оружие (цифры) и стрелять, в руках остаются только кулаки;
-- ходит чуть медленнее, бежит трусцой (заметно медленнее обычного бега) и может прыгать;
-- остаётся скованным после перезахода, пока его не освободят или он не умрёт.
-
-Нажатие F1 на скованного игрока запускает ту же мини-игру, но для снятия наручников.
-Если наручники были надеты предметом, то при снятии предмет возвращается тому, кто снимал.
-
 ## Админ-команды
 /PlyCuff <игрок>   - заковать
 /PlyUncuff <игрок> - освободить
@@ -24,6 +11,21 @@ PLUGIN.readme = [[
 
 -- дистанция, с которой можно начать (F1)
 PLUGIN.cuffRange = 96
+
+-- на каком расстоянии перед ведущим идёт ведомый
+PLUGIN.leadDistance = 52
+
+-- если ведомый оказался дальше этого расстояния от ведущего, его отпускает
+-- (в юнитах: ~39 юнитов = 1 метр, 150 юнитов ≈ 3.8 м)
+PLUGIN.leadMaxDistance = 150
+
+-- участки тела, которые нужно осмотреть при обыске (F3); `bone2` + `frac` ставят маркер между двумя костями
+PLUGIN.searchZones = {
+	{name = "searchZoneJacket", bone = "ValveBiped.Bip01_Spine2"},
+	{name = "searchZoneBelt", bone = "ValveBiped.Bip01_Pelvis"},
+	{name = "searchZonePockets", bone = "ValveBiped.Bip01_R_Thigh", bone2 = "ValveBiped.Bip01_R_Calf", frac = 0.3},
+	{name = "searchZonePouch", bone = "ValveBiped.Bip01_L_Thigh", bone2 = "ValveBiped.Bip01_L_Calf", frac = 0.3}
+}
 
 -- множитель скорости скованного игрока: ходьба и бег (трусцой)
 PLUGIN.cuffedSpeed = 0.8
@@ -80,17 +82,49 @@ ix.lang.AddTable("english", {
 	cuffAlready = "%s уже в наручниках.",
 	cuffNotCuffed = "%s не в наручниках.",
 	cuffNoChar = "У этого игрока нет активного персонажа.",
-	cuffedHud = "Ваши руки скованы за спиной"
+	cuffedHud = "Ваши руки скованы за спиной",
+	cuffedLedHud = "Вас ведут за собой",
+	cuffTitleLead = "ВЕСТИ ЗА СОБОЙ",
+	leadStage1 = "Берёте под руку...",
+	leadStage2 = "Крепко придерживаете...",
+	leadStage3 = "Разворачиваете перед собой...",
+	leadBusy = "Этого человека уже ведут.",
+	leadAlready = "Вы уже ведёте другого человека. Отпустите его на F2.",
+	leadStartedSelf = "Вас ведут за собой.",
+	leadStartedOther = "Вы ведёте: %s.",
+	leadStoppedSelf = "Вас больше не ведут.",
+	leadStoppedOther = "Вы отпустили: %s.",
+	cuffTitleSearch = "ОБЫСК",
+	searchProgress = "Осмотрено %d из %d",
+	searchZoneJacket = "Куртка",
+	searchZoneBelt = "Пояс",
+	searchZonePockets = "Карманы",
+	searchZonePouch = "Подсумок",
+	searchStage1 = "Нащупываете застёжку...",
+	searchStage2 = "Расстёгиваете...",
+	searchStage3 = "Перебираете содержимое...",
+	searchBusy = "Этого человека уже обыскивают.",
+	searchTargetStart = "Кто-то вас обыскивает!"
 })
 
-ix.config.Add("cuffTime", 1.5, "How long it takes to handle each part of the handcuffs, in seconds.", nil, {
+ix.config.Add("cuffTime", 1.5, "Сколько секунд занимает каждый участок при надевании и снятии наручников.", nil, {
 	data = {min = 0.2, max = 10, decimals = 1},
-	category = "Handcuffs"
+	category = "Наручники"
 })
 
-ix.config.Add("cuffWeaponMultiplier", 2, "Time multiplier when the person cuffing holds a weapon in their hands.", nil, {
+ix.config.Add("cuffWeaponMultiplier", 2, "Во сколько раз дольше надеваются и снимаются наручники, если в руках оружие.", nil, {
 	data = {min = 1, max = 5, decimals = 1},
-	category = "Handcuffs"
+	category = "Наручники"
+})
+
+ix.config.Add("cuffLeadTime", 1.5, "Сколько секунд занимает каждый участок, когда скованного берут за собой. Оружие в руках не влияет.", nil, {
+	data = {min = 0.2, max = 10, decimals = 1},
+	category = "Наручники"
+})
+
+ix.config.Add("cuffSearchTime", 1.5, "Сколько секунд занимает осмотр каждого участка при обыске скованного. Оружие в руках не влияет.", nil, {
+	data = {min = 0.2, max = 10, decimals = 1},
+	category = "Наручники"
 })
 
 -- shared
@@ -98,6 +132,20 @@ local playerMeta = FindMetaTable("Player")
 
 function playerMeta:IsCuffed()
 	return self:GetNetVar("ixCuffed", false) and true or false
+end
+
+-- скованного ведут за собой
+function playerMeta:IsLed()
+	return self:GetNetVar("ixLeader") != nil
+end
+
+-- игрок, который ведёт этого скованного (nil, если никто не ведёт)
+function playerMeta:GetCuffLeader()
+	local leader = self:GetNetVar("ixLeader")
+
+	if (IsValid(leader)) then
+		return leader
+	end
 end
 
 -- во сколько раз дольше придётся возиться, если в руках оружие
@@ -111,6 +159,55 @@ function PLUGIN:GetCuffMultiplier(client)
 	return 1
 end
 
+-- конфиги времени для режимов, где оружие в руках не влияет на скорость
+local fixedZoneTime = {lead = "cuffLeadTime", search = "cuffSearchTime"}
+
+-- время на один участок: при ведении и обыске оружие в руках на него не влияет
+function PLUGIN:GetZoneTime(client, mode)
+	if (fixedZoneTime[mode]) then
+		return math.max(ix.config.Get(fixedZoneTime[mode], 1.5), 0.05)
+	end
+
+	return math.max(ix.config.Get("cuffTime", 1.5) * self:GetCuffMultiplier(client), 0.05)
+end
+
+-- участки, которые нужно пройти в этом режиме мини-игры
+function PLUGIN:GetZones(mode)
+	return mode == "search" and self.searchZones or self.cuffZones
+end
+
+-- куда должен смотреть ведомый: туда же, куда смотрит ведущий
+function PLUGIN:GetLeadAngles(client)
+	local leader = client:GetCuffLeader()
+
+	if (leader) then
+		local angles = leader:EyeAngles()
+
+		return Angle(angles.p, angles.y, 0)
+	end
+
+	-- ведущий не виден (далеко/вышел): остаёмся на последнем направлении
+	return Angle(0, client:GetNetVar("ixLeadYaw", 0), 0)
+end
+
+-- ведущий и ведомый не сталкиваются (нужен включённый SetCustomCollisionCheck у обоих)
+function PLUGIN:ShouldCollide(ent1, ent2)
+	if (ent1:IsPlayer() and ent2:IsPlayer() and (ent1:IsLed() or ent2:IsLed())) then
+		if (ent1:GetCuffLeader() == ent2 or ent2:GetCuffLeader() == ent1) then
+			return false
+		end
+	end
+end
+
+-- кого ведёт этот игрок
+function PLUGIN:GetLedPlayer(client)
+	for _, ply in ipairs(player.GetAll()) do
+		if (ply:GetNetVar("ixLeader") == client) then
+			return ply
+		end
+	end
+end
+
 -- скованные руки: никаких действий с предметами
 function PLUGIN:CanPlayerInteractItem(client, action, item, data)
 	if (client:IsCuffed()) then
@@ -122,6 +219,17 @@ end
 function PLUGIN:StartCommand(client, cmd)
 	if (client:IsCuffed()) then
 		cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(bit.bor(IN_ATTACK, IN_ATTACK2, IN_RELOAD))))
+
+		-- ведомый: ни своего движения, ни прыжка, ни поворота камеры
+		if (client:IsLed()) then
+			cmd:SetForwardMove(0)
+			cmd:SetSideMove(0)
+			cmd:SetUpMove(0)
+			cmd:SetMouseX(0)
+			cmd:SetMouseY(0)
+			cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(bit.bor(IN_JUMP, IN_DUCK, IN_SPEED))))
+			cmd:SetViewAngles(self:GetLeadAngles(client))
+		end
 	end
 end
 
@@ -133,7 +241,33 @@ function PLUGIN:SetupMove(client, mv)
 
 		mv:SetMaxClientSpeed(speed)
 		mv:SetMaxSpeed(speed)
+
+		local leader = client:GetCuffLeader()
+
+		if (leader) then
+			self:MoveLed(client, leader, mv)
+		end
 	end
+end
+
+-- ведомый идёт к точке перед ведущим, подстраиваясь под его скорость
+function PLUGIN:MoveLed(client, leader, mv)
+	local forward = Angle(0, leader:EyeAngles().y, 0):Forward()
+	local diff = leader:GetPos() + forward * self.leadDistance - mv:GetOrigin()
+	local velocity = leader:GetVelocity()
+	local vertical = mv:GetVelocity().z
+
+	diff.z = 0
+	velocity.z = 0
+	velocity = velocity + diff * 6
+
+	if (velocity:Length() > 400) then
+		velocity = velocity:GetNormalized() * 400
+	end
+
+	-- вертикальной скоростью занимается физика (ступеньки, падение)
+	velocity.z = vertical
+	mv:SetVelocity(velocity)
 end
 
 -- admin commands
@@ -212,6 +346,10 @@ if (SERVER) then
 			self:StopCuffAction(client, true)
 		end
 
+		-- заковали/освободили: ведомого больше не ведут, а скованный ведущий никого не ведёт
+		self:SetLeader(client, nil, true)
+		self:ReleaseLed(client, bSilent)
+
 		if (state) then
 			-- в руках остаются только кулаки
 			if (client:HasWeapon("ix_hands")) then
@@ -250,6 +388,102 @@ if (SERVER) then
 		end
 	end
 
+	-- вести скованного игрока за собой; leader = nil - отпустить
+	function PLUGIN:SetLeader(client, leader, bSilent)
+		local old = client:GetNetVar("ixLeader")
+
+		if (old == nil and !IsValid(leader)) then
+			return
+		end
+
+		if (IsValid(leader)) then
+			local angles = Angle(0, leader:EyeAngles().y, 0)
+			local goal = leader:GetPos() + angles:Forward() * self.leadDistance
+			local mins, maxs = client:GetHull()
+			local trace = util.TraceHull({
+				start = leader:GetPos(),
+				endpos = goal,
+				mins = mins,
+				maxs = maxs,
+				filter = {leader, client},
+				mask = MASK_PLAYERSOLID
+			})
+
+			-- ведомый сразу оказывается перед ведущим, если там есть место
+			if (!trace.Hit) then
+				client:SetPos(goal)
+			end
+
+			client:SetVelocity(-client:GetVelocity())
+			client:SetNetVar("ixLeadYaw", angles.y)
+			client:SetNetVar("ixLeader", leader)
+			client:SnapEyeAngles(angles)
+
+			-- у ведомого отключаются столкновения с игроками и предметами, иначе ведущего дёргает на ходу
+			-- (группа коллизии передаётся клиентам, поэтому предсказание движения не расходится с сервером)
+			client:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+			client:SetCustomCollisionCheck(true)
+			leader:SetCustomCollisionCheck(true)
+			client:CollisionRulesChanged()
+			leader:CollisionRulesChanged()
+
+			if (!bSilent) then
+				client:NotifyLocalized("leadStartedSelf")
+				leader:NotifyLocalized("leadStartedOther", client:GetName())
+			end
+		else
+			client:SetNetVar("ixLeader", nil)
+			client:SetNetVar("ixLeadYaw", nil)
+
+			-- столкновения снова обычные
+			client:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+			client:SetCustomCollisionCheck(false)
+			client:CollisionRulesChanged()
+
+			if (IsValid(old)) then
+				old:SetCustomCollisionCheck(false)
+				old:CollisionRulesChanged()
+			end
+
+			if (!bSilent) then
+				client:NotifyLocalized("leadStoppedSelf")
+
+				if (IsValid(old)) then
+					old:NotifyLocalized("leadStoppedOther", client:GetName())
+				end
+			end
+		end
+	end
+
+	-- отпускает всех, кого ведёт этот игрок
+	function PLUGIN:ReleaseLed(client, bSilent)
+		for _, ply in ipairs(player.GetAll()) do
+			if (ply:GetNetVar("ixLeader") == client) then
+				self:SetLeader(ply, nil, bSilent)
+			end
+		end
+	end
+
+	-- следим, чтобы ведомый не остался привязанным к ушедшему/мёртвому/скованному ведущему
+	function PLUGIN:PlayerTick(client)
+		if (!client:IsLed()) then
+			return
+		end
+
+		local leader = client:GetCuffLeader()
+
+		if (!leader or !leader:Alive() or leader:IsCuffed() or !client:Alive() or !client:IsCuffed()
+		or leader:GetPos():DistToSqr(client:GetPos()) > self.leadMaxDistance ^ 2) then
+			self:SetLeader(client, nil)
+			return
+		end
+
+		-- другой код не должен вернуть ведомому столкновения
+		if (client:GetCollisionGroup() != COLLISION_GROUP_DEBRIS_TRIGGER) then
+			client:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+		end
+	end
+
 	-- скованный может переключиться только на кулаки
 	function PLUGIN:PlayerSwitchWeapon(client, oldWeapon, newWeapon)
 		if (client:IsCuffed() and (!IsValid(newWeapon) or newWeapon:GetClass() != "ix_hands")) then
@@ -259,6 +493,9 @@ if (SERVER) then
 
 	function PLUGIN:PlayerLoadedCharacter(client, character, lastChar)
 		-- состояние предыдущего персонажа не должно переходить на нового
+		self:ReleaseLed(client, true)
+		self:SetLeader(client, nil, true)
+
 		if (IsValid(client.ixCuffer)) then
 			self:StopCuffAction(client.ixCuffer, true)
 		end
@@ -280,7 +517,27 @@ if (SERVER) then
 		end
 	end
 
+	-- труп ведомого создаётся с его скоростью (до 400 ед/с) и импульсом от попадания,
+	-- поэтому сразу после смерти обнуляем скорость всех частей трупа
 	function PLUGIN:PlayerDeath(client)
+		if (client:IsLed()) then
+			local ragdoll = client:GetRagdollEntity()
+
+			if (IsValid(ragdoll)) then
+				for i = 0, ragdoll:GetPhysicsObjectCount() - 1 do
+					local phys = ragdoll:GetPhysicsObjectNum(i)
+
+					if (IsValid(phys)) then
+						phys:SetVelocity(vector_origin)
+						phys:AddAngleVelocity(-phys:GetAngleVelocity())
+					end
+				end
+			end
+		end
+
+		self:ReleaseLed(client)
+		self:SetLeader(client, nil, true)
+
 		if (IsValid(client.ixCuffer)) then
 			self:StopCuffAction(client.ixCuffer, true)
 		end
@@ -295,6 +552,8 @@ if (SERVER) then
 	end
 
 	function PLUGIN:PlayerDisconnected(client)
+		self:ReleaseLed(client, true)
+
 		if (IsValid(client.ixCuffer)) then
 			self:StopCuffAction(client.ixCuffer, true)
 		end
@@ -309,7 +568,15 @@ if (SERVER) then
 		return client:GetShootPos():DistToSqr(target:WorldSpaceCenter()) <= (self.cuffRange + extra) ^ 2
 	end
 
-	function PLUGIN:BeginCuffAction(client, target)
+	-- инвентарь, который открывается после обыска
+	function PLUGIN:GetSearchInventory(target)
+		local character = target:GetCharacter()
+
+		return character and character:GetInventory()
+	end
+
+	-- request: "lead" (F2), "search" (F3) или что-то другое (F1: надеть/снять наручники)
+	function PLUGIN:BeginCuffAction(client, target, request)
 		if ((client.ixCuffNext or 0) > CurTime()) then
 			return
 		end
@@ -324,13 +591,52 @@ if (SERVER) then
 			return
 		end
 
+		-- F2 на того, кого уже ведёшь, отпускает его (расстояние не важно)
+		if (request == "lead" and target:GetCuffLeader() == client) then
+			self:SetLeader(target, nil)
+			return
+		end
+
 		if (!self:CanReachTarget(client, target, 48)) then
 			return
 		end
 
-		local uncuff = target:IsCuffed()
+		local mode = "cuff"
 
-		if (!uncuff and !self:GetCuffItem(client)) then
+		if (request == "search") then
+			local inventory = self:GetSearchInventory(target)
+
+			if (!target:IsCuffed() or !inventory) then
+				return
+			end
+
+			if (ix.storage.InUse(inventory)) then
+				client:NotifyLocalized("searchBusy")
+				return
+			end
+
+			mode = "search"
+		elseif (request == "lead") then
+			if (!target:IsCuffed()) then
+				return
+			end
+
+			if (target:IsLed()) then
+				client:NotifyLocalized("leadBusy")
+				return
+			end
+
+			if (self:GetLedPlayer(client)) then
+				client:NotifyLocalized("leadAlready")
+				return
+			end
+
+			mode = "lead"
+		elseif (target:IsCuffed()) then
+			mode = "uncuff"
+		end
+
+		if (mode == "cuff" and !self:GetCuffItem(client)) then
 			client:NotifyLocalized("cuffNoItem")
 			return
 		end
@@ -342,7 +648,7 @@ if (SERVER) then
 
 		client.ixCuffAction = {
 			target = target,
-			uncuff = uncuff,
+			mode = mode,
 			done = {},
 			count = 0,
 			last = CurTime()
@@ -351,13 +657,15 @@ if (SERVER) then
 		target.ixCuffer = client
 		target:EmitSound("physics/metal/metal_solid_impact_soft" .. math.random(1, 3) .. ".wav", 55, math.random(92, 108))
 
-		if (!uncuff) then
+		if (mode == "cuff") then
 			target:NotifyLocalized("cuffTargetStart")
+		elseif (mode == "search") then
+			target:NotifyLocalized("searchTargetStart")
 		end
 
 		net.Start("ixCuffBegin")
 			net.WriteEntity(target)
-			net.WriteBool(uncuff)
+			net.WriteString(mode)
 		net.Send(client)
 	end
 
@@ -380,10 +688,40 @@ if (SERVER) then
 		end
 	end
 
-	function PLUGIN:FinishCuffAction(client, target, uncuff)
+	function PLUGIN:FinishCuffAction(client, target, mode)
 		self:StopCuffAction(client, false)
 
-		if (uncuff) then
+		if (mode == "lead") then
+			if (target:IsCuffed() and !target:IsLed()) then
+				self:SetLeader(target, client)
+			end
+
+			return
+		end
+
+		-- обыск закончен: обыскивающему открывается инвентарь скованного
+		if (mode == "search") then
+			local inventory = self:GetSearchInventory(target)
+
+			if (!target:IsCuffed() or !inventory) then
+				return
+			end
+
+			if (ix.storage.InUse(inventory)) then
+				client:NotifyLocalized("searchBusy")
+				return
+			end
+
+			ix.storage.Open(client, inventory, {
+				entity = target,
+				name = target:GetName(),
+				searchTime = 0
+			})
+
+			return
+		end
+
+		if (mode == "uncuff") then
 			if (!target:IsCuffed()) then
 				return
 			end
@@ -430,17 +768,18 @@ if (SERVER) then
 		local target = action.target
 
 		if (!IsValid(target) or !target:Alive() or !client:Alive() or client:IsCuffed()
-		or target:IsCuffed() != action.uncuff or !self:CanReachTarget(client, target, 48)) then
+		or target:IsCuffed() != (action.mode != "cuff") or (action.mode == "lead" and target:IsLed())
+		or !self:CanReachTarget(client, target, 48)) then
 			self:StopCuffAction(client, true)
 			return
 		end
 
-		if (!self.cuffZones[index] or action.done[index]) then
+		if (!self:GetZones(action.mode)[index] or action.done[index]) then
 			return
 		end
 
 		-- участок нельзя закончить быстрее, чем положено (с учётом оружия в руках)
-		local zoneTime = math.max(ix.config.Get("cuffTime", 1.5) * self:GetCuffMultiplier(client), 0.05)
+		local zoneTime = self:GetZoneTime(client, action.mode)
 
 		if (CurTime() - action.last < zoneTime * 0.8) then
 			return
@@ -450,15 +789,22 @@ if (SERVER) then
 		action.count = action.count + 1
 		action.last = CurTime()
 
-		target:EmitSound("physics/metal/metal_solid_impact_soft" .. math.random(1, 3) .. ".wav", 55, math.random(92, 108))
+		if (action.mode == "search") then
+			target:EmitSound("npc/combine_soldier/gear" .. math.random(1, 6) .. ".wav", 55, math.random(92, 108))
+		else
+			target:EmitSound("physics/metal/metal_solid_impact_soft" .. math.random(1, 3) .. ".wav", 55, math.random(92, 108))
+		end
 
-		if (action.count >= #self.cuffZones) then
-			self:FinishCuffAction(client, target, action.uncuff)
+		if (action.count >= #self:GetZones(action.mode)) then
+			self:FinishCuffAction(client, target, action.mode)
 		end
 	end
 
 	net.Receive("ixCuffStart", function(_, client)
-		PLUGIN:BeginCuffAction(client, net.ReadEntity())
+		local target = net.ReadEntity()
+		local request = net.ReadString()
+
+		PLUGIN:BeginCuffAction(client, target, request)
 	end)
 
 	net.Receive("ixCuffZone", function(_, client)
@@ -474,6 +820,10 @@ if (CLIENT) then
 	local COLOR_DONE = Color(120, 200, 120)
 	local COLOR_TEXT = Color(190, 190, 190)
 	local COLOR_WARN = Color(230, 170, 80)
+
+	-- заголовок и подписи этапов для каждого режима мини-игры
+	local MODE_TITLE = {cuff = "cuffTitleCuff", uncuff = "cuffTitleUncuff", lead = "cuffTitleLead", search = "cuffTitleSearch"}
+	local MODE_STAGE = {cuff = "cuffStage", uncuff = "uncuffStage", lead = "leadStage", search = "searchStage"}
 
 	-- drawing helpers
 	local function DrawDisk(x, y, radius, color)
@@ -600,14 +950,14 @@ if (CLIENT) then
 		self.wasDown = false
 		self.closing = false
 		self.nextRustle = 0
-		self.uncuff = false
+		self.mode = "cuff"
 	end
 
-	function PANEL:Setup(entity, uncuff)
+	function PANEL:Setup(entity, mode)
 		self.entity = entity
-		self.uncuff = uncuff
+		self.mode = mode
 
-		for i, zone in ipairs(PLUGIN.cuffZones) do
+		for i, zone in ipairs(PLUGIN:GetZones(mode)) do
 			self.zones[i] = {
 				name = L(zone.name),
 				progress = 0,
@@ -683,7 +1033,7 @@ if (CLIENT) then
 		local entity = self.entity
 
 		if (!IsValid(entity) or !IsValid(client) or !client:Alive() or !entity:Alive() or client:IsCuffed()
-		or entity:IsCuffed() != self.uncuff
+		or entity:IsCuffed() != (self.mode != "cuff") or (self.mode == "lead" and entity:IsLed())
 		or client:GetShootPos():DistToSqr(entity:WorldSpaceCenter()) > (PLUGIN.cuffRange + 40) ^ 2) then
 			self:Close(true)
 			return
@@ -693,10 +1043,10 @@ if (CLIENT) then
 		local eyePos = client:EyePos()
 		local scale = ScrH() / 1080
 		local cursorX, cursorY = self:CursorPos()
-		local zoneTime = math.max(ix.config.Get("cuffTime", 1.5) * PLUGIN:GetCuffMultiplier(client), 0.05)
+		local zoneTime = PLUGIN:GetZoneTime(client, self.mode)
 
 		-- marker positions follow the target's bones
-		for i, zone in ipairs(PLUGIN.cuffZones) do
+		for i, zone in ipairs(PLUGIN:GetZones(self.mode)) do
 			local state = self.zones[i]
 			local pos = GetZonePos(entity, zone)
 			local screen = pos:ToScreen()
@@ -747,8 +1097,11 @@ if (CLIENT) then
 
 				if (CurTime() >= self.nextRustle) then
 					self.nextRustle = CurTime() + math.Rand(0.22, 0.45)
-					client:EmitSound("physics/metal/metal_solid_impact_soft" .. math.random(1, 3) .. ".wav",
-						50, math.random(90, 115), 0.45, CHAN_ITEM)
+					local sound = self.mode == "search"
+						and ("physics/cardboard/cardboard_box_impact_soft" .. math.random(1, 7))
+						or ("physics/metal/metal_solid_impact_soft" .. math.random(1, 3))
+
+					client:EmitSound(sound .. ".wav", 50, math.random(90, 115), 0.45, CHAN_ITEM)
 				end
 
 				if (state.progress >= 1) then
@@ -794,7 +1147,7 @@ if (CLIENT) then
 		DrawFade(0, height - 200 * scale, width, 200 * scale, 190, true)
 
 		-- header
-		draw.SimpleText(L(self.uncuff and "cuffTitleUncuff" or "cuffTitleCuff"), "ixBigFont", width / 2, 70 * scale,
+		draw.SimpleText(L(MODE_TITLE[self.mode]), "ixBigFont", width / 2, 70 * scale,
 			color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		surface.SetDrawColor(accent.r, accent.g, accent.b, 255)
@@ -819,11 +1172,11 @@ if (CLIENT) then
 			end
 		end
 
-		draw.SimpleText(L("cuffProgress", self.doneCount, total), "ixSmallFont", width / 2, 172 * scale,
+		draw.SimpleText(L(self.mode == "search" and "searchProgress" or "cuffProgress", self.doneCount, total), "ixSmallFont", width / 2, 172 * scale,
 			COLOR_TEXT, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		-- weapon in hands slows everything down
-		if (IsValid(client) and PLUGIN:GetCuffMultiplier(client) > 1) then
+		if (self.mode != "lead" and IsValid(client) and PLUGIN:GetCuffMultiplier(client) > 1) then
 			draw.SimpleText(L("cuffArmedHint"), "ixSmallFont", width / 2, 194 * scale,
 				COLOR_WARN, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
@@ -876,7 +1229,7 @@ if (CLIENT) then
 						local extra = ""
 
 						if (self.active == i) then
-							extra = L((self.uncuff and "uncuffStage" or "cuffStage") .. math.min(3, math.floor(state.progress * 3) + 1))
+							extra = L(MODE_STAGE[self.mode] .. math.min(3, math.floor(state.progress * 3) + 1))
 						end
 
 						surface.SetFont("ixSmallFont")
@@ -924,7 +1277,11 @@ if (CLIENT) then
 			return true
 		end
 
-		if (!pressed or !bind:find("gm_showhelp")) then
+		-- F1 - надеть/снять наручники, F2 - повести скованного / отпустить, F3 - обыскать скованного
+		local lead = bind:find("gm_showteam") != nil
+		local search = bind:find("gm_showspare1") != nil
+
+		if (!pressed or (!lead and !search and !bind:find("gm_showhelp"))) then
 			return
 		end
 
@@ -936,13 +1293,37 @@ if (CLIENT) then
 			return
 		end
 
+		-- F2 отпускает того, кого ведёшь (на него можно не смотреть)
+		if (lead) then
+			local led = self:GetLedPlayer(client)
+
+			if (led) then
+				net.Start("ixCuffStart")
+					net.WriteEntity(led)
+					net.WriteString("lead")
+				net.SendToServer()
+
+				return true
+			end
+		end
+
 		local target = self:GetCuffTarget(client)
 
 		if (!target) then
 			return
 		end
 
-		if (!target:IsCuffed()) then
+		-- F3 работает только на скованных
+		if (search and !target:IsCuffed()) then
+			return
+		end
+
+		-- F2 работает только на скованных, которых ещё никто не ведёт
+		if (lead and (!target:IsCuffed() or target:IsLed())) then
+			return
+		end
+
+		if (!lead and !search and !target:IsCuffed()) then
 			local character = client:GetCharacter()
 			local inventory = character and character:GetInventory()
 
@@ -954,6 +1335,7 @@ if (CLIENT) then
 
 		net.Start("ixCuffStart")
 			net.WriteEntity(target)
+			net.WriteString(search and "search" or (lead and "lead" or "cuff"))
 		net.SendToServer()
 
 		return true
@@ -961,7 +1343,7 @@ if (CLIENT) then
 
 	net.Receive("ixCuffBegin", function()
 		local entity = net.ReadEntity()
-		local uncuff = net.ReadBool()
+		local mode = net.ReadString()
 
 		if (!IsValid(entity)) then
 			return
@@ -972,7 +1354,7 @@ if (CLIENT) then
 		end
 
 		PLUGIN.cuffPanel = vgui.Create("ixCuffAction")
-		PLUGIN.cuffPanel:Setup(entity, uncuff)
+		PLUGIN.cuffPanel:Setup(entity, mode)
 	end)
 
 	net.Receive("ixCuffStop", function()
@@ -1055,6 +1437,47 @@ if (CLIENT) then
 		MsgN("}")
 	end)
 
+	-- на клиенте тоже включаем свою проверку столкновений для пары ведущий/ведомый,
+	-- чтобы предсказание движения совпадало с сервером
+	function PLUGIN:Think()
+		if (CurTime() < (self.nextCollisionThink or 0)) then
+			return
+		end
+
+		self.nextCollisionThink = CurTime() + 0.2
+
+		local client = LocalPlayer()
+
+		if (!IsValid(client)) then
+			return
+		end
+
+		local other = client:GetCuffLeader() or self:GetLedPlayer(client)
+
+		if (IsValid(other)) then
+			client:SetCustomCollisionCheck(true)
+			other:SetCustomCollisionCheck(true)
+			self.collisionOther = other
+		elseif (self.collisionOther) then
+			client:SetCustomCollisionCheck(false)
+
+			if (IsValid(self.collisionOther)) then
+				self.collisionOther:SetCustomCollisionCheck(false)
+			end
+
+			self.collisionOther = nil
+		end
+	end
+
+	-- ведомый не может двигать камерой: она повторяет взгляд ведущего
+	function PLUGIN:CreateMove(cmd)
+		local client = LocalPlayer()
+
+		if (IsValid(client) and client:IsCuffed() and client:IsLed()) then
+			cmd:SetViewAngles(PLUGIN:GetLeadAngles(client))
+		end
+	end
+
 	-- у скованного нет рук перед глазами
 	function PLUGIN:PreDrawViewModel()
 		local client = LocalPlayer()
@@ -1071,7 +1494,7 @@ if (CLIENT) then
 			return
 		end
 
-		draw.SimpleText(L("cuffedHud"), "ixSmallFont", ScrW() / 2, ScrH() - 120 * (ScrH() / 1080),
+		draw.SimpleText(L(client:IsLed() and "cuffedLedHud" or "cuffedHud"), "ixSmallFont", ScrW() / 2, ScrH() - 120 * (ScrH() / 1080),
 			Color(220, 120, 120, 210), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 end

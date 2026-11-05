@@ -19,7 +19,9 @@ local ACTION_TYPES = {
 	{"Выдать деньги", "giveMoney"}, {"Забрать деньги", "takeMoney"},
 	{"Выдать предмет", "giveItem"}, {"Забрать предмет", "takeItem"},
 	{"Взять задание", "startQuest"}, {"Сдать задание", "completeQuest"},
-	{"Открыть магазин", "openShop"}
+	{"Открыть магазин", "openShop"},
+	{"Открыть выдачу техники", "vehicleMenu"},
+	{"Вернуть технику (сдать)", "returnVehicle"}
 }
 
 local QSTATES = {
@@ -116,6 +118,34 @@ local function Normalize(w)
 		it.stock = tonumber(it.stock) or -1
 		it.max = tonumber(it.max) or it.stock
 	end
+
+	local function NormAccess(a)
+		a.factions = istable(a.factions) and a.factions or {}
+		a.classes = istable(a.classes) and a.classes or {}
+		a.message = a.message or ""
+	end
+
+	w.access = istable(w.access) and w.access or {}
+	NormAccess(w.access)
+
+	w.vehicles = istable(w.vehicles) and w.vehicles or {}
+	w.vehicles.points = istable(w.vehicles.points) and w.vehicles.points or {}
+	w.vehicles.list = istable(w.vehicles.list) and w.vehicles.list or {}
+	w.vehicles.menuText = w.vehicles.menuText or ""
+	w.vehicles.refund = tonumber(w.vehicles.refund) or 50
+
+	for _, v in ipairs(w.vehicles.list) do
+		v.name = v.name or v.id
+		v.kind = v.kind or "entity"
+		v.class = v.class or ""
+		v.model = v.model or ""
+		v.script = v.script or ""
+		v.cost = tonumber(v.cost) or 0
+		v.cooldown = tonumber(v.cooldown) or 0
+		v.limit = tonumber(v.limit) or 1
+		v.access = istable(v.access) and v.access or {}
+		NormAccess(v.access)
+	end
 end
 
 local function SetIdle(e)
@@ -151,6 +181,108 @@ local function CondCount(c)
 
 	return n
 end
+
+-- ============================================================
+-- Доступ по фракциям и классам (общий компонент)
+-- ============================================================
+
+local function AccessCount(acc)
+	return table.Count(acc.factions or {}) + table.Count(acc.classes or {})
+end
+
+local function AccessTree(parent, acc)
+	acc.factions = istable(acc.factions) and acc.factions or {}
+	acc.classes = istable(acc.classes) and acc.classes or {}
+
+	if (#ix.faction.indices == 0) then
+		UI.Hint(parent, "На сервере нет фракций.")
+		return
+	end
+
+	for fIndex, f in ipairs(ix.faction.indices) do
+		local classes = {}
+
+		for _, c in ipairs(ix.class.list) do
+			if (c.faction == fIndex) then classes[#classes + 1] = c end
+		end
+
+		local card = UI.Card(parent, 20 + 32 + #classes * 34 + (#classes > 0 and 4 or 0))
+
+		local ft = UI.Toggle(card, L(f.name), acc.factions[f.uniqueID] == true, function(v)
+			acc.factions[f.uniqueID] = v or nil
+		end)
+		ft:Dock(TOP)
+		ft:SetTall(32)
+
+		for _, c in ipairs(classes) do
+			local ct = UI.Toggle(card, L(c.name), acc.classes[c.uniqueID] == true, function(v)
+				acc.classes[c.uniqueID] = v or nil
+			end)
+			ct:Dock(TOP)
+			ct:SetTall(30)
+			ct:DockMargin(36, 4, 0, 0)
+		end
+	end
+end
+
+local function EditAccess(title, acc, done)
+	local ov, box = UI.Modal(title, 580, 620)
+
+	UI.Hint(box, "Ничего не отмечено — доступно всем. Фракция — доступ всей фракции; отмеченные классы фракции сужают доступ до них. Класс без отмеченной фракции получает доступ сам по себе.")
+
+	local footer = UI.Row(box, 40)
+	footer:Dock(BOTTOM)
+
+	local scroll = UI.Scroll(box)
+	scroll:Dock(FILL)
+
+	AccessTree(scroll:GetCanvas(), acc)
+
+	local ok = UI.Button(footer, "Готово", function()
+		ov:Remove()
+		done()
+	end, "accent")
+	ok:Dock(RIGHT)
+	ok:SetWide(160)
+end
+
+-- поле с подписью слева (для компактных строк)
+local function Mini(parent, label, value, wide, onChange)
+	local p = vgui.Create("DPanel", parent)
+	p:Dock(LEFT)
+	p:SetWide(wide)
+	p:DockMargin(0, 0, 8, 0)
+	p.Paint = Noop
+
+	local l = vgui.Create("DLabel", p)
+	l:SetFont("ixNPC.EdSmall")
+	l:SetTextColor(C.dim)
+	l:SetText(label)
+	l:Dock(LEFT)
+	l:SetWide(math.floor(wide * 0.52))
+
+	local e = UI.NumEntry(p, value, "0", onChange)
+	e:Dock(FILL)
+
+	return e
+end
+
+-- Подсветка точек появления техники в мире, пока открыт редактор
+hook.Add("PostDrawTranslucentRenderables", "ixNPCPoints", function()
+	local pts = PLUGIN.editorPoints
+
+	if (!pts or !IsValid(PLUGIN.editor)) then return end
+
+	local a = UI.Accent()
+
+	for _, p in ipairs(pts) do
+		local pos = Vector(p.x, p.y, p.z)
+		local ang = Angle(0, p.yaw, 0)
+
+		render.DrawWireframeBox(pos, ang, Vector(-90, -45, 0), Vector(90, 45, 60), a, true)
+		render.DrawLine(pos + Vector(0, 0, 30), pos + ang:Forward() * 120 + Vector(0, 0, 30), Color(255, 255, 255), true)
+	end
+end)
 
 -- ============================================================
 -- Окно условий
@@ -317,7 +449,11 @@ local function EditActions(work, opt, done)
 			local l = vgui.Create("DLabel", card)
 			l:SetFont("ixNPC.Ed")
 			l:SetTextColor(C.dim)
-			l:SetText("Откроет окно торговли с этим NPC")
+			l:SetText(({
+				openShop = "Откроет окно торговли с этим NPC",
+				vehicleMenu = "Откроет список техники этого NPC (вкладка «Техника»)",
+				returnVehicle = "Заберёт технику игрока рядом с NPC и вернёт часть стоимости"
+			})[t] or "")
 			l:Dock(FILL)
 		end
 	end
@@ -375,6 +511,7 @@ function PLUGIN:OpenEditor(ent, def)
 	local work = table.Copy(def)
 	Normalize(work)
 	UI.SetAccent(UI.HexToColor(work.color))
+	PLUGIN.editorPoints = work.vehicles.points
 
 	local sel = {node = work.dialogue.start, quest = work.quests[1] and work.quests[1].id}
 	local P, B = {}, {}
@@ -470,9 +607,15 @@ function PLUGIN:OpenEditor(ent, def)
 
 	local TABS = {
 		{"general", "Основное", "icon16/user_edit.png", function() return "" end},
+		{"access", "Доступ", "icon16/lock.png", function()
+			local n = AccessCount(work.access)
+
+			return n > 0 and n or ""
+		end},
 		{"dialogue", "Диалоги", "icon16/comments.png", function() return table.Count(work.dialogue.nodes) end},
 		{"quests", "Задания", "icon16/book_open.png", function() return #work.quests end},
-		{"shop", "Магазин", "icon16/cart.png", function() return #work.shop.items end}
+		{"shop", "Магазин", "icon16/cart.png", function() return #work.shop.items end},
+		{"vehicles", "Техника", "icon16/car.png", function() return #work.vehicles.list end}
 	}
 
 	local function ShowPage(id)
@@ -1352,6 +1495,213 @@ function PLUGIN:OpenEditor(ent, def)
 	end
 
 	-- ============================================================
+	-- Страница: Доступ
+	-- ============================================================
+
+	B.access = function(page)
+		page:Clear()
+
+		local scroll = UI.Scroll(page)
+		scroll:Dock(FILL)
+
+		local body = scroll:GetCanvas()
+		body:DockPadding(22, 6, 22, 24)
+
+		UI.Section(body, "Кто может говорить с этим NPC")
+		UI.Hint(body, "Ничего не отмечено — NPC доступен всем. Отметка фракции открывает доступ всей фракции. Если у фракции отмечены отдельные классы, доступ получат только они. Класс без отмеченной фракции получает доступ сам по себе.")
+
+		AccessTree(body, work.access)
+
+		UI.Section(body, "Сообщение при отказе")
+		UI.Field(body, "Что увидит игрок без доступа", work.access.message, "Этот человек не хочет с вами разговаривать.", function(v)
+			work.access.message = v
+		end)
+	end
+
+	-- ============================================================
+	-- Страница: Техника
+	-- ============================================================
+
+	local KINDS = {
+		{"Сущность (LVS, Glide и др.)", "entity"},
+		{"simfphys", "simfphys"},
+		{"Source-джип (prop_vehicle_jeep)", "jeep"}
+	}
+
+	B.vehicles = function(page)
+		page:Clear()
+
+		local veh = work.vehicles
+		local scroll = UI.Scroll(page)
+		scroll:Dock(FILL)
+
+		local body = scroll:GetCanvas()
+		body:DockPadding(22, 6, 22, 24)
+
+		-- точки появления
+		UI.Section(body, "Точки появления (" .. #veh.points .. " / 12)")
+		UI.Hint(body, "Встаньте там, где должна появиться техника, лицом в нужную сторону, и нажмите кнопку. Техника появится на первой свободной точке. Если точек нет — прямо перед NPC. Пока редактор открыт, точки подсвечены в мире (окно можно сдвинуть за шапку).")
+
+		for i, p in ipairs(veh.points) do
+			local row = UI.Row(body, 34)
+
+			local x = UI.IconButton(row, "icon16/cross.png", function()
+				table.remove(veh.points, i)
+				Rebuild("vehicles")
+			end, "danger")
+			x:Dock(RIGHT)
+			x:DockMargin(8, 0, 0, 0)
+
+			local l = vgui.Create("DLabel", row)
+			l:SetFont("ixNPC.Ed")
+			l:SetTextColor(C.text)
+			l:SetText(string.format("Точка %d:   %.0f   %.0f   %.0f     курс %.0f°", i, p.x, p.y, p.z, p.yaw))
+			l:Dock(FILL)
+		end
+
+		if (#veh.points < 12) then
+			local addP = UI.Button(body, "+ Добавить точку на моей позиции", function()
+				local lp = LocalPlayer()
+				local pos = lp:GetPos()
+
+				veh.points[#veh.points + 1] = {
+					x = math.Round(pos.x, 1), y = math.Round(pos.y, 1), z = math.Round(pos.z, 1),
+					yaw = math.Round(lp:EyeAngles().y, 1)
+				}
+
+				Rebuild("vehicles")
+			end)
+			addP:Dock(TOP)
+			addP:SetTall(36)
+		end
+
+		-- общие настройки
+		UI.Section(body, "Выдача и сдача")
+		UI.Field(body, "Фраза NPC в меню техники", veh.menuText, "Какая техника вам нужна?", function(v) veh.menuText = v end)
+		UI.Field(body, "Возврат денег при сдаче техники (% от цены)", veh.refund, "50", function(v)
+			veh.refund = math.Clamp(tonumber(v) or 0, 0, 100)
+		end)
+		UI.Hint(body, "Чтобы игроки могли получить технику, добавьте в диалоге вариант с действием «Открыть выдачу техники». Сдать технику — действие «Вернуть технику (сдать)».")
+
+		-- каталог
+		UI.Section(body, "Каталог техники (" .. #veh.list .. " / 20)")
+
+		for i, v in ipairs(veh.list) do
+			local rows = (v.kind == "simfphys") and 3 or 4
+			local card = UI.Card(body, 20 + rows * 32 + (rows - 1) * 6 + 6)
+
+			-- строка 1: название, ID, удалить
+			local r1 = UI.Row(card, 32)
+
+			local x = UI.IconButton(r1, "icon16/cross.png", function()
+				table.remove(veh.list, i)
+				Rebuild("vehicles")
+			end, "danger")
+			x:Dock(RIGHT)
+			x:DockMargin(8, 0, 0, 0)
+
+			local idE = UI.Entry(r1, v.id, "ID", nil)
+			idE:Dock(RIGHT)
+			idE:SetWide(150)
+			idE:DockMargin(8, 0, 0, 0)
+
+			idE.OnLoseFocus = function(s)
+				local new = string.Trim(s:GetText())
+				local dup = false
+
+				for _, o in ipairs(veh.list) do
+					if (o != v and o.id == new) then dup = true end
+				end
+
+				if (new == "" or dup) then
+					s:SetText(v.id)
+				else
+					v.id = new
+				end
+			end
+
+			local ne = UI.Entry(r1, v.name, "Название (видят игроки)", function(t) v.name = t end)
+			ne:Dock(FILL)
+
+			-- строка 2: тип и класс
+			local r2 = UI.Row(card, 32)
+
+			local kc = UI.Combo(r2, KINDS, v.kind, function(k)
+				v.kind = k
+				timer.Simple(0, function() Rebuild("vehicles") end)
+			end)
+			kc:Dock(LEFT)
+			kc:SetWide(260)
+			kc:DockMargin(0, 0, 8, 0)
+
+			local ph = (v.kind == "simfphys") and "имя машины simfphys (spawnname)"
+				or (v.kind == "jeep") and "класс не нужен для Source-джипа" or "класс сущности, например lvs_wheeldrive_…"
+
+			local ce = UI.Entry(r2, v.class, ph, function(t) v.class = t end)
+			ce:Dock(FILL)
+			ce:SetEnabled(v.kind != "jeep")
+
+			-- строка 3: модель / скрипт
+			if (v.kind != "simfphys") then
+				local r3 = UI.Row(card, 32)
+
+				if (v.kind == "jeep") then
+					local se = UI.Entry(r3, v.script, "scripts/vehicles/jeep_test.txt", function(t) v.script = t end)
+					se:Dock(RIGHT)
+					se:SetWide(300)
+					se:DockMargin(8, 0, 0, 0)
+				end
+
+				local me = UI.Entry(r3, v.model, "модель (необязательно), например models/buggy.mdl", function(t) v.model = t end)
+				me:Dock(FILL)
+			end
+
+			-- строка 4: цена, пауза, лимит, доступ
+			local r4 = UI.Row(card, 32)
+			r4:DockMargin(0, 0, 0, 0)
+
+			Mini(r4, "Цена", v.cost, 170, function(t) v.cost = math.max(0, tonumber(t) or 0) end)
+			Mini(r4, "Пауза, мин", math.floor(v.cooldown / 60), 200, function(t) v.cooldown = math.max(0, (tonumber(t) or 0) * 60) end)
+			Mini(r4, "Лимит", v.limit, 130, function(t) v.limit = math.Clamp(tonumber(t) or 1, 1, 10) end)
+
+			local n = AccessCount(v.access)
+
+			local ab = UI.Button(r4, "Доступ: " .. (n > 0 and n or "всем"), function()
+				EditAccess("Доступ к технике «" .. v.name .. "»", v.access, function() Rebuild("vehicles") end)
+			end, n > 0 and "accent" or nil)
+			ab:Dock(RIGHT)
+			ab:SetWide(150)
+		end
+
+		if (#veh.list < 20) then
+			local addV = UI.Button(body, "+ Добавить технику", function()
+				local n = #veh.list + 1
+				local id = "veh_" .. n
+
+				local function Exists(x)
+					for _, o in ipairs(veh.list) do
+						if (o.id == x) then return true end
+					end
+				end
+
+				while (Exists(id)) do
+					n = n + 1
+					id = "veh_" .. n
+				end
+
+				veh.list[#veh.list + 1] = {
+					id = id, name = "Новая техника", kind = "entity", class = "", model = "", script = "",
+					cost = 0, cooldown = 0, limit = 1, access = {factions = {}, classes = {}, message = ""}
+				}
+
+				Rebuild("vehicles")
+			end, "accent")
+			addV:Dock(TOP)
+			addV:SetTall(38)
+		end
+	end
+
+	-- ============================================================
 	-- Подвал: кнопки
 	-- ============================================================
 
@@ -1428,6 +1778,7 @@ function PLUGIN:OpenEditor(ent, def)
 
 			Normalize(work)
 			UI.SetAccent(UI.HexToColor(work.color))
+			PLUGIN.editorPoints = work.vehicles.points
 			sel.node = work.dialogue.start
 			sel.quest = work.quests[1] and work.quests[1].id
 

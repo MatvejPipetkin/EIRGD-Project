@@ -3,7 +3,7 @@ local PLUGIN = PLUGIN
 
 PLUGIN.name = "Containers"
 PLUGIN.author = "Chessnut"
-PLUGIN.description = "Provides the ability to store items."
+PLUGIN.description = "Provides the ability to store items. Containers are opened with a short, realistic action (cabinet, drawer, shelf, small container)."
 
 ix.container = ix.container or {}
 ix.container.stored = ix.container.stored or {}
@@ -12,15 +12,19 @@ ix.config.Add("containerSave", true, "Whether or not containers will save after 
 	category = "Containers"
 })
 
-ix.config.Add("containerOpenTime", 0.7, "How long it takes to open a container.", nil, {
-	data = {min = 0, max = 50},
+ix.config.Add("containerTimeScale", 1, "Multiplier for the time it takes to open any container. 0 makes opening instant.", nil, {
+	data = {min = 0, max = 5, decimals = 2},
 	category = "Containers"
 })
 
+--- Registers a container definition. See sh_definitions.lua for the available fields.
 function ix.container.Register(model, data)
 	ix.container.stored[model:lower()] = data
 end
 
+-- order matters: the config and helpers must exist before the definitions are registered
+ix.util.Include("sh_config.lua")
+ix.util.Include("sh_interaction.lua")
 ix.util.Include("sh_definitions.lua")
 
 if (SERVER) then
@@ -105,26 +109,22 @@ if (SERVER) then
 	function PLUGIN:LoadData()
 		local data = self:GetData()
 
-		if (data) then
-			for _, v in ipairs(data) do
-				if (!istable(v)) then
-					continue
-				end
+		if (!data) then
+			return
+		end
 
-				local model = isstring(v[4]) and v[4]:lower()
-				local data2 = model and ix.container.stored[model]
+		for _, v in ipairs(data) do
+			local model = istable(v) and isstring(v[4]) and v[4]:lower()
+			local data2 = model and ix.container.stored[model]
 
-				if (data2) then
-					local inventoryID = tonumber(v[3])
+			if (data2) then
+				local inventoryID = tonumber(v[3])
 
-					if (!inventoryID or inventoryID < 1) then
-						ErrorNoHalt(string.format(
-							"[Helix] Attempted to restore container inventory with invalid inventory ID '%s' (%s, %s)\n",
-							tostring(inventoryID), v[6] or "no name", v[4] or "no model"))
-
-						continue
-					end
-
+				if (!inventoryID or inventoryID < 1) then
+					ErrorNoHalt(string.format(
+						"[Helix] Attempted to restore container inventory with invalid inventory ID '%s' (%s, %s)\n",
+						tostring(inventoryID), v[6] or "no name", v[4] or "no model"))
+				else
 					local entity = ents.Create("ix_container")
 					entity:SetPos(v[1])
 					entity:SetAngles(v[2])
@@ -178,7 +178,9 @@ if (SERVER) then
 			return
 		end
 
-		if (!client:GetCharacter()) then
+		local character = client:GetCharacter()
+
+		if (!character) then
 			return
 		end
 
@@ -198,7 +200,10 @@ if (SERVER) then
 
 		if (dist < 16384 and password) then
 			if (entity.password and entity.password == password) then
-				entity:OpenInventory(client)
+				-- the right password unlocks the container for this character, then the usual opening action starts
+				entity.Sessions = entity.Sessions or {}
+				entity.Sessions[character:GetID()] = true
+				entity:BeginInteraction(client)
 			else
 				entity.PasswordAttempts[steamID] = attempts and attempts + 1 or 1
 
@@ -255,6 +260,22 @@ function PLUGIN:InitializedPlugins()
 	for k, v in pairs(ix.container.stored) do
 		if (v.name and v.width and v.height) then
 			ix.inventory.Register("container:" .. k:lower(), v.width, v.height)
+
+			if (v.interaction and !ix.container.interactions[v.interaction]) then
+				ErrorNoHalt(string.format(
+					"[Containers] '%s' uses unknown interaction '%s', falling back to '%s'.\n",
+					k, tostring(v.interaction), tostring(ix.container.GetInteractionID(v))
+				))
+			end
+
+			v.interaction = ix.container.GetInteractionID(v)
+			v.settings = nil -- rebuilt from the config on first use
+
+			if (SERVER and !util.IsValidModel(k)) then
+				MsgC(Color(255, 200, 0), string.format(
+					"[Containers] model '%s' was not found (content not mounted?) - this container will never be created.\n", k
+				))
+			end
 		else
 			ErrorNoHalt("[Helix] Container for '"..k.."' is missing all inventory information!\n")
 			ix.container.stored[k] = nil

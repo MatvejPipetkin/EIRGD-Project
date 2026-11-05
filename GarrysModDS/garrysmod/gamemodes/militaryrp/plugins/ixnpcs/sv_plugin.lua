@@ -24,7 +24,8 @@ end
 
 local ACTIONS = {
 	giveMoney = true, takeMoney = true, giveItem = true, takeItem = true,
-	startQuest = true, completeQuest = true, openShop = true
+	startQuest = true, completeQuest = true, openShop = true,
+	vehicleMenu = true, returnVehicle = true
 }
 
 local function SanitizeCond(c)
@@ -52,7 +53,30 @@ local function SanitizeAction(a)
 	}
 end
 
-function PLUGIN:NewDef(name)
+local function SanitizeAccess(a)
+	local out = {factions = {}, classes = {}, message = ""}
+
+	if (!istable(a)) then return out end
+
+	for _, key in ipairs({"factions", "classes"}) do
+		local count = 0
+
+		if (istable(a[key])) then
+			for uid, flag in pairs(a[key]) do
+				if (flag == true and count < 64) then
+					count = count + 1
+					out[key][S(uid, 64)] = true
+				end
+			end
+		end
+	end
+
+	out.message = S(a.message, 200)
+
+	return out
+end
+
+function PLUGIN:NewDefRaw(name)
 	return {
 		name = (name and name != "") and name or "Новый NPC",
 		desc = "Торговец",
@@ -60,6 +84,8 @@ function PLUGIN:NewDef(name)
 		skin = 0,
 		noBubble = false,
 		color = "#5AA0EB",
+		access = {factions = {}, classes = {}, message = ""},
+		vehicles = {points = {}, list = {}, menuText = "Какая техника вам нужна?", refund = 50},
 		dialogue = {
 			start = "start",
 			nodes = {
@@ -95,6 +121,11 @@ function PLUGIN:NewDef(name)
 			}
 		}
 	}
+end
+
+-- Новый NPC (всегда очищенный, чтобы у всех вариантов были actions/cond)
+function PLUGIN:NewDef(name)
+	return (self:Sanitize(self:NewDefRaw(name)))
 end
 
 -- возвращает def, ошибку, список предупреждений
@@ -255,6 +286,63 @@ function PLUGIN:Sanitize(def)
 					stock = stock,                         -- остаток (-1 = бесконечно)
 					max = max                              -- вместимость склада (для продажи NPC)
 				}
+			end
+		end
+	end
+
+	-- Доступ по фракциям / классам
+	out.access = SanitizeAccess(def.access)
+
+	-- Техника
+	local veh = istable(def.vehicles) and def.vehicles or {}
+
+	out.vehicles = {points = {}, list = {}, menuText = S(veh.menuText, 300), refund = N(veh.refund, 0, 100, 50)}
+
+	if (istable(veh.points)) then
+		for i, p in ipairs(veh.points) do
+			if (i > 12) then break end
+
+			if (istable(p) and tonumber(p.x) and tonumber(p.y) and tonumber(p.z)) then
+				out.vehicles.points[#out.vehicles.points + 1] = {
+					x = math.Clamp(tonumber(p.x), -1000000, 1000000),
+					y = math.Clamp(tonumber(p.y), -1000000, 1000000),
+					z = math.Clamp(tonumber(p.z), -1000000, 1000000),
+					yaw = math.Clamp(tonumber(p.yaw) or 0, -360, 360)
+				}
+			end
+		end
+	end
+
+	local seenVeh = {}
+
+	if (istable(veh.list)) then
+		for i, v in ipairs(veh.list) do
+			if (i > 20) then break end
+
+			local id = istable(v) and S(v.id, 64) or ""
+
+			if (id != "" and !seenVeh[id]) then
+				seenVeh[id] = true
+
+				local sv = {
+					id = id, name = S(v.name, 64),
+					kind = (v.kind == "simfphys" or v.kind == "jeep") and v.kind or "entity",
+					class = S(v.class, 128), model = S(v.model, 200), script = S(v.script, 200),
+					cost = N(v.cost, 0, 100000000, 0),
+					cooldown = N(v.cooldown, 0, 604800, 0),
+					limit = N(v.limit, 1, 10, 1),
+					access = SanitizeAccess(v.access)
+				}
+
+				if (sv.name == "") then sv.name = id end
+
+				if (sv.kind != "jeep" and sv.class == "") then
+					warns[#warns + 1] = "Техника '" .. id .. "': не указан класс."
+				elseif (sv.kind == "entity" and !scripted_ents.Get(sv.class)) then
+					warns[#warns + 1] = "Техника '" .. id .. "': класс '" .. sv.class .. "' не найден на сервере."
+				end
+
+				out.vehicles.list[#out.vehicles.list + 1] = sv
 			end
 		end
 	end
@@ -495,11 +583,51 @@ function PLUGIN:CheckCond(client, cond)
 	return true
 end
 
+-- Доступ по фракциям и классам.
+-- Фракция отмечена — доступ всей фракции. Если у фракции отмечены отдельные классы,
+-- доступ получают только они. Класс без отмеченной фракции получает доступ сам по себе.
+function PLUGIN:CheckAccess(client, acc)
+	if (!acc) then return true end
+
+	local factions, classes = acc.factions or {}, acc.classes or {}
+
+	if (next(factions) == nil and next(classes) == nil) then return true end
+
+	local char = client:GetCharacter()
+
+	if (!char) then return false end
+
+	local factionIndex = char:GetFaction()
+	local faction = ix.faction.indices[factionIndex]
+	local class = ix.class.list[char:GetClass()]
+	local classOK = class != nil and classes[class.uniqueID] == true
+
+	if (faction and factions[faction.uniqueID]) then
+		for _, c in ipairs(ix.class.list) do
+			if (c.faction == factionIndex and classes[c.uniqueID]) then
+				return classOK -- у фракции есть отмеченные классы
+			end
+		end
+
+		return true
+	end
+
+	return classOK
+end
+
+function PLUGIN:DenyMessage(def)
+	local msg = def.access and def.access.message or ""
+
+	return msg != "" and msg or "Этот человек не хочет с вами разговаривать."
+end
+
 function PLUGIN:ValidSession(client)
 	local ent = client.ixNPCEnt
 
-	return IsValid(ent) and ent:GetClass() == "ix_npc" and client:GetCharacter() != nil
-		and client:GetPos():DistToSqr(ent:GetPos()) <= USE_DIST * USE_DIST
+	if (!IsValid(ent) or ent:GetClass() != "ix_npc" or !client:GetCharacter()) then return false end
+	if (client:GetPos():DistToSqr(ent:GetPos()) > USE_DIST * USE_DIST) then return false end
+
+	return self:CheckAccess(client, ent.npcDef.access)
 end
 
 function PLUGIN:Open(client, ent)
@@ -507,6 +635,12 @@ function PLUGIN:Open(client, ent)
 	if ((client.ixNPCNextUse or 0) > CurTime()) then return end
 
 	client.ixNPCNextUse = CurTime() + 0.5
+
+	if (!self:CheckAccess(client, ent.npcDef.access)) then
+		client:Notify(self:DenyMessage(ent.npcDef))
+		return
+	end
+
 	client.ixNPCEnt = ent
 
 	self:SendNode(client, ent, ent.npcDef.dialogue.start)
@@ -515,12 +649,14 @@ end
 function PLUGIN:Close(client)
 	client.ixNPCEnt = nil
 	client.ixNPCNode = nil
+	client.ixNPCMode = nil
 	client.ixNPCVisible = nil
 end
 
 local function OptionTag(opt)
-	for _, a in ipairs(opt.actions) do
+	for _, a in ipairs(opt.actions or {}) do
 		if (a.type == "openShop") then return "shop" end
+		if (a.type == "vehicleMenu" or a.type == "returnVehicle") then return "vehicle" end
 		if (a.type == "completeQuest") then return "turnin" end
 		if (a.type == "startQuest") then return "quest" end
 	end
@@ -532,6 +668,25 @@ end
 
 local function HexColor(hex)
 	return Color(tonumber(hex:sub(2, 3), 16) or 90, tonumber(hex:sub(4, 5), 16) or 160, tonumber(hex:sub(6, 7), 16) or 235)
+end
+
+-- Отправка реплики и вариантов игроку (opts = {{text=, tag=}, ...}, до 31 штуки)
+function PLUGIN:Transmit(client, ent, text, opts)
+	local def = ent.npcDef
+
+	net.Start("ixNPCNode")
+		net.WriteEntity(ent)
+		net.WriteString(def.name)
+		net.WriteString(def.desc)
+		net.WriteColor(HexColor(def.color or "#5AA0EB"))
+		net.WriteString(self:Format(text, client, def))
+		net.WriteUInt(#opts, 5)
+
+		for _, o in ipairs(opts) do
+			net.WriteString(o.text)
+			net.WriteString(o.tag)
+		end
+	net.Send(client)
 end
 
 function PLUGIN:SendNode(client, ent, nodeID)
@@ -553,21 +708,10 @@ function PLUGIN:SendNode(client, ent, nodeID)
 	end
 
 	client.ixNPCNode = nodeID
+	client.ixNPCMode = nil
 	client.ixNPCVisible = visible
 
-	net.Start("ixNPCNode")
-		net.WriteEntity(ent)
-		net.WriteString(def.name)
-		net.WriteString(def.desc)
-		net.WriteColor(HexColor(def.color or "#5AA0EB"))
-		net.WriteString(self:Format(node.text, client, def))
-		net.WriteUInt(#opts, 5)
-
-		for _, o in ipairs(opts) do
-			net.WriteString(o.text)
-			net.WriteString(o.tag)
-		end
-	net.Send(client)
+	self:Transmit(client, ent, node.text, opts)
 end
 
 net.Receive("ixNPCChoose", function(_, client)
@@ -577,6 +721,35 @@ net.Receive("ixNPCChoose", function(_, client)
 
 	local ent = client.ixNPCEnt
 	local def = ent.npcDef
+
+	-- меню выдачи техники
+	if (client.ixNPCMode == "vehicles") then
+		local real = client.ixNPCVisible and client.ixNPCVisible[idx]
+
+		if (real == nil) then return end
+
+		if (real == 0) then
+			PLUGIN:SendNode(client, ent, client.ixNPCNode)
+			return
+		end
+
+		local veh = def.vehicles.list[real]
+
+		if (!veh) then return end
+
+		local ok, err = PLUGIN:SpawnVehicle(client, ent, veh)
+
+		if (ok) then
+			net.Start("ixNPCClose") net.Send(client)
+			PLUGIN:Close(client)
+		else
+			client:Notify(err or "Не удалось выдать технику.")
+			PLUGIN:SendVehicleNode(client, ent)
+		end
+
+		return
+	end
+
 	local node = def.dialogue.nodes[client.ixNPCNode]
 	local real = client.ixNPCVisible and client.ixNPCVisible[idx]
 	local opt = real and node and node.options[real]
@@ -585,7 +758,7 @@ net.Receive("ixNPCChoose", function(_, client)
 
 	local ctx = {}
 
-	for _, act in ipairs(opt.actions) do
+	for _, act in ipairs(opt.actions or {}) do
 		local ok, err = PLUGIN:RunAction(client, ent, act, ctx)
 
 		if (!ok) then
@@ -597,6 +770,8 @@ net.Receive("ixNPCChoose", function(_, client)
 
 	if (ctx.shop) then
 		PLUGIN:SendShop(client, ent)
+	elseif (ctx.vehicles) then
+		PLUGIN:SendVehicleNode(client, ent)
 	elseif (opt.next and def.dialogue.nodes[opt.next]) then
 		PLUGIN:SendNode(client, ent, opt.next)
 	else
@@ -631,9 +806,215 @@ function PLUGIN:RunAction(client, ent, a, ctx)
 		return self:CompleteQuest(client, ent.npcDef, a.quest)
 	elseif (t == "openShop") then
 		ctx.shop = true
+	elseif (t == "vehicleMenu") then
+		if (#ent.npcDef.vehicles.list == 0) then return false, "У этого NPC нет техники." end
+
+		ctx.vehicles = true
+	elseif (t == "returnVehicle") then
+		return self:ReturnVehicles(client, ent)
 	end
 
 	return true
+end
+
+-- ============================================================
+-- Техника
+-- ============================================================
+
+PLUGIN.spawned = PLUGIN.spawned or {}
+
+local function IsVehicleEnt(e)
+	return e:IsVehicle() or e.IsSimfphyscar or e.LVS or e.IsGlideVehicle or e.ixNPCVeh
+end
+
+function PLUGIN:VehicleCooldownLeft(char, veh)
+	local last = char:GetData("npcVehCD", {})[veh.id] or 0
+
+	return math.max(0, math.ceil(last + veh.cooldown - os.time()))
+end
+
+-- первая свободная точка; если точек нет вовсе — перед NPC
+function PLUGIN:FindSpawnPoint(ent)
+	local points = ent.npcDef.vehicles.points
+
+	for _, p in ipairs(points) do
+		local pos = Vector(p.x, p.y, p.z)
+		local busy = false
+
+		for _, e in ipairs(ents.FindInSphere(pos, 130)) do
+			if (IsVehicleEnt(e)) then
+				busy = true
+				break
+			end
+		end
+
+		if (!busy) then return pos, Angle(0, p.yaw, 0) end
+	end
+
+	if (#points == 0) then
+		return ent:GetPos() + ent:GetForward() * 180 + Vector(0, 0, 12), Angle(0, ent:GetAngles().y, 0)
+	end
+end
+
+function PLUGIN:CreateVehicle(client, veh, pos, ang)
+	local v
+
+	if (veh.kind == "simfphys") then
+		if (simfphys and simfphys.SpawnVehicleSimple) then
+			v = simfphys.SpawnVehicleSimple(veh.class, pos, ang)
+		elseif (simfphys and simfphys.SpawnVehicle) then
+			local vt = (list.Get("simfphys_vehicles") or {})[veh.class]
+
+			if (vt) then
+				v = simfphys.SpawnVehicle(client, pos, ang, vt.Model, vt.Class, veh.class, vt, true)
+			end
+		end
+	elseif (veh.kind == "jeep") then
+		v = ents.Create("prop_vehicle_jeep")
+
+		if (IsValid(v)) then
+			v:SetModel(veh.model != "" and veh.model or "models/buggy.mdl")
+			v:SetKeyValue("vehiclescript", veh.script != "" and veh.script or "scripts/vehicles/jeep_test.txt")
+			v:SetKeyValue("limitview", "0")
+			v:SetPos(pos)
+			v:SetAngles(Angle(0, ang.y - 90, 0))
+			v:Spawn()
+			v:Activate()
+		end
+	else
+		v = ents.Create(veh.class)
+
+		if (IsValid(v)) then
+			if (veh.model != "") then v:SetModel(veh.model) end
+
+			v:SetPos(pos)
+			v:SetAngles(ang)
+			v:Spawn()
+			v:Activate()
+		end
+	end
+
+	return IsValid(v) and v or nil
+end
+
+function PLUGIN:SpawnVehicle(client, ent, veh)
+	local char = client:GetCharacter()
+
+	if (!self:CheckAccess(client, veh.access)) then return false, "У вас нет допуска к этой технике." end
+
+	local wait = self:VehicleCooldownLeft(char, veh)
+
+	if (wait > 0) then
+		return false, string.format("Техника будет доступна через %d:%02d.", math.floor(wait / 60), wait % 60)
+	end
+
+	local active = 0
+
+	for i = #self.spawned, 1, -1 do
+		local v = self.spawned[i]
+
+		if (!IsValid(v)) then
+			table.remove(self.spawned, i)
+		elseif (v.ixNPCChar == char:GetID() and v.ixNPCVehID == veh.id) then
+			active = active + 1
+		end
+	end
+
+	if (active >= veh.limit) then return false, "Вы уже получили эту технику. Сдайте её, чтобы взять новую." end
+	if (veh.cost > 0 and !char:HasMoney(veh.cost)) then return false, "Недостаточно средств." end
+
+	local pos, ang = self:FindSpawnPoint(ent)
+
+	if (!pos) then return false, "Все места для техники заняты. Попробуйте позже." end
+
+	local v = self:CreateVehicle(client, veh, pos, ang)
+
+	if (!v) then return false, "Не удалось создать технику — обратитесь к администратору." end
+
+	if (veh.cost > 0) then char:TakeMoney(veh.cost) end
+
+	v.ixNPCVeh = true
+	v.ixNPCChar = char:GetID()
+	v.ixNPCVehID = veh.id
+	v.ixNPCSource = ent
+	v.ixNPCCost = veh.cost
+
+	if (v.CPPISetOwner) then v:CPPISetOwner(client) end
+	if (v.SetCreator) then v:SetCreator(client) end
+
+	self.spawned[#self.spawned + 1] = v
+
+	local cds = char:GetData("npcVehCD", {})
+	cds[veh.id] = os.time()
+	char:SetData("npcVehCD", cds)
+
+	client:Notify("Техника выдана: " .. veh.name)
+
+	return true
+end
+
+-- Сдача техники: убирает технику игрока, выданную этим NPC и стоящую поблизости
+function PLUGIN:ReturnVehicles(client, ent)
+	local char = client:GetCharacter()
+	local percent = ent.npcDef.vehicles.refund
+	local count, refund = 0, 0
+
+	for i = #self.spawned, 1, -1 do
+		local v = self.spawned[i]
+
+		if (!IsValid(v)) then
+			table.remove(self.spawned, i)
+		elseif (v.ixNPCChar == char:GetID() and v.ixNPCSource == ent and v:GetPos():DistToSqr(ent:GetPos()) <= 900 * 900) then
+			refund = refund + math.floor((v.ixNPCCost or 0) * percent / 100)
+			count = count + 1
+
+			v:Remove()
+			table.remove(self.spawned, i)
+		end
+	end
+
+	if (count == 0) then return false, "Ваша техника должна стоять рядом с NPC." end
+
+	if (refund > 0) then
+		char:GiveMoney(refund)
+		client:Notify("Техника сдана. Возвращено: " .. ix.currency.Get(refund))
+	else
+		client:Notify("Техника сдана.")
+	end
+
+	return true
+end
+
+function PLUGIN:SendVehicleNode(client, ent)
+	local def = ent.npcDef
+	local char = client:GetCharacter()
+	local opts, visible = {}, {}
+
+	for i, v in ipairs(def.vehicles.list) do
+		if (self:CheckAccess(client, v.access)) then
+			local text = v.name .. "  —  " .. (v.cost > 0 and ix.currency.Get(v.cost) or "бесплатно")
+			local wait = self:VehicleCooldownLeft(char, v)
+
+			if (wait > 0) then
+				text = text .. string.format("  (через %d:%02d)", math.floor(wait / 60), wait % 60)
+			end
+
+			opts[#opts + 1] = {text = text, tag = "vehicle"}
+			visible[#visible + 1] = i
+		end
+	end
+
+	local text = def.vehicles.menuText != "" and def.vehicles.menuText or "Какая техника вам нужна?"
+
+	if (#opts == 0) then text = "Для вас сейчас нет доступной техники." end
+
+	opts[#opts + 1] = {text = "Назад", tag = "leave"}
+	visible[#visible + 1] = 0
+
+	client.ixNPCMode = "vehicles"
+	client.ixNPCVisible = visible
+
+	self:Transmit(client, ent, text, opts)
 end
 
 -- ============================================================
