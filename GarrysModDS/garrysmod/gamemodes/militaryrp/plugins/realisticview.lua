@@ -36,10 +36,9 @@ local phrases = {
 
 	cfgRvVignette = "Естественная виньетка",
 	cfgRvVignetteStrength = "Сила виньетки",
-	cfgRvLowVignette = "Красные края при низком здоровье",
 	cfgRvHitBlur = "Размытие при попадании",
 	cfgRvHitBlurStrength = "Сила размытия при попадании",
-	cfgRvHurtFlash = "Вспышка и размытие при уроне",
+	cfgRvHurtFlash = "Размытие при уроне",
 	cfgRvBlink = "Моргание",
 	cfgRvBlinkRate = "Частота моргания",
 	cfgRvBlinkDepth = "Закрытие глаз при моргании",
@@ -184,10 +183,6 @@ ix.config.Add("rvVignetteStrength", 1, "Насколько сильно зате
 	category = "realisticView"
 })
 
-ix.config.Add("rvLowVignette", true, "Пульсирующие красные края экрана при низком здоровье.", nil, {
-	category = "realisticView"
-})
-
 ix.config.Add("rvHitBlur", true, "Лёгкое размытие и «звон в глазах» в момент попадания по игроку. От пуль сильнее.", nil, {
 	category = "realisticView"
 })
@@ -197,7 +192,7 @@ ix.config.Add("rvHitBlurStrength", 1, "Насколько сильно разм�
 	category = "realisticView"
 })
 
-ix.config.Add("rvHurtFlash", true, "Короткая красная вспышка и размытие при попадании.", nil, {
+ix.config.Add("rvHurtFlash", true, "Короткое размытие экрана при получении урона (без красной вспышки — покраснение отдано плагину медицины).", nil, {
 	category = "realisticView"
 })
 
@@ -934,17 +929,6 @@ function PLUGIN:HUDPaintBackground()
 		surface.DrawRect(0, 0, w, h)
 	end
 
-	local low = state.low
-
-	if (low > 0.01 and Opt("rvLowVignette", true)) then
-		local alpha = (60 + 150 * low) * (0.7 + 0.3 * state.pulse)
-		DrawEdgeVignette(110, 0, 0, alpha, 0.22 + 0.2 * low)
-	end
-
-	if (state.hurtFlash > 0.01 and Opt("rvHurtFlash", true)) then
-		DrawEdgeVignette(150, 0, 0, 170 * state.hurtFlash, 0.30)
-	end
-
 	local base = math.Clamp(state.droop + state.squint, 0, 0.5)
 	local lid = base + (1 - base) * state.blinkLid * Opt("rvBlinkDepth", 0.85)
 
@@ -1020,7 +1004,6 @@ function PLUGIN:RenderScreenspaceEffects()
 	cm["$pp_colour_brightness"] = brightness * k * adaptK - wound * 0.2 * darken
 	cm["$pp_colour_contrast"] = 1 + (contrast - 1) * k * adaptK
 	cm["$pp_colour_colour"] = math.max(1 - low * 0.45 - wound * 0.35 * darken, 0.1)
-	cm["$pp_colour_addr"] = low * 0.04 * (0.6 + state.pulse * 0.4)
 	cm["$pp_colour_contrast"] = cm["$pp_colour_contrast"] - low * 0.08 - wound * 0.12 * darken
 
 	DrawColorModify(cm)

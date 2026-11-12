@@ -1,38 +1,52 @@
-local glowMat = Material("sprites/light_glow02_add")
+-- общий стиль меню (тот же, что в cl_menu.lua / cl_inventory.lua)
+ix.menuStyle = ix.menuStyle or {accent = Color(90, 160, 235), projectName = "EIRGD"}
 
+--[[
+	НАСТРОЙКИ
+	Окно личного дела почти на весь экран, в стиле cl_inventory:
+	тёмная панель с размытием, акцентная шапка, карточки как ячейки инвентаря.
+]]
 local CFG = {
-	accentColor = Color(90, 160, 235),
-	fallbackColor = Color(90, 160, 235),
+	windowWidth = 0.94, -- ширина окна в долях экрана
+	windowHeight = 0.84, -- высота окна в долях экрана
+	leftWidth = 430, -- ширина карточки профиля при высоте экрана 1080 (масштабируется)
+	attrMinWidth = 380, -- минимальная ширина карточки характеристики при высоте 1080
+	attrMinHeight = 96, -- минимальная высота карточки характеристики
+	attrMaxHeight = 150, -- максимальная высота (карточки растягиваются, чтобы занять место)
+	gap = 16, -- общий отступ между блоками
+	profileBottom = 130, -- отступ нижних строк профиля (фракция/класс/средства) от низа карточки; больше = выше
+	blur = true, -- размытие фона за окном
+	characterOverview = false, -- показывать персонажа слева (окно закрывает почти весь экран, поэтому выключено)
 	sounds = true,
-	soundVolume = 0.55,
-	scanlines = true,
-	revealStep = 0.05,
-	windowWidth = 0.5,
-	windowHeight = 0.82,
+	soundVolume = 0.4,
+	revealStep = 0.035, -- задержка появления между элементами
 
 	soundSet = {
-		hover = {"buttons/blip1.wav", 0.3, 115},
-		click = {"buttons/button15.wav", 0.5, 100},
-		tick = {"buttons/blip2.wav", 0.16, 130},
-		open = {"buttons/combine_button1.wav", 0.4, 105},
-		reveal = {"buttons/combine_button3.wav", 0.25, 110}
+		hover = {"buttons/blip1.wav", 0.25, 115},
+		click = {"buttons/button15.wav", 0.45, 100},
+		reveal = {"buttons/combine_button3.wav", 0.2, 110}
 	}
 }
 
-local COL_GOOD = Color(110, 225, 150)
-local COL_BAD = Color(235, 85, 85)
+local glowMat = Material("sprites/light_glow02_add")
+
+local COL_GOOD = Color(110, 210, 130)
+local COL_BAD = Color(225, 85, 80)
 local CHAR_PATTERN = "[\1-\127\194-\253][\128-\191]*"
 
-local function CreateInfoFonts()
-	local h = ScrH()
+local function S(value)
+	return math.floor(value * ScrH() / 1080 + 0.5)
+end
 
-	surface.CreateFont("ixInfoName", {font = "Roboto", size = math.floor(h * 0.04), weight = 700, extended = true, antialias = true})
-	surface.CreateFont("ixInfoValue", {font = "Roboto", size = math.floor(h * 0.0255), weight = 600, extended = true, antialias = true})
-	surface.CreateFont("ixInfoMid", {font = "Roboto", size = math.floor(h * 0.0215), weight = 600, extended = true, antialias = true})
-	surface.CreateFont("ixInfoText", {font = "Roboto", size = math.floor(h * 0.0185), weight = 500, extended = true, antialias = true})
-	surface.CreateFont("ixInfoSmall", {font = "Roboto", size = math.floor(h * 0.0155), weight = 600, extended = true, antialias = true})
-	surface.CreateFont("ixInfoTiny", {font = "Roboto", size = math.floor(h * 0.0125), weight = 500, extended = true, antialias = true})
-	surface.CreateFont("ixInfoMono", {font = "Courier New", size = math.floor(h * 0.0135), weight = 500, extended = true, antialias = true})
+local function CreateInfoFonts()
+	surface.CreateFont("ixInfoTitle", {font = "Roboto", size = S(22), weight = 600, extended = true, antialias = true})
+	surface.CreateFont("ixInfoName", {font = "Roboto", size = S(40), weight = 600, extended = true, antialias = true})
+	surface.CreateFont("ixInfoValue", {font = "Roboto", size = S(25), weight = 500, extended = true, antialias = true})
+	surface.CreateFont("ixInfoMid", {font = "Roboto", size = S(21), weight = 500, extended = true, antialias = true})
+	surface.CreateFont("ixInfoText", {font = "Roboto", size = S(19), weight = 400, extended = true, antialias = true})
+	surface.CreateFont("ixInfoSmall", {font = "Roboto", size = S(16), weight = 500, extended = true, antialias = true})
+	surface.CreateFont("ixInfoTiny", {font = "Roboto", size = S(13), weight = 500, extended = true, antialias = true})
+	surface.CreateFont("ixInfoMono", {font = "Roboto", size = S(14), weight = 400, extended = true, antialias = true})
 end
 
 CreateInfoFonts()
@@ -43,15 +57,11 @@ local function EaseOutCubic(x)
 end
 
 local function GetAccent()
-	return CFG.accentColor or ix.config.Get("color") or CFG.fallbackColor
+	return ix.menuStyle.accent or ix.config.Get("color") or Color(90, 160, 235)
 end
 
 local function Upper(text)
 	return (string.utf8upper or string.upper)(text)
-end
-
-local function GetPad()
-	return math.floor(ScrW() * 0.009)
 end
 
 local function ReadableColor(c)
@@ -112,31 +122,7 @@ local function SplitChars(text)
 	return chars
 end
 
-local function TypeText(text, p)
-	if (p >= 1) then
-		return text
-	end
-
-	local chars = SplitChars(text)
-	local n = math.floor(#chars * math.Clamp(p, 0, 1))
-
-	if (n >= #chars) then
-		return text
-	end
-
-	return table.concat(chars, "", 1, n)
-end
-
-local function Typed(pnl, text, dur)
-	local st = pnl.typeStart
-
-	if (!st) then
-		return text
-	end
-
-	return TypeText(text, (RealTime() - st) / (dur or 0.5))
-end
-
+-- подбирает шрифт из списка, а если не влезает совсем — обрезает с многоточием
 local function FitText(text, fonts, maxW)
 	for _, f in ipairs(fonts) do
 		surface.SetFont(f)
@@ -269,6 +255,7 @@ local function RingBand(cx, cy, rIn, rOut, a0, step, seg)
 	end
 end
 
+-- сглаженная дуга (кольцо) с мягкими краями
 local function SmoothArc(cx, cy, r, deg0, deg1, thick, seg, cr, cg, cb, ca)
 	if (ca <= 0 or deg1 <= deg0) then
 		return
@@ -289,19 +276,6 @@ local function SmoothArc(cx, cy, r, deg0, deg1, thick, seg, cr, cg, cb, ca)
 	end
 end
 
-local function DrawBrackets(x, y, w, h, len, r, g, b, a)
-	surface.SetDrawColor(r, g, b, a)
-
-	surface.DrawRect(x, y, len, 2)
-	surface.DrawRect(x, y, 2, len)
-	surface.DrawRect(x + w - len, y, len, 2)
-	surface.DrawRect(x + w - 2, y, 2, len)
-	surface.DrawRect(x, y + h - 2, len, 2)
-	surface.DrawRect(x, y + h - len, 2, len)
-	surface.DrawRect(x + w - len, y + h - 2, len, 2)
-	surface.DrawRect(x + w - 2, y + h - len, 2, len)
-end
-
 local function DrawFade(x, y, w, h, r, g, b, a, fromLeft)
 	local n = 24
 	local sw = math.ceil(w / n)
@@ -316,10 +290,110 @@ local function DrawFade(x, y, w, h, r, g, b, a, fromLeft)
 	end
 end
 
+-- яркие уголки как в cl_inventory
+local function DrawCorners(w, h, len, r, g, b, a)
+	surface.SetDrawColor(r, g, b, a)
+	surface.DrawRect(0, 0, len, 1)
+	surface.DrawRect(0, 0, 1, len)
+	surface.DrawRect(w - len, 0, len, 1)
+	surface.DrawRect(w - 1, 0, 1, len)
+	surface.DrawRect(0, h - 1, len, 1)
+	surface.DrawRect(0, h - len, 1, len)
+	surface.DrawRect(w - len, h - 1, len, 1)
+	surface.DrawRect(w - 1, h - len, 1, len)
+end
+
+-- плавное наведение (0..1)
+local function Hover(pnl, speed)
+	pnl.hoverFrac = Lerp(math.min(RealFrameTime() * (speed or 10), 1), pnl.hoverFrac or 0, pnl:IsHovered() and 1 or 0)
+
+	return pnl.hoverFrac
+end
+
+-- карточка как ячейка инвентаря: тёмная основа, заливка, рамка (при наведении — акцентная)
+local function DrawCard(w, h, hov, ar, ag, ab)
+	draw.NoTexture()
+	surface.SetDrawColor(0, 0, 0, 110)
+	surface.DrawRect(0, 0, w, h)
+	surface.SetDrawColor(22, 27, 34, 170 + 40 * hov)
+	surface.DrawRect(1, 1, w - 2, h - 2)
+	surface.SetDrawColor(Lerp(hov, 255, ar), Lerp(hov, 255, ag), Lerp(hov, 255, ab), 16 + 184 * hov)
+	surface.DrawOutlinedRect(0, 0, w, h, 1)
+end
+
+-- ============================================================
+-- Скролл с тонкой полосой и плавной прокруткой колесом
+-- ============================================================
+local scrollBase = baseclass.Get("DScrollPanel")
 local PANEL = {}
 
 function PANEL:Init()
-	self:SetTall(math.floor(ScrH() * 0.028))
+	local bar = self:GetVBar()
+
+	bar:SetWide(S(4))
+	bar:SetHideButtons(true)
+
+	bar.Paint = function(this, w, h)
+		draw.NoTexture()
+		surface.SetDrawColor(255, 255, 255, 8)
+		surface.DrawRect(0, 0, w, h)
+	end
+
+	bar.btnGrip.Paint = function(this, w, h)
+		local accent = GetAccent()
+
+		draw.NoTexture()
+		surface.SetDrawColor(accent.r, accent.g, accent.b, this.Depressed and 230 or 140)
+		surface.DrawRect(0, 0, w, h)
+	end
+end
+
+function PANEL:PerformLayout(w, h)
+	if (scrollBase.PerformLayout) then
+		scrollBase.PerformLayout(self, w, h)
+	end
+
+	if (self.onLayout and self.lastLayoutH != h) then
+		self.lastLayoutH = h
+		self.onLayout(self)
+	end
+end
+
+function PANEL:OnMouseWheeled(delta)
+	local bar = self:GetVBar()
+	local maxScroll = math.max(self:GetCanvas():GetTall() - self:GetTall(), 0)
+
+	self.targetScroll = math.Clamp((self.targetScroll or bar:GetScroll()) - delta * S(90), 0, maxScroll)
+
+	return true
+end
+
+function PANEL:Think()
+	if (!self.targetScroll) then
+		return
+	end
+
+	local bar = self:GetVBar()
+	local cur = bar:GetScroll()
+	local new = Lerp(math.min(RealFrameTime() * 12, 1), cur, self.targetScroll)
+
+	if (math.abs(new - self.targetScroll) < 0.5) then
+		new = self.targetScroll
+		self.targetScroll = nil
+	end
+
+	bar:SetScroll(new)
+end
+
+vgui.Register("ixInfoScroll", PANEL, "DScrollPanel")
+
+-- ============================================================
+-- Заголовок раздела: маркер, текст, линия, текст справа
+-- ============================================================
+PANEL = {}
+
+function PANEL:Init()
+	self:SetTall(S(26))
 
 	self.text = ""
 	self.rightText = ""
@@ -338,47 +412,46 @@ end
 
 function PANEL:Paint(w, h)
 	local accent = GetAccent()
-	local ar, ag, ab = accent.r, accent.g, accent.b
-	local now = RealTime()
 	local mid = math.floor(h * 0.5)
 
 	draw.NoTexture()
-	surface.SetDrawColor(255, 255, 255, 140 + 100 * (0.5 + 0.5 * math.sin(now * 3)))
-	surface.DrawRect(0, mid - 3, 6, 6)
+	surface.SetDrawColor(accent.r, accent.g, accent.b, 230)
+	surface.DrawRect(0, mid - S(6), 2, S(12))
 
 	surface.SetFont("ixInfoSmall")
 
-	local fullW = surface.GetTextSize(self.text)
+	local tw = surface.GetTextSize(self.text)
 
-	draw.SimpleText(Typed(self, self.text, 0.5), "ixInfoSmall", 16, mid, Color(255, 255, 255, 215), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	draw.SimpleText(self.text, "ixInfoSmall", S(10), mid, Color(255, 255, 255, 190), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 
 	local rw = 0
 
 	if (self.rightText != "") then
 		surface.SetFont("ixInfoMono")
-		rw = surface.GetTextSize(self.rightText) + 14
+		rw = surface.GetTextSize(self.rightText) + S(10)
 
-		draw.SimpleText(self.rightText, "ixInfoMono", w, mid, Color(ar, ag, ab, 210), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+		draw.SimpleText(self.rightText, "ixInfoMono", w, mid, Color(accent.r, accent.g, accent.b, 220), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
 	end
 
-	local x0 = 16 + fullW + 14
+	local x0 = S(10) + tw + S(12)
 	local x1 = w - rw
 
 	if (x1 > x0) then
 		draw.NoTexture()
-		surface.SetDrawColor(ar, ag, ab, 70)
+		surface.SetDrawColor(255, 255, 255, 18)
 		surface.DrawRect(x0, mid, x1 - x0, 1)
-		surface.DrawRect(x0, mid - 3, 1, 7)
-		surface.DrawRect(x1 - 1, mid - 3, 1, 7)
 	end
 end
 
 vgui.Register("ixInfoSection", PANEL, "Panel")
 
+-- ============================================================
+-- Шапка окна (текст; фон и линия рисуются в корневой панели)
+-- ============================================================
 PANEL = {}
 
 function PANEL:Init()
-	self:SetTall(math.floor(ScrH() * 0.034))
+	self:SetTall(S(52))
 
 	self.text = ""
 	self.nextTime = 0
@@ -402,39 +475,60 @@ function PANEL:Think()
 end
 
 function PANEL:Paint(w, h)
-	local accent = GetAccent()
-	local ar, ag, ab = accent.r, accent.g, accent.b
-	local now = RealTime()
-	local mid = math.floor(h * 0.5)
+	local cy = math.floor(h * 0.5)
 
-	draw.NoTexture()
-	surface.SetDrawColor(0, 0, 0, 140)
-	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 16)
-	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 70)
-	surface.DrawOutlinedRect(0, 0, w, h, 1)
-
-	DrawBrackets(0, 0, w, h, 8, 255, 255, 255, 150)
-
-	surface.SetDrawColor(255, 255, 255, 120 + 110 * (0.5 + 0.5 * math.sin(now * 3.2)))
-	surface.DrawRect(14, mid - 3, 7, 7)
-
-	draw.SimpleText("СИСТЕМНОЕ ВРЕМЯ", "ixInfoTiny", 30, mid, Color(ar, ag, ab, 200), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-	draw.SimpleText(self.text, "ixInfoMid", math.floor(w * 0.5), mid, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	draw.SimpleText("ЛОКАЛЬНОЕ  " .. os.date("%H:%M:%S"), "ixInfoMono", w - 16, mid, Color(255, 255, 255, 170), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+	draw.SimpleText("ЛИЧНОЕ ДЕЛО", "ixInfoTitle", S(24), cy, Color(255, 255, 255, 220), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	draw.SimpleText(self.text, "ixInfoSmall", w - S(20), cy, Color(255, 255, 255, 130), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
 end
 
-vgui.Register("ixInfoClock", PANEL, "Panel")
+vgui.Register("ixInfoHeader", PANEL, "Panel")
 
+-- ============================================================
+-- Карточка профиля (левая колонка): фон с оттенком цвета фракции
+-- ============================================================
 PANEL = {}
 
 function PANEL:Init()
-	self:SetTall(math.floor(ScrH() * 0.125))
+	self.color = nil
 
+	self:DockPadding(S(20), S(8), S(20), S(12))
+end
+
+function PANEL:Paint(w, h)
+	local r, g, b = ReadableColor(self.color)
+
+	draw.NoTexture()
+	surface.SetDrawColor(0, 0, 0, 110)
+	surface.DrawRect(0, 0, w, h)
+	surface.SetDrawColor(22, 27, 34, 190)
+	surface.DrawRect(1, 1, w - 2, h - 2)
+
+	-- вертикальный оттенок фракции сверху
+	local n = 24
+	local sh = math.ceil(h * 0.55 / n)
+
+	for i = 0, n - 1 do
+		surface.SetDrawColor(r, g, b, 34 * (1 - i / n) ^ 2)
+		surface.DrawRect(1, 1 + i * sh, w - 2, sh)
+	end
+
+	surface.SetDrawColor(r, g, b, 255)
+	surface.DrawRect(0, 0, w, 2)
+
+	surface.SetDrawColor(255, 255, 255, 16)
+	surface.DrawOutlinedRect(0, 0, w, h, 1)
+end
+
+vgui.Register("ixInfoProfile", PANEL, "Panel")
+
+-- ============================================================
+-- Эмблема, имя и номер дела (занимает всё свободное место карточки профиля)
+-- ============================================================
+PANEL = {}
+
+function PANEL:Init()
 	self.text = ""
 	self.idText = ""
-	self.subText = ""
 	self.initial = ""
 	self.backgroundColor = Color(0, 0, 0, 150)
 end
@@ -443,9 +537,8 @@ function PANEL:SetText(text)
 	self.text = text or ""
 end
 
-function PANEL:SetData(idText, subText, initial)
+function PANEL:SetData(idText, initial)
 	self.idText = idText or ""
-	self.subText = subText or ""
 	self.initial = initial or ""
 end
 
@@ -453,190 +546,43 @@ function PANEL:SizeToContents()
 end
 
 function PANEL:Paint(w, h)
-	local accent = GetAccent()
-	local ar, ag, ab = accent.r, accent.g, accent.b
 	local fr, fg, fb = ReadableColor(self.backgroundColor)
-	local now = RealTime()
-	local R = math.floor(h * 0.33)
-	local bx, by = w - R - 44, math.floor(h * 0.5)
+	local R = math.Clamp(math.floor(math.min(w, h) * 0.2), S(26), S(62))
+	local nameText, nameFont = FitText(self.text, {"ixInfoName", "ixInfoValue", "ixInfoMid"}, w)
 
-	draw.NoTexture()
-	surface.SetDrawColor(7, 10, 15, 205)
-	surface.DrawRect(0, 0, w, h)
+	surface.SetFont(nameFont)
 
-	DrawFade(0, 0, math.floor(w * 0.7), h, fr, fg, fb, 95, true)
+	local _, nh = surface.GetTextSize(nameText)
+	local blockH = R * 2 + S(20) + nh + S(8) + S(14)
+	local cx = math.floor(w * 0.5)
+	local cy = math.floor((h - blockH) * 0.5) + R
 
-	surface.SetDrawColor(ar, ag, ab, 90)
-	surface.DrawRect(0, 0, w, 1)
-	surface.DrawRect(0, h - 1, w, 1)
-
-	surface.SetDrawColor(fr, fg, fb, 255)
-	surface.DrawRect(0, 0, 6, h)
-	surface.SetDrawColor(255, 255, 255, 90)
-	surface.DrawRect(6, 0, 1, h)
-
-	DrawBrackets(0, 0, w, h, 14, ar, ag, ab, 170)
-
-	local tx = 30
-	local maxW = bx - R - 40 - tx
-
-	draw.SimpleText(Typed(self, self.idText, 0.6), "ixInfoMono", tx, math.floor(h * 0.2), Color(ar, ag, ab, 230), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-
-	local nameText, nameFont = FitText(self.text, {"ixInfoName", "ixInfoValue", "ixInfoMid"}, maxW)
-	local typedName = Typed(self, nameText, 0.7)
-
-	draw.SimpleText(typedName, nameFont, tx + 2, math.floor(h * 0.5) + 2, Color(0, 0, 0, 160), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-	draw.SimpleText(typedName, nameFont, tx, math.floor(h * 0.5), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-
-	local subText, subFont = FitText(self.subText, {"ixInfoSmall", "ixInfoTiny"}, maxW)
-
-	draw.SimpleText(Typed(self, subText, 0.8), subFont, tx, math.floor(h * 0.8), Color(255, 255, 255, 190), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-
+	-- мягкое свечение под эмблемой
 	surface.SetMaterial(glowMat)
-	surface.SetDrawColor(fr, fg, fb, 30)
-	surface.DrawTexturedRect(bx - R * 1.8, by - R * 1.8, R * 3.6, R * 3.6)
+	surface.SetDrawColor(fr, fg, fb, 40)
+	surface.DrawTexturedRect(cx - R * 2.2, cy - R * 2.2, R * 4.4, R * 4.4)
 	draw.NoTexture()
 
-	SmoothArc(bx, by, R, 0, 360, 1.5, 48, ar, ag, ab, 130)
+	SmoothArc(cx, cy, R, 0, 360, 2, 64, fr, fg, fb, 220)
+	SmoothArc(cx, cy, R - S(8), 0, 360, 1, 56, 255, 255, 255, 28)
 
-	for i = 0, 3 do
-		local s = now * 30 + i * 90
+	draw.SimpleText(self.initial, "ixInfoName", cx, cy, Color(255, 255, 255, 240), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
-		SmoothArc(bx, by, R + 8, s, s + 40, 2.5, 10, 255, 255, 255, 200)
-	end
+	local ny = cy + R + S(20)
 
-	for i = 0, 5 do
-		local s = -now * 45 + i * 60
-
-		SmoothArc(bx, by, R - 9, s, s + 22, 1.5, 6, ar, ag, ab, 150)
-	end
-
-	draw.SimpleText(self.initial, "ixInfoName", bx, by, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	draw.SimpleText(nameText, nameFont, cx, ny, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	draw.SimpleText(self.idText, "ixInfoMono", cx, ny + nh + S(8), Color(255, 255, 255, 115), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 end
 
 vgui.Register("ixInfoPlate", PANEL, "Panel")
 
+-- ============================================================
+-- Строка таблицы данных (подпись над значением), используется в профиле
+-- ============================================================
 PANEL = {}
 
 function PANEL:Init()
-	self.rawText = ""
-	self.lines = {}
-	self.hoverFrac = 0
-	self.maxW = 0
-	self.wrapW = -1
-	self.headerH = math.floor(ScrH() * 0.03)
-	self.pad = 16
-
-	self:SetMouseInputEnabled(true)
-	self:SetCursor("hand")
-	self:SetTall(self.headerH + 40)
-end
-
-function PANEL:SetText(text)
-	self.rawText = text or ""
-end
-
-function PANEL:SizeToContents()
-	local w = self:GetWide()
-
-	if (w <= 0) then
-		w = self.maxW or 0
-	end
-
-	if (w <= 0) then
-		return
-	end
-
-	self.wrapW = w
-
-	local text = self.rawText
-
-	self.bEmpty = string.Trim(text) == ""
-
-	if (self.bEmpty) then
-		text = "ОПИСАНИЕ НЕ ЗАДАНО. НАЖМИТЕ, ЧТОБЫ ДОБАВИТЬ."
-	end
-
-	self.lines = WrapText(text, "ixInfoText", w - self.pad * 2 - 8)
-
-	surface.SetFont("ixInfoText")
-
-	local _, th = surface.GetTextSize("A")
-
-	self.lineH = th + 3
-	self:SetTall(self.headerH + 10 + #self.lines * self.lineH + self.pad)
-end
-
-function PANEL:PerformLayout(w, h)
-	if (w > 0 and w != self.wrapW) then
-		self.maxW = w
-		self:SizeToContents()
-	end
-end
-
-function PANEL:OnCursorEntered()
-	PlayUI("hover", 1.05, 0.7)
-end
-
-function PANEL:OnMousePressed(code)
-	if (code == MOUSE_LEFT) then
-		PlayUI("click")
-		ix.command.Send("CharDesc")
-
-		if (IsValid(ix.gui.menu)) then
-			ix.gui.menu:Remove()
-		end
-	end
-end
-
-function PANEL:Paint(w, h)
-	local accent = GetAccent()
-	local ar, ag, ab = accent.r, accent.g, accent.b
-	local pad = self.pad
-
-	self.hoverFrac = Lerp(math.min(RealFrameTime() * 12, 1), self.hoverFrac, self:IsHovered() and 1 or 0)
-
-	local hov = self.hoverFrac
-
-	draw.NoTexture()
-	surface.SetDrawColor(0, 0, 0, 150)
-	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 14 + 26 * hov)
-	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 70 + 100 * hov)
-	surface.DrawOutlinedRect(0, 0, w, h, 1)
-	surface.SetDrawColor(255, 255, 255, 70 + 185 * hov)
-	surface.DrawRect(0, 0, 4, h)
-
-	if (hov > 0.02) then
-		DrawBrackets(0, 0, w, h, math.floor(10 * hov), 255, 255, 255, 200 * hov)
-	end
-
-	local hy = math.floor(self.headerH * 0.5)
-
-	draw.SimpleText("ВНЕШНИЕ ДАННЫЕ", "ixInfoTiny", pad + 4, hy, Color(ar, ag, ab, 220), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-	draw.SimpleText("[ ЛКМ — ИЗМЕНИТЬ ОПИСАНИЕ ]", "ixInfoTiny", w - pad, hy, Color(255, 255, 255, 70 + 170 * hov), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
-
-	draw.NoTexture()
-	surface.SetDrawColor(ar, ag, ab, 55)
-	surface.DrawRect(pad + 4, self.headerH, w - (pad + 4) * 2, 1)
-
-	local col = self.bEmpty and Color(255, 255, 255, 90) or Color(255, 255, 255, 225)
-	local lh = self.lineH or 20
-
-	for i, line in ipairs(self.lines) do
-		if (line != "") then
-			draw.SimpleText(line, "ixInfoText", pad + 4, self.headerH + 10 + (i - 1) * lh, col, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
-		end
-	end
-end
-
-vgui.Register("ixInfoDescription", PANEL, "Panel")
-
-PANEL = {}
-
-function PANEL:Init()
-	self:SetTall(math.floor(ScrH() * 0.07))
+	self:SetTall(S(62))
 	self:SetMouseInputEnabled(true)
 
 	self.label = ""
@@ -668,48 +614,140 @@ function PANEL:OnCursorEntered()
 end
 
 function PANEL:Paint(w, h)
-	local accent = GetAccent()
-	local ar, ag, ab = accent.r, accent.g, accent.b
-	local sr, sg, sb = ReadableColor(self.stripe)
-
-	self.hoverFrac = Lerp(math.min(RealFrameTime() * 12, 1), self.hoverFrac, self:IsHovered() and 1 or 0)
-
-	local hov = self.hoverFrac
+	local hov = Hover(self)
 
 	draw.NoTexture()
-	surface.SetDrawColor(0, 0, 0, 150)
+	surface.SetDrawColor(255, 255, 255, 6 * hov)
 	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 12 + 22 * hov)
-	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 60 + 100 * hov)
-	surface.DrawOutlinedRect(0, 0, w, h, 1)
+	surface.SetDrawColor(255, 255, 255, 16)
+	surface.DrawRect(0, 0, w, 1)
 
-	surface.SetDrawColor(sr, sg, sb, 255)
-	surface.DrawRect(0, 0, 4 + math.floor(3 * hov), h)
+	draw.SimpleText(self.label, "ixInfoTiny", 0, math.floor(h * 0.31), Color(255, 255, 255, 115), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 
-	local bl = 8 + math.floor(4 * hov)
+	local fitText, font = FitText(self.text, {"ixInfoValue", "ixInfoMid", "ixInfoSmall"}, w)
+	local c = self.stripe and Color(ReadableColor(self.stripe)) or color_white
 
-	surface.SetDrawColor(255, 255, 255, 110 + 120 * hov)
-	surface.DrawRect(w - bl - 1, 0, bl, 2)
-	surface.DrawRect(w - 2, 0, 2, bl)
-	surface.DrawRect(w - bl - 1, h - 2, bl, 2)
-	surface.DrawRect(w - 2, h - bl, 2, bl)
-
-	draw.SimpleText(self.label, "ixInfoTiny", 18, math.floor(h * 0.28), Color(ar, ag, ab, 210), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-
-	local fitText, font = FitText(self.text, {"ixInfoValue", "ixInfoMid", "ixInfoSmall"}, w - 18 - 22)
-
-	draw.SimpleText(Typed(self, fitText, 0.5), font, 18, math.floor(h * 0.68), Color(255, 255, 255, 235 + 20 * hov), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	draw.SimpleText(fitText, font, 0, math.floor(h * 0.68), Color(c.r, c.g, c.b, 235 + 20 * hov), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 end
 
 vgui.Register("ixInfoTile", PANEL, "Panel")
 
+-- ============================================================
+-- Описание внешности (клик — изменить)
+-- ============================================================
 PANEL = {}
 
 function PANEL:Init()
-	self.cols = 3
-	self.gap = 8
-	self.rowH = math.floor(ScrH() * 0.07)
+	self.rawText = ""
+	self.lines = {}
+	self.hoverFrac = 0
+	self.maxW = S(600)
+	self.wrapW = -1
+	self.headerH = S(32)
+	self.pad = S(20)
+
+	self:SetMouseInputEnabled(true)
+	self:SetCursor("hand")
+	self:SetTall(self.headerH + S(52))
+end
+
+function PANEL:SetText(text)
+	self.rawText = text or ""
+end
+
+function PANEL:SizeToContents()
+	local w = self:GetWide()
+
+	if (w <= 0) then
+		w = self.maxW or 0
+	end
+
+	if (w <= 0) then
+		return
+	end
+
+	self.wrapW = w
+
+	local text = self.rawText
+
+	self.bEmpty = string.Trim(text) == ""
+
+	if (self.bEmpty) then
+		text = "ОПИСАНИЕ НЕ ЗАДАНО. НАЖМИТЕ, ЧТОБЫ ДОБАВИТЬ."
+	end
+
+	self.lines = WrapText(text, "ixInfoText", w - self.pad * 2)
+
+	surface.SetFont("ixInfoText")
+
+	local _, th = surface.GetTextSize("A")
+
+	self.lineH = th + S(4)
+	self:SetTall(self.headerH + S(10) + #self.lines * self.lineH + S(16))
+end
+
+function PANEL:PerformLayout(w, h)
+	if (w > 0 and w != self.wrapW) then
+		self.maxW = w
+		self:SizeToContents()
+	end
+end
+
+function PANEL:OnCursorEntered()
+	PlayUI("hover", 1.05, 0.7)
+end
+
+function PANEL:OnMousePressed(code)
+	if (code == MOUSE_LEFT) then
+		PlayUI("click")
+		ix.command.Send("CharDesc")
+
+		if (IsValid(ix.gui.menu)) then
+			ix.gui.menu:Remove()
+		end
+	end
+end
+
+function PANEL:Paint(w, h)
+	local accent = GetAccent()
+	local ar, ag, ab = accent.r, accent.g, accent.b
+	local pad = self.pad
+	local hov = Hover(self)
+
+	DrawCard(w, h, hov, ar, ag, ab)
+
+	surface.SetDrawColor(ar, ag, ab, 110 + 145 * hov)
+	surface.DrawRect(0, 0, S(2), h)
+
+	local hy = math.floor(self.headerH * 0.5) + S(2)
+
+	draw.SimpleText("ВНЕШНИЕ ДАННЫЕ", "ixInfoTiny", pad, hy, Color(255, 255, 255, 120), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	draw.SimpleText("ЛКМ — ИЗМЕНИТЬ", "ixInfoTiny", w - pad, hy, Color(ar, ag, ab, 230 * hov), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+
+	local col = self.bEmpty and Color(255, 255, 255, 90) or Color(255, 255, 255, 225)
+	local lh = self.lineH or S(23)
+
+	for i, line in ipairs(self.lines) do
+		if (line != "") then
+			draw.SimpleText(line, "ixInfoText", pad, self.headerH + S(10) + (i - 1) * lh, col, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+		end
+	end
+end
+
+vgui.Register("ixInfoDescription", PANEL, "Panel")
+
+-- ============================================================
+-- Сетка карточек: колонки по ширине, высота строк растягивается под доступное место
+-- ============================================================
+PANEL = {}
+
+function PANEL:Init()
+	self.minCellW = S(380)
+	self.gap = S(12)
+	self.rowH = S(96)
+	self.minRowH = S(96)
+	self.maxRowH = S(150)
+	self.viewport = nil
 end
 
 function PANEL:GetVisibleTiles()
@@ -725,30 +763,48 @@ function PANEL:GetVisibleTiles()
 end
 
 function PANEL:SizeToContents()
-	local rows = math.max(math.ceil(#self:GetVisibleTiles() / self.cols), 1)
-
-	self:SetTall(rows * self.rowH + (rows - 1) * self.gap)
 	self:InvalidateLayout(true)
 end
 
 function PANEL:PerformLayout(w, h)
-	local cw = math.floor((w - self.gap * (self.cols - 1)) / self.cols)
+	local tiles = self:GetVisibleTiles()
+	local cols = math.max(math.floor((w + self.gap) / (self.minCellW + self.gap)), 1)
 
-	for i, v in ipairs(self:GetVisibleTiles()) do
-		local col = (i - 1) % self.cols
-		local row = math.floor((i - 1) / self.cols)
+	cols = math.max(math.min(cols, #tiles), 1)
 
-		v:SetPos(col * (cw + self.gap), row * (self.rowH + self.gap))
-		v:SetSize(cw, self.rowH)
+	local rows = math.max(math.ceil(#tiles / cols), 1)
+	local rowH = self.rowH
+
+	if (IsValid(self.viewport) and self.viewport:GetTall() > 0) then
+		rowH = math.Clamp(math.floor((self.viewport:GetTall() - self.gap * (rows - 1)) / rows), self.minRowH, self.maxRowH)
+	end
+
+	local cw = math.floor((w - self.gap * (cols - 1)) / cols)
+
+	for i, v in ipairs(tiles) do
+		local col = (i - 1) % cols
+		local row = math.floor((i - 1) / cols)
+
+		v:SetPos(col * (cw + self.gap), row * (rowH + self.gap))
+		v:SetSize(cw, rowH)
+	end
+
+	local need = rows * rowH + (rows - 1) * self.gap
+
+	if (self:GetTall() != need) then
+		self:SetTall(need)
 	end
 end
 
 vgui.Register("ixInfoGrid", PANEL, "Panel")
 
+-- ============================================================
+-- Карточка характеристики
+-- ============================================================
 PANEL = {}
 
 function PANEL:Init()
-	self:SetTall(math.floor(ScrH() * 0.05))
+	self:SetTall(S(96))
 	self:SetMouseInputEnabled(true)
 
 	self.label = ""
@@ -758,6 +814,8 @@ function PANEL:Init()
 	self.hoverFrac = 0
 	self.animStart = RealTime()
 	self.delay = 0
+	self.curLo = 0
+	self.curHi = 0
 end
 
 function PANEL:SetData(label, value, boost, maximum)
@@ -770,6 +828,8 @@ end
 function PANEL:Replay(delay)
 	self.animStart = RealTime()
 	self.delay = delay or 0
+	self.curLo = 0
+	self.curHi = 0
 end
 
 function PANEL:SizeToContents()
@@ -782,119 +842,119 @@ end
 function PANEL:Paint(w, h)
 	local accent = GetAccent()
 	local ar, ag, ab = accent.r, accent.g, accent.b
-	local pad = 14
+	local pad = S(18)
+	local hov = Hover(self)
+	local t = EaseOutCubic(math.Clamp((RealTime() - self.animStart - self.delay) / 0.8, 0, 1))
 
-	self.hoverFrac = Lerp(math.min(RealFrameTime() * 12, 1), self.hoverFrac, self:IsHovered() and 1 or 0)
+	DrawCard(w, h, hov, ar, ag, ab)
 
-	local hov = self.hoverFrac
-	local t = EaseOutCubic(math.Clamp((RealTime() - self.animStart - self.delay) / 0.9, 0, 1))
-
-	draw.NoTexture()
-	surface.SetDrawColor(0, 0, 0, 140)
-	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 10 + 20 * hov)
-	surface.DrawRect(0, 0, w, h)
-	surface.SetDrawColor(ar, ag, ab, 50 + 100 * hov)
-	surface.DrawOutlinedRect(0, 0, w, h, 1)
-	surface.SetDrawColor(255, 255, 255, 70 + 185 * hov)
-	surface.DrawRect(0, 0, 3 + math.floor(2 * hov), h)
+	surface.SetDrawColor(ar, ag, ab, 255 * hov)
+	surface.DrawRect(0, 0, S(2), h)
 
 	local bx, bw = pad, w - pad * 2
-	local bh = 6
-	local by = h - bh - 9
+	local bh = S(6)
+	local by = h - bh - S(16)
 
 	local value, boost = self.value, self.boost
 	local base = value - boost
 	local lo, hi = math.min(value, base), math.max(value, base)
-	local loF = math.Clamp(lo / self.max, 0, 1) * t
-	local hiF = math.Clamp(hi / self.max, 0, 1) * t
+	local k = math.min(RealFrameTime() * 10, 1)
 
-	surface.SetDrawColor(ar, ag, ab, 35)
+	self.curLo = Lerp(k, self.curLo or 0, math.Clamp(lo / self.max, 0, 1) * t)
+	self.curHi = Lerp(k, self.curHi or 0, math.Clamp(hi / self.max, 0, 1) * t)
+
+	local loF, hiF = self.curLo, self.curHi
+
+	-- полоска
+	surface.SetDrawColor(255, 255, 255, 16)
 	surface.DrawRect(bx, by, bw, bh)
 
-	surface.SetDrawColor(255, 255, 255, 235)
+	surface.SetDrawColor(ar, ag, ab, 235)
 	surface.DrawRect(bx, by, math.floor(bw * loF), bh)
 
 	if (boost != 0 and hiF > loF) then
 		local c = boost > 0 and COL_GOOD or COL_BAD
 
 		surface.SetDrawColor(c.r, c.g, c.b, 235)
-		surface.DrawRect(bx + math.floor(bw * loF), by, math.floor(bw * (hiF - loF)), bh)
+		surface.DrawRect(bx + math.floor(bw * loF), by, math.ceil(bw * (hiF - loF)), bh)
 	end
 
-	surface.SetDrawColor(7, 10, 15, 200)
-
-	for i = 1, 19 do
-		surface.DrawRect(bx + math.floor(bw * i / 20), by, 1, bh)
-	end
-
-	if (hiF > 0.005) then
-		surface.SetMaterial(glowMat)
-		surface.SetDrawColor(255, 255, 255, 110 * t)
-		surface.DrawTexturedRect(bx + bw * hiF - 14, by + bh * 0.5 - 14, 28, 28)
-		draw.NoTexture()
-	end
-
-	surface.SetDrawColor(ar, ag, ab, 120)
-	surface.DrawOutlinedRect(bx - 1, by - 1, bw + 2, bh + 2, 1)
-
-	local ty = math.floor((by - 3) * 0.5) + 1
+	-- верхняя строка: название и процент
+	local topY = S(24)
 	local pct = string.format("%d%%", math.floor(value / self.max * 100 + 0.5))
-	local nums = string.format("%.1f / %.1f", value, self.max)
 
-	surface.SetFont("ixInfoSmall")
+	surface.SetFont("ixInfoMid")
 
 	local pw = surface.GetTextSize(pct)
+	local label = FitText(Upper(self.label), {"ixInfoSmall"}, w - pad * 2 - pw - S(16))
 
-	draw.SimpleText(Upper(self.label), "ixInfoSmall", pad, ty, Color(255, 255, 255, 230), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-	draw.SimpleText(pct, "ixInfoSmall", w - pad, ty, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
-	draw.SimpleText(nums, "ixInfoMono", w - pad - pw - 14, ty, Color(ar, ag, ab, 220), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+	draw.SimpleText(label, "ixInfoSmall", pad, topY, Color(255, 255, 255, 190), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	draw.SimpleText(pct, "ixInfoMid", w - pad, topY, Color(255, 255, 255, 235), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+
+	-- значение крупно между строкой названия и полоской
+	local space = by - S(44)
+	local vfont = space >= S(46) and "ixInfoName" or "ixInfoValue"
+	local vy = S(44) + math.floor(space * 0.5)
+	local vtext = string.format("%.1f", value)
+
+	surface.SetFont(vfont)
+
+	local vw = surface.GetTextSize(vtext)
+
+	draw.SimpleText(vtext, vfont, pad, vy, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	draw.SimpleText(string.format("/ %.1f", self.max), "ixInfoMono", pad + vw + S(8), vy + S(4), Color(255, 255, 255, 110), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 
 	if (boost != 0) then
-		surface.SetFont("ixInfoMono")
-
-		local nw = surface.GetTextSize(nums)
 		local c = boost > 0 and COL_GOOD or COL_BAD
 
-		draw.SimpleText(string.format("%s%.1f", boost > 0 and "+" or "", boost), "ixInfoMono", w - pad - pw - 14 - nw - 12, ty, Color(c.r, c.g, c.b, 240), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+		draw.SimpleText(string.format("%s%.1f", boost > 0 and "+" or "", boost), "ixInfoMid", w - pad, vy, Color(c.r, c.g, c.b, 240), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
 	end
 end
 
 vgui.Register("ixInfoAttribute", PANEL, "Panel")
 
+-- строки, которые добавляют плагины через CreateCharacterInfo
 local function StyleRow(row, index)
 	row.Paint = function(this, w, h)
 		local accent = GetAccent()
 
 		draw.NoTexture()
-		surface.SetDrawColor(0, 0, 0, 140)
+		surface.SetDrawColor(255, 255, 255, 6)
 		surface.DrawRect(0, 0, w, h)
-		surface.SetDrawColor(accent.r, accent.g, accent.b, 10 + (index % 2) * 10)
-		surface.DrawRect(0, 0, w, h)
-		surface.SetDrawColor(255, 255, 255, 90)
-		surface.DrawRect(0, 0, 3, h)
-		surface.SetDrawColor(accent.r, accent.g, accent.b, 50)
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 120)
+		surface.DrawRect(0, 0, S(2), h)
+		surface.SetDrawColor(255, 255, 255, 14)
 		surface.DrawRect(0, h - 1, w, 1)
 	end
 end
 
+-- ============================================================
+-- Основная панель
+-- ============================================================
 PANEL = {}
 
-local scrollBase = baseclass.Get("DScrollPanel")
+local function StackHeight(this)
+	local height = 0
+
+	for _, v in ipairs(this:GetChildren()) do
+		if (IsValid(v) and v:IsVisible()) then
+			local _, top, _, bottom = v:GetDockMargin()
+			height = height + v:GetTall() + top + bottom
+		end
+	end
+
+	this:SetTall(height)
+end
 
 function PANEL:Init()
-	local parent = self:GetParent()
-	local pad = GetPad()
+	local gap = S(CFG.gap)
+	local pad = S(20)
 
 	self:SetSize(math.floor(ScrW() * CFG.windowWidth), math.floor(ScrH() * CFG.windowHeight))
 	self:Recenter()
 
-	self.VBar:SetWide(0)
-
 	self.revealList = {}
 	self.rowCounter = 0
-
-	local innerW = self:GetWide() - pad * 2
 
 	local function Reg(pnl)
 		self.revealList[#self.revealList + 1] = pnl
@@ -905,79 +965,66 @@ function PANEL:Init()
 	local suppress = {}
 	hook.Run("CanCreateCharacterInfo", suppress)
 
-	if (!suppress.time) then
-		self.time = Reg(self:Add("ixInfoClock"))
-		self.time:Dock(TOP)
-		self.time:DockMargin(0, 0, 0, 12)
-	end
+	-- шапка
+	self.header = Reg(self:Add("ixInfoHeader"))
+	self.header:Dock(TOP)
 
-	if (!suppress.name) then
-		self.name = Reg(self:Add("ixInfoPlate"))
-		self.name:Dock(TOP)
-		self.name:DockMargin(0, 0, 0, 10)
-	end
+	-- тело: слева карточка профиля, справа описание и характеристики
+	self.body = self:Add("Panel")
+	self.body:Dock(FILL)
+	self.body:DockPadding(pad, pad, pad, pad)
 
-	if (!suppress.description) then
-		self.description = Reg(self:Add("ixInfoDescription"))
-		self.description.maxW = innerW
-		self.description:Dock(TOP)
-		self.description:DockMargin(0, 0, 0, 8)
-	end
+	self.profile = Reg(self.body:Add("ixInfoProfile"))
+	self.profile:Dock(LEFT)
+	self.profile:SetWide(S(CFG.leftWidth))
+	self.profile:DockMargin(0, 0, pad, 0)
+	self.profile:DockPadding(S(20), S(8), S(20), S(CFG.profileBottom))
 
+	self.right = self.body:Add("Panel")
+	self.right:Dock(FILL)
+
+	-- нижняя часть профиля: строки докаются снизу вверх (первая добавленная — самая нижняя)
 	if (!suppress.characterInfo) then
-		self.dataHeader = Reg(self:Add("ixInfoSection"))
-		self.dataHeader:SetText("ДАННЫЕ ПЕРСОНАЖА")
-		self.dataHeader:Dock(TOP)
-		self.dataHeader:DockMargin(0, 12, 0, 8)
-
-		self.dataGrid = self:Add("ixInfoGrid")
-		self.dataGrid:Dock(TOP)
-
-		if (!suppress.faction) then
-			self.faction = Reg(self.dataGrid:Add("ixInfoTile"))
+		if (!suppress.money) then
+			self.money = self.profile:Add("ixInfoTile")
+			self.money:Dock(BOTTOM)
 		end
 
 		if (!suppress.class) then
-			self.class = Reg(self.dataGrid:Add("ixInfoTile"))
+			self.class = self.profile:Add("ixInfoTile")
+			self.class:Dock(BOTTOM)
 		end
 
-		if (!suppress.money) then
-			self.money = Reg(self.dataGrid:Add("ixInfoTile"))
+		if (!suppress.faction) then
+			self.faction = self.profile:Add("ixInfoTile")
+			self.faction:Dock(BOTTOM)
 		end
 
-		if (!suppress.operator) then
-			self.operator = Reg(self.dataGrid:Add("ixInfoTile"))
-		end
-
-		if (!suppress.ping) then
-			self.ping = Reg(self.dataGrid:Add("ixInfoTile"))
-		end
-
-		self.dataGrid:SizeToContents()
-
-		self.extraHeader = Reg(self:Add("ixInfoSection"))
-		self.extraHeader:SetText("ДОПОЛНИТЕЛЬНО")
-		self.extraHeader:Dock(TOP)
-		self.extraHeader:DockMargin(0, 12, 0, 8)
-
-		self.characterInfo = Reg(self:Add("Panel"))
+		self.characterInfo = self.profile:Add("Panel")
 		self.characterInfo.list = {}
-		self.characterInfo:Dock(TOP)
-		self.characterInfo.SizeToContents = function(this)
-			local height = 0
+		self.characterInfo:Dock(BOTTOM)
+		self.characterInfo:DockMargin(0, 0, 0, S(8))
+		self.characterInfo.SizeToContents = StackHeight
 
-			for _, v in ipairs(this:GetChildren()) do
-				if (IsValid(v) and v:IsVisible()) then
-					local _, top, _, bottom = v:GetDockMargin()
-					height = height + v:GetTall() + top + bottom
-				end
-			end
-
-			this:SetTall(height)
-		end
+		self.extraHeader = self.profile:Add("ixInfoSection")
+		self.extraHeader:SetText("ДОПОЛНИТЕЛЬНО")
+		self.extraHeader:Dock(BOTTOM)
+		self.extraHeader:DockMargin(0, 0, 0, S(8))
 
 		hook.Run("CreateCharacterInfo", self.characterInfo)
 		self:RefreshExtra()
+	end
+
+	-- эмблема, имя и номер дела занимают всё оставшееся место
+	if (!suppress.name) then
+		self.name = self.profile:Add("ixInfoPlate")
+		self.name:Dock(FILL)
+	end
+
+	if (!suppress.description) then
+		self.description = Reg(self.right:Add("ixInfoDescription"))
+		self.description:Dock(TOP)
+		self.description:DockMargin(0, 0, 0, gap)
 	end
 
 	if (!suppress.attributes) then
@@ -985,40 +1032,39 @@ function PANEL:Init()
 		local list = ix.attributes and ix.attributes.list
 
 		if (character and list and table.Count(list) > 0) then
-			self.attrHeader = Reg(self:Add("ixInfoSection"))
+			self.attrHeader = Reg(self.right:Add("ixInfoSection"))
 			self.attrHeader:SetText("ХАРАКТЕРИСТИКИ")
 			self.attrHeader:Dock(TOP)
-			self.attrHeader:DockMargin(0, 12, 0, 8)
+			self.attrHeader:DockMargin(0, 0, 0, S(10))
 
-			self.attributes = self:Add("Panel")
-			self.attributes:Dock(TOP)
+			self.attrScroll = self.right:Add("ixInfoScroll")
+			self.attrScroll:Dock(FILL)
+
+			self.attributes = self.attrScroll:Add("ixInfoGrid")
+			self.attributes.viewport = self.attrScroll
+			self.attributes.minCellW = S(CFG.attrMinWidth)
+			self.attributes.minRowH = S(CFG.attrMinHeight)
+			self.attributes.maxRowH = S(CFG.attrMaxHeight)
+			self.attributes.gap = S(12)
 			self.attributes.bars = {}
-			self.attributes.SizeToContents = function(this)
-				local height = 0
+			self.attributes:Dock(TOP)
 
-				for _, v in ipairs(this:GetChildren()) do
-					if (IsValid(v) and v:IsVisible()) then
-						local _, top, _, bottom = v:GetDockMargin()
-						height = height + v:GetTall() + top + bottom
-					end
+			local grid = self.attributes
+
+			self.attrScroll.onLayout = function()
+				if (IsValid(grid)) then
+					grid:InvalidateLayout()
 				end
-
-				this:SetTall(height)
 			end
-
-			local bFirst = true
 
 			for k, v in SortedPairsByMemberValue(list, "name") do
 				local bar = Reg(self.attributes:Add("ixInfoAttribute"))
-				bar:Dock(TOP)
-				bar:DockMargin(0, bFirst and 0 or 4, 0, 0)
 				bar.attributeID = k
 
 				if (isstring(v.description) and v.description != "") then
-					bar:SetTooltip(L(v.description))
+					bar:SetTooltip(L2(v.description) or v.description)
 				end
 
-				bFirst = false
 				self.attributes.bars[#self.attributes.bars + 1] = bar
 			end
 
@@ -1027,15 +1073,11 @@ function PANEL:Init()
 		end
 	end
 
-	hook.Run("CreateCharacterInfoCategory", self)
+	hook.Run("CreateCharacterInfoCategory", self.right)
+end
 
-	local children = self:GetCanvas():GetChildren()
-
-	for i, child in ipairs(children) do
-		local l, t, r, b = child:GetDockMargin()
-
-		child:DockMargin(l + pad, t + (i == 1 and pad or 0), r + pad, b + (i == #children and pad or 0))
-	end
+function PANEL:GetCanvas()
+	return self.right
 end
 
 function PANEL:Recenter()
@@ -1087,6 +1129,10 @@ function PANEL:RefreshExtra()
 		self.extraHeader:SetVisible(count > 0)
 		self.extraHeader:SetRightText(count > 0 and string.format("%02d", count) or "")
 	end
+
+	if (IsValid(self.profile)) then
+		self.profile:InvalidateLayout()
+	end
 end
 
 function PANEL:UpdateAttributes(character)
@@ -1132,11 +1178,6 @@ function PANEL:UpdateLive()
 		return
 	end
 
-	if (IsValid(self.ping)) then
-		self.ping:SetLabelText("ЗАДЕРЖКА")
-		self.ping:SetText(ply:Ping() .. " МС")
-	end
-
 	local character = ply.GetCharacter and ply:GetCharacter()
 
 	if (character) then
@@ -1149,10 +1190,6 @@ function PANEL:UpdateLive()
 end
 
 function PANEL:Think()
-	if (scrollBase.Think) then
-		scrollBase.Think(self)
-	end
-
 	self:Recenter()
 
 	local now = CurTime()
@@ -1179,17 +1216,15 @@ function PANEL:Update(character)
 	local bShowClass = class and (!faction or class.name != faction.name)
 	local className = bShowClass and Upper(L(class.name)) or ""
 
+	if (IsValid(self.profile)) then
+		self.profile.color = faction and faction.color or nil
+	end
+
 	if (IsValid(self.name)) then
-		local sub = factionName
-
-		if (bShowClass) then
-			sub = sub .. "  //  " .. className
-		end
-
 		local initial = SplitChars(factionName)[1] or ""
 
 		self.name:SetText(character:GetName())
-		self.name:SetData(string.format("ЛИЧНОЕ ДЕЛО  //  № %06d", character:GetID() or 0), sub, initial)
+		self.name:SetData(string.format("№ %06d", character:GetID() or 0), initial)
 
 		if (faction) then
 			self.name.backgroundColor = ColorAlpha(faction.color, 150) or Color(0, 0, 0, 150)
@@ -1222,13 +1257,8 @@ function PANEL:Update(character)
 		self.money:SetText(ix.currency.Get(character:GetMoney()))
 	end
 
-	if (IsValid(self.operator)) then
-		self.operator:SetLabelText("STEAM-НИК")
-		self.operator:SetText(LocalPlayer():SteamName())
-	end
-
-	if (IsValid(self.dataGrid)) then
-		self.dataGrid:SizeToContents()
+	if (IsValid(self.profile)) then
+		self.profile:InvalidateLayout()
 	end
 
 	self:UpdateLive()
@@ -1243,28 +1273,23 @@ function PANEL:Update(character)
 end
 
 function PANEL:Reveal()
+	local step = math.min(CFG.revealStep, 1 / math.max(#self.revealList, 1))
+
 	for i, pnl in ipairs(self.revealList) do
 		if (IsValid(pnl)) then
 			pnl.revealA = 0
-			pnl.typeStart = nil
 			pnl:SetAlpha(0)
 
-			timer.Simple((i - 1) * (CFG.revealStep or 0.05), function()
+			timer.Simple((i - 1) * step, function()
 				if (!IsValid(pnl)) then
 					return
 				end
-
-				pnl.typeStart = RealTime()
 
 				if (pnl.Replay) then
 					pnl:Replay()
 				end
 
-				if (i % 3 == 1) then
-					PlayUI("tick", 0.8 + i * 0.03, 0.8)
-				end
-
-				pnl:CreateAnimation(0.5, {
+				pnl:CreateAnimation(0.45, {
 					index = 30,
 					target = {revealA = 255},
 					easing = "outCubic",
@@ -1288,62 +1313,51 @@ function PANEL:OnSubpanelRightClick()
 	properties.OpenEntityMenu(LocalPlayer())
 end
 
+-- фон и шапка в стиле cl_inventory
 function PANEL:Paint(w, h)
+	if (CFG.blur and ix.util.DrawBlur) then
+		ix.util.DrawBlur(self, 6)
+	end
+
 	local accent = GetAccent()
-	local ar, ag, ab = accent.r, accent.g, accent.b
+	local headerH = IsValid(self.header) and self.header:GetTall() or S(52)
+	local cy = math.floor(headerH * 0.5)
 
 	draw.NoTexture()
-	surface.SetDrawColor(7, 10, 15, 215)
+
+	surface.SetDrawColor(8, 11, 16, 215)
 	surface.DrawRect(0, 0, w, h)
 
-	DrawFade(0, 0, math.floor(w * 0.35), h, ar, ag, ab, 14, true)
+	surface.SetDrawColor(0, 0, 0, 90)
+	surface.DrawRect(0, 0, w, headerH)
 
-	local step = math.max(math.floor(ScrH() / 12), 48)
-
-	for gx = 0, w, step do
-		surface.SetDrawColor(ar, ag, ab, (gx / step) % 4 == 0 and 6 or 2.5)
-		surface.DrawRect(gx, 0, 1, h)
+	-- мягкое свечение под линией шапки
+	for i = 1, 6 do
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 16 * (1 - i / 6) ^ 2)
+		surface.DrawRect(1, headerH + i - 1, w - 2, 1)
 	end
 
-	for gy = 0, h, step do
-		surface.SetDrawColor(ar, ag, ab, (gy / step) % 4 == 0 and 6 or 2.5)
-		surface.DrawRect(0, gy, w, 1)
-	end
+	surface.SetDrawColor(accent.r, accent.g, accent.b, 60)
+	surface.DrawRect(0, headerH - 1, w, 1)
+
+	-- яркий отрезок на линии и маркер у заголовка
+	surface.SetDrawColor(accent.r, accent.g, accent.b, 230)
+	surface.DrawRect(S(8), headerH - 2, S(40), 3)
+	surface.DrawRect(S(8), cy - S(7), 2, S(14))
 end
 
 function PANEL:PaintOver(w, h)
 	local accent = GetAccent()
-	local ar, ag, ab = accent.r, accent.g, accent.b
-	local now = RealTime()
 
 	draw.NoTexture()
 
-	if (CFG.scanlines) then
-		surface.SetDrawColor(0, 0, 0, 12)
-
-		for y = 0, h, 3 do
-			surface.DrawRect(0, y, w, 1)
-		end
-
-		local bandH = h * 0.16
-		local y0 = ((now * h * 0.07) % (h + bandH)) - bandH
-		local parts = 14
-
-		for i = 0, parts - 1 do
-			local f = math.sin((i + 0.5) / parts * math.pi)
-
-			surface.SetDrawColor(ar, ag, ab, 5 * f)
-			surface.DrawRect(0, y0 + i * bandH / parts, w, math.ceil(bandH / parts) + 1)
-		end
-	end
-
-	surface.SetDrawColor(ar, ag, ab, 110)
+	surface.SetDrawColor(accent.r, accent.g, accent.b, 45)
 	surface.DrawOutlinedRect(0, 0, w, h, 1)
 
-	DrawBrackets(0, 0, w, h, 18, ar, ag, ab, 200)
+	DrawCorners(w, h, S(10), accent.r, accent.g, accent.b, 230)
 end
 
-vgui.Register("ixCharacterInfo", PANEL, "DScrollPanel")
+vgui.Register("ixCharacterInfo", PANEL, "Panel")
 
 hook.Add("CreateMenuButtons", "ixCharInfo", function(tabs)
 	tabs["you"] = {
@@ -1361,10 +1375,15 @@ hook.Add("CreateMenuButtons", "ixCharInfo", function(tabs)
 		OnSelected = function(info, container)
 			container.infoPanel:Update(LocalPlayer():GetCharacter())
 			container.infoPanel:Reveal()
-			ix.gui.menu:SetCharacterOverview(true)
+
+			if (IsValid(ix.gui.menu)) then
+				ix.gui.menu:SetCharacterOverview(CFG.characterOverview)
+			end
 		end,
 		OnDeselected = function(info, container)
-			ix.gui.menu:SetCharacterOverview(false)
+			if (IsValid(ix.gui.menu)) then
+				ix.gui.menu:SetCharacterOverview(false)
+			end
 		end
 	}
 end)

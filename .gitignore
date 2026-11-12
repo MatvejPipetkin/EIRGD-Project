@@ -2313,3 +2313,7 @@ GarrysModDS/garrysmod/clientside_errors.txt
 /GarrysModDS/garrysmod/data/helix/militaryrp
 /GarrysModDS/garrysmod/data/helix
 *.txt
+*.manifest
+*.gma
+*.cachedmsg
+*.acf

@@ -1,1 +1,1 @@
-[{"containerOpenTime":4}]
+[{"staminaDrain":2.3,"containerOpenTime":4}]
