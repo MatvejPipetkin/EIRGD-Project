@@ -2,85 +2,40 @@ local PLUGIN = PLUGIN
 PLUGIN.name = "Tab Rank"
 
 PLUGIN.ranks = {
-	["superadmin"] = 
+	["superadmin"] =
 		{
 			col = Color(84,204,252,120),
-			icon = "interval_ui/chat_icons/star.png",
+			icon = "icon16/star.png",
 		},
-	["Руководство"] = 
+	["Куратор проекта"] =
 		{
 			col = Color(84,204,252,120),
-			icon = "interval_ui/chat_icons/star.png",
+			icon = "icon16/award_star_gold_1.png",
 		},
-	["Global Team"] = 
-		{
-			col = Color(84,204,252,120),
-			icon = "interval_ui/chat_icons/star.png",
-		},
-	["Super Team"] = 
-		{
-			col = Color(84,204,252,120),
-			icon = "interval_ui/chat_icons/star.png",
-		},
-	["Спец Админ"] = 
-		{
-			col = Color(84,204,252,120),
-			icon = "interval_ui/chat_icons/moderator.png",
-		},
-	["Спец Ивентолог"] = 
-		{
-			col = Color(84,204,252,120),
-			icon = "interval_ui/chat_icons/paintbrush.png",
-		},
-	["Спец Куратор"] = 
-		{
-			col = Color(84,204,252,120),
-			icon = "interval_ui/chat_icons/moderator.png",
-		},
-	["Старший Админ"] = 
+	["Старший Администратор"] =
 		{
 			col = Color(113, 54, 138,120),
-			icon = "interval_ui/chat_icons/moderator.png",
+			icon = "icon16/shield.png",
 		},
-	["Старший Ивентолог"] = 
+	["Младший Администратор"] =
 		{
 			col = Color(113, 54, 138,120),
-			icon = "interval_ui/chat_icons/paintbrush.png",
+			icon = "icon16/user_suit.png",
 		},
-	["Старший Куратор"] = 
-		{
-			col = Color(113, 54, 138,120),
-			icon = "interval_ui/chat_icons/moderator.png",
-		},
-	["Младший Админ"] = 
-		{
-			col = Color(113, 54, 138,120),
-			icon = "interval_ui/chat_icons/moderator.png",
-		},
-	["Младший Ивентолог"] = 
-		{
-			col = Color(113, 54, 138,120),
-			icon = "interval_ui/chat_icons/paintbrush.png",
-		},
-	["Младший Куратор"] = 
+	["Хелпер"] =
 		{
 			col = Color(0,0,0,120),
-			icon = "interval_ui/chat_icons/moderator.png",
+			icon = "icon16/help.png",
 		},
-	["sponsor blessed"] = 
+	["Ивентолог"] =
 		{
-			col = Color(0,120,0,120),
-			icon = "interval_ui/chat_icons/heart.png",
+			col = Color(113, 54, 138,120),
+			icon = "icon16/wand.png",
 		},
-	["sponsor inversive"] = 
-		{
-			col = Color(0,120,0,120),
-			icon = "interval_ui/chat_icons/heart.png",
-		},
-	["user"] = 
+	["user"] =
 		{
 			col = Color(60,60,60,120),
-			icon = "interval_ui/chat_icons/message_icon.png",
+			icon = "icon16/user.png",
 		},
 }
 
