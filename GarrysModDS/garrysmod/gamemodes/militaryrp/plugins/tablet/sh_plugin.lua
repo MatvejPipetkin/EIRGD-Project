@@ -24,7 +24,7 @@ ix.tablet.commandGroups = {
 	["commander"] = true,
 	["superadmin"] = true
 }
-
+--
 ix.tablet.payInterval = 300 -- секунды между выплатами (поставьте то же, что у вас в настройке salaryInterval)
 
 -- ----- Значки званий -----
