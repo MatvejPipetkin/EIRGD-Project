@@ -16,7 +16,10 @@ local LOG_KIND = {
 	commend = {"ПООЩРЕНИЕ", C.ok},
 	order = {"ПРИКАЗ", C.warn},
 	account = {"ДОСТУП", C.info},
-	marker = {"КАРТА", C.dim}
+	marker = {"КАРТА", C.dim},
+	alert = {"ГОТОВНОСТЬ", C.warn},
+	beacon = {"СБОР", C.info},
+	suspend = {"ДОПУСК", C.danger}
 }
 
 local DAYS = {"воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"}
@@ -485,6 +488,17 @@ function PANEL:Init()
 
 		local st = ix.tablet.state
 
+		-- Боевая готовность фракции (выше мирного времени) — мигающий индикатор по центру.
+		if (st and st.alert and st.alert.level > 1) then
+			local lv = ix.tablet.alertLevels[st.alert.level]
+
+			if (lv) then
+				local pulse = st.alert.level >= 3 and (0.65 + 0.35 * math.sin(CurTime() * 4)) or 1
+
+				draw.SimpleText("● ГОТОВНОСТЬ: " .. lv.short, "ixTabletT", bw / 2, bh / 2, ColorAlpha(ix.tablet.AlertColor(st.alert.level), 255 * pulse), 1, 1)
+			end
+		end
+
 		if (st and st.unread > 0) then
 			local mx = x - S(78)
 			UI.Icon("mail", mx, bh / 2 - S(7), S(14), C.warn)
@@ -565,6 +579,7 @@ function PANEL:OnResponse(action, data)
 		local old = ix.tablet.state
 
 		data.positions = old and old.positions or {}
+		data.recv = CurTime()
 		data.me.color = Color(data.me.color.r, data.me.color.g, data.me.color.b)
 		ix.tablet.state = data
 
@@ -819,6 +834,11 @@ function PANEL:RefreshSidebar()
 		{"map", "Карта", "map"}
 	}
 
+	-- Вкладка высшего командования (звания от leaderFrom, см. sh_plugin.lua).
+	if (st.me.leader) then
+		tabs[#tabs + 1] = {"staff", "Ставка", "star"}
+	end
+
 	if (st.me.canManage) then
 		tabs[#tabs + 1] = {"log", "Журнал", "log"}
 	end
@@ -867,12 +887,24 @@ function PANEL:SwitchTab(name, refresh)
 		name = "home"
 	end
 
+	if (name == "staff" and !ix.tablet.state.me.leader) then
+		name = "home"
+	end
+
+	-- Вкладки из других файлов (например, «Ставка» из cl_tabletstaff.lua) лежат в ix.tablet.tabs.
+	local build = self["Tab_" .. name] or (ix.tablet.tabs and ix.tablet.tabs[name])
+
+	if (!build) then
+		name = "home"
+		build = self.Tab_home
+	end
+
 	self.tab = name
 	self.content:Clear()
 
 	local p = self.content:Add("EditablePanel")
 	p:Dock(FILL)
-	self["Tab_" .. name](self, p)
+	build(self, p)
 
 	if (!refresh) then
 		p:SetAlpha(0)
@@ -906,6 +938,30 @@ function PANEL:Tab_home(p)
 
 	local av = Avatar(top, me.model, S(76))
 	av:SetPos(S(18), S(14))
+
+	-- Боевая готовность выше мирного времени — полоса под шапкой.
+	local al = st.alert
+	local alv = al and al.level > 1 and ix.tablet.alertLevels[al.level]
+
+	if (alv) then
+		local strip = p:Add("EditablePanel")
+
+		strip:Dock(TOP)
+		strip:SetTall(S(34))
+		strip:DockMargin(0, 0, 0, S(10))
+
+		strip.Paint = function(_, w, h)
+			local col = ix.tablet.AlertColor(al.level)
+			local text = "БОЕВАЯ ГОТОВНОСТЬ: " .. alv.name
+
+			if (al.note and al.note != "") then text = text .. "  —  " .. al.note end
+
+			Box(0, 0, w, h, ColorAlpha(col, 26))
+			Outline(0, 0, w, h, ColorAlpha(col, 150))
+			Box(0, 0, S(4), h, col)
+			draw.SimpleText(Trunc(text, w - S(28), "ixTabletS"), "ixTabletS", S(16), h / 2, col, 0, 1)
+		end
+	end
 
 	local stats = p:Add("EditablePanel")
 	stats:Dock(TOP)
@@ -1203,6 +1259,10 @@ function PANEL:Tab_roster(p)
 			draw.SimpleText(e.online and "На связи" or ("Не в сети  |  был(а) в сети: " .. (e.seen and Ago(e.seen) or "давно")), "ixTabletT", S(88), S(68), e.online and C.ok or C.dim)
 
 			RankIcon(w - S(52), S(2), S(40), e.rank, C.accent)
+
+			if (e.suspended) then
+				Pill(w - S(8), S(62), "ДОПУСК ПРИОСТАНОВЛЕН", C.danger)
+			end
 		end
 
 		local av = Avatar(head, e.model, S(76))
@@ -1283,6 +1343,25 @@ function PANEL:Tab_roster(p)
 				Derma_Query("Сбросить логин и пароль бойца «" .. e.name .. "»? Он зарегистрирует новые данные при следующем входе.", "Сброс доступа", "Сбросить", function()
 					ix.tablet.Send("resetAccount", {id = e.id})
 				end, "Отмена")
+			end
+
+			-- Только лидерам и только для бойцов ниже по званию: закрыть/вернуть допуск к планшету.
+			if (me.leader and e.rank < me.rank) then
+				local susp = act:Add("ixTabletButton")
+				susp:Dock(RIGHT)
+				susp:DockMargin(0, 0, S(6), 0)
+				susp:SetWide(S(140))
+				susp:SetLabel(e.suspended and "Вернуть допуск" or "Закрыть допуск")
+				susp.col = e.suspended and C.ok or C.danger
+				susp.DoClick = function()
+					if (e.suspended) then
+						ix.tablet.Send("restore", {id = e.id})
+					else
+						Derma_Query("Приостановить допуск бойца «" .. e.name .. "» к планшету? Он потеряет доступ к приказам и составу, пока вы не вернёте допуск.", "Приостановка допуска", "Приостановить", function()
+							ix.tablet.Send("suspend", {id = e.id})
+						end, "Отмена")
+					end
+				end
 			end
 		end
 
@@ -1451,9 +1530,10 @@ function PANEL:Tab_orders(p)
 	end
 
 	if (self.orderCompose and st.me.canManage) then
+		local leader = st.me.leader and st.clearances and #st.clearances > 0
 		local card = Card(p, "НОВЫЙ ПРИКАЗ")
 		card:Dock(TOP)
-		card:SetTall(S(212))
+		card:SetTall(S(212) + (leader and S(40) or 0))
 		card:DockMargin(0, 0, 0, S(10))
 
 		local title = card:Add("DTextEntry")
@@ -1504,12 +1584,49 @@ function PANEL:Tab_orders(p)
 			pin.on = pinned
 		end
 
+		-- Лидерам: гриф секретности и подтверждение «принял к исполнению».
+		local clear, needAck = 1, false
+
+		if (leader) then
+			local row2 = card:Add("EditablePanel")
+			row2:Dock(TOP)
+			row2:SetTall(S(32))
+			row2:DockMargin(0, S(8), 0, 0)
+
+			local cb = row2:Add("ixTabletButton")
+			cb:Dock(LEFT)
+			cb:SetWide(S(250))
+			cb.col = C.danger
+
+			local function Refresh()
+				cb:SetLabel("Гриф: " .. st.clearances[clear].name)
+			end
+
+			Refresh()
+
+			cb.DoClick = function()
+				clear = clear % #st.clearances + 1
+				Refresh()
+			end
+
+			local ack = row2:Add("ixTabletToggle")
+			ack:Dock(LEFT)
+			ack:DockMargin(S(6), 0, 0, 0)
+			ack:SetWide(S(230))
+			ack:SetLabel("Требует подтверждения")
+			ack.col = C.info
+			ack.DoClick = function()
+				needAck = !needAck
+				ack.on = needAck
+			end
+		end
+
 		local pub = row:Add("ixTabletButton")
 		pub:Dock(RIGHT)
 		pub:SetWide(S(130))
 		pub:SetLabel("Опубликовать")
 		pub.DoClick = function()
-			ix.tablet.Send("order", {title = title:GetValue(), text = body:GetValue(), priority = pr, pinned = pinned})
+			ix.tablet.Send("order", {title = title:GetValue(), text = body:GetValue(), priority = pr, pinned = pinned, clear = clear, ack = needAck})
 		end
 	end
 
@@ -1524,18 +1641,27 @@ function PANEL:Tab_orders(p)
 		l:Dock(TOP)
 	end
 
+	-- Название грифа по минимальному званию (список грифов приходит только лидерам).
+	local function ClearName(o)
+		for _, c in ipairs(st.clearances or {}) do
+			if (c.min == o.minRank) then return "ГРИФ: " .. string.upper(c.name) end
+		end
+
+		return "СЕКРЕТНО (от звания " .. o.minRank .. ")"
+	end
+
 	for _, o in ipairs(orders) do
 		local lines = Wrap(o.text, S(560), "ixTabletS")
 		local row = scroll:Add("EditablePanel")
 
 		row:Dock(TOP)
 		row:DockMargin(0, 0, S(8), S(8))
-		row:SetTall(S(58) + #lines * S(18))
+		row:SetTall(S(58) + #lines * S(18) + (o.ack and S(38) or 0))
 
 		row.Paint = function(_, w, h)
 			Box(0, 0, w, h, C.panel)
 			Outline(0, 0, w, h, C.line)
-			Box(0, 0, S(4), h, PR_COL[o.priority] or C.dim)
+			Box(0, 0, S(4), h, o.minRank and C.danger or (PR_COL[o.priority] or C.dim))
 
 			draw.SimpleText(Trunc(o.title, w - S(330), "ixTabletM"), "ixTabletM", S(16), S(10), C.text)
 			draw.SimpleText(o.by .. " — " .. DateStr(o.time), "ixTabletT", S(16), S(34), C.dim)
@@ -1547,24 +1673,62 @@ function PANEL:Tab_orders(p)
 			local tx = w - (st.me.canManage and S(176) or S(12))
 			if (o.pinned) then tx = Pill(tx, S(10), "ЗАКРЕПЛЁН", C.accent) end
 			if (o.priority > 1) then Pill(tx, S(10), PR_TAG[o.priority], PR_COL[o.priority]) end
+
+			-- Гриф секретности и подтверждение — второй строкой плашек (кнопки справа сверху заканчиваются выше).
+			local tx2 = w - S(12)
+			if (o.minRank) then tx2 = Pill(tx2, S(36), ClearName(o), C.danger) end
+			if (o.ack) then Pill(tx2, S(36), "ПОДТВЕРЖДЕНИЕ", C.info) end
+
+			if (o.ack) then
+				local y = h - S(34)
+
+				Box(S(16), y - S(4), w - S(32), 1, C.line)
+
+				-- Лидеру — сводка, кто уже принял приказ.
+				if (o.ackTotal) then
+					local col = o.ackDone >= o.ackTotal and C.ok or C.warn
+
+					draw.SimpleText(string.format("Приняли: %d из %d", o.ackDone, o.ackTotal), "ixTabletS", S(16), y + S(16), col, 0, 1)
+				end
+
+				if (o.acked) then
+					draw.SimpleText("Принято вами к исполнению", "ixTabletS", w - S(16), y + S(16), C.ok, TEXT_ALIGN_RIGHT, 1)
+				end
+			end
 		end
 
+		local del, pin, ackBtn
+
 		if (st.me.canManage) then
-			local del = row:Add("ixTabletButton")
+			del = row:Add("ixTabletButton")
 			del:SetSize(S(64), S(24))
 			del:SetLabel("Удалить")
 			del.col = C.danger
 			del.DoClick = function() ix.tablet.Send("orderDel", {id = o.id}) end
 
-			local pin = row:Add("ixTabletButton")
+			pin = row:Add("ixTabletButton")
 			pin:SetSize(S(96), S(24))
 			pin:SetLabel(o.pinned and "Открепить" or "Закрепить")
 			pin.col = C.dim
 			pin.DoClick = function() ix.tablet.Send("orderPin", {id = o.id}) end
+		end
 
-			row.PerformLayout = function(_, w)
+		if (o.ack and !o.acked) then
+			ackBtn = row:Add("ixTabletButton")
+			ackBtn:SetSize(S(210), S(26))
+			ackBtn:SetLabel("Принял, исполняю")
+			ackBtn.col = C.ok
+			ackBtn.DoClick = function() ix.tablet.Send("orderAck", {id = o.id}) end
+		end
+
+		row.PerformLayout = function(_, w, h)
+			if (del) then
 				del:SetPos(w - S(72), S(8))
 				pin:SetPos(w - S(72) - S(102), S(8))
+			end
+
+			if (ackBtn) then
+				ackBtn:SetPos(w - S(218), h - S(35))
 			end
 		end
 	end

@@ -326,7 +326,8 @@ function PANEL:OpenDialog(sx, sy, wx, wy)
 	local UI = ix.tablet.ui
 	local C, S = UI.C, UI.S
 	local kinds = ix.tablet.markerKinds
-	local dw, dh = S(360), S(170)
+	local leader = ix.tablet.state and ix.tablet.state.me and ix.tablet.state.me.leader
+	local dw, dh = S(360), S(170) + (leader and S(42) or 0)
 	local d = self:Add("EditablePanel")
 
 	d:SetSize(dw, dh)
@@ -399,6 +400,35 @@ function PANEL:OpenDialog(sx, sy, wx, wy)
 	cancel:SetSize((dw - S(26)) / 2, S(32))
 	cancel:SetLabel("Отмена")
 	cancel.DoClick = function() d:Remove() end
+
+	-- Лидеру: сигнал сбора вместо обычной метки — маячок на экране и на карте у всех бойцов в сети.
+	if (leader) then
+		local durs = ix.tablet.beaconDurations or {10}
+		local di = 2 <= #durs and 2 or 1
+
+		local rally = d:Add("ixTabletButton")
+
+		rally:SetPos(S(10), S(170))
+		rally:SetSize(dw - S(20) - S(96), S(32))
+		rally.col = C.info
+		rally.DoClick = function()
+			ix.tablet.Send("beaconSet", {x = wx, y = wy, text = entry:GetValue(), dur = durs[di]})
+			d:Remove()
+		end
+
+		local dur = d:Add("ixTabletButton")
+
+		dur:SetPos(dw - S(10) - S(90), S(170))
+		dur:SetSize(S(90), S(32))
+		dur.col = C.dim
+		dur.DoClick = function()
+			di = di % #durs + 1
+			dur:SetLabel(durs[di] .. " мин.")
+		end
+
+		rally:SetLabel("Сигнал сбора для всех")
+		dur:SetLabel(durs[di] .. " мин.")
+	end
 
 	entry:RequestFocus()
 end
@@ -555,6 +585,26 @@ function PANEL:Paint(w, h)
 					draw.SimpleText(m.text, "ixTabletT", sx + S(9), sy, C.text, 0, 1)
 				end
 			end
+		end
+	end
+
+	-- Сигнал сбора (виден всем бойцам, подан лидером): пульсирующее кольцо с ромбом.
+	if (st and st.beacon) then
+		local b = st.beacon
+		local sx, sy = self:WorldToScreen(b.x, b.y)
+
+		if (sx > -S(40) and sx < w + S(40) and sy > -S(40) and sy < h + S(40)) then
+			local t = (CurTime() * 1.2) % 1
+			local r = S(7)
+
+			UI.Ring(sx, sy, S(8) + t * S(22), ColorAlpha(C.info, 190 * (1 - t)), 2)
+			UI.Poly(Color(0, 0, 0, 220), {{x = sx, y = sy - r - 2}, {x = sx + r + 2, y = sy}, {x = sx, y = sy + r + 2}, {x = sx - r - 2, y = sy}})
+			UI.Poly(C.info, {{x = sx, y = sy - r}, {x = sx + r, y = sy}, {x = sx, y = sy + r}, {x = sx - r, y = sy}})
+
+			local label = "СБОР" .. ((b.text or "") != "" and (": " .. b.text) or "")
+
+			draw.SimpleText(label, "ixTabletT", sx + S(12), sy + 1, Color(0, 0, 0, 220), 0, 1)
+			draw.SimpleText(label, "ixTabletT", sx + S(12), sy, C.info, 0, 1)
 		end
 	end
 

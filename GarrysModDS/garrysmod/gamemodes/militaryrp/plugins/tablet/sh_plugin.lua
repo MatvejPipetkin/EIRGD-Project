@@ -24,6 +24,35 @@ ix.tablet.commandGroups = {
 	["commander"] = true,
 	["superadmin"] = true
 }
+
+-- ----- Командование: инструменты лидеров («Ставка») -----
+-- Лидер фракции — боец со званием не ниже leaderFrom (см. ix.tablet.factions ниже). У армейской
+-- лестницы это 21 «Генерал армии» и 22 «Маршал». Лидерам открывается вкладка «Ставка»:
+--   * уровень боевой готовности фракции (баннер и индикатор на экране у всех бойцов в сети);
+--   * сигнал сбора (маячок на экране каждого бойца и на карте планшета);
+--   * грифы секретности на приказах и приказы «с подтверждением» (кто принял к исполнению);
+--   * приостановка допуска бойца к планшету (потерян планшет, расследование).
+-- Лидер автоматически получает и права командования (приказы, звания, выговоры, метки),
+-- даже если у него нет группы SAM из commandGroups.
+-- У фракции без leaderFrom (например, ОПГ) этих функций нет.
+
+-- Уровни боевой готовности (по возрастанию). color = {r, g, b}.
+ix.tablet.alertLevels = {
+	{name = "Мирное время", short = "МИР", color = {96, 200, 120}},
+	{name = "Повышенная готовность", short = "ГОТОВНОСТЬ", color = {232, 180, 60}},
+	{name = "Боевая тревога", short = "ТРЕВОГА", color = {236, 120, 56}},
+	{name = "Полная мобилизация", short = "МОБИЛИЗАЦИЯ", color = {224, 84, 72}}
+}
+
+-- Варианты длительности сигнала сбора (минуты). Лидер выбирает один из них в диалоге на карте.
+ix.tablet.beaconDurations = {5, 10, 30}
+
+function ix.tablet.AlertColor(level)
+	local lv = ix.tablet.alertLevels[level or 1] or ix.tablet.alertLevels[1]
+
+	return Color(lv.color[1], lv.color[2], lv.color[3])
+end
+
 ---
 ix.tablet.payInterval = 300 -- секунды между выплатами (поставьте то же, что у вас в настройке salaryInterval)
 
@@ -80,6 +109,17 @@ local ARMY_ICONS = {
 	{type = "star5", ring = true}                  -- 22 Маршал
 }
 
+-- Грифы секретности приказов (только для лидеров): min — с какого звания приказ виден бойцу.
+-- Ниже этого звания приказ в планшете просто не показывается. Номера — по ARMY_RANKS.
+local ARMY_CLEARANCES = {
+	{name = "Для всех", min = 1},
+	{name = "Сержантский состав+", min = 4},
+	{name = "Офицеры", min = 11},
+	{name = "Старшие офицеры+", min = 15},
+	{name = "Высший состав", min = 18},
+	{name = "Только лидеры", min = 21}
+}
+
 -- Зарплата за одну выплату. Индекс = номер звания (тот же порядок, что в ARMY_RANKS).
 local ARMY_PAY = {
 	50, 55, 60,                              -- 1-3   рядовой состав
@@ -113,7 +153,9 @@ ix.tablet.factions = {
 	["fvur"] = {
 		ranks = table.Copy(ARMY_RANKS),
 		icons = table.Copy(ARMY_ICONS),
-		pay = table.Copy(ARMY_PAY)
+		pay = table.Copy(ARMY_PAY),
+		leaderFrom = 21, -- 21 «Генерал армии» и 22 «Маршал» — лидеры
+		clearances = table.Copy(ARMY_CLEARANCES)
 	},
 	["opg"] = {
 		-- 8 званий, у ОПГ свой набор значков (не армейский).
@@ -134,7 +176,9 @@ ix.tablet.factions = {
 	["eir_republic"] = {
 		ranks = table.Copy(ARMY_RANKS),
 		icons = table.Copy(ARMY_ICONS),
-		pay = table.Copy(ARMY_PAY)
+		pay = table.Copy(ARMY_PAY),
+		leaderFrom = 21,
+		clearances = table.Copy(ARMY_CLEARANCES)
 	}
 }
 
@@ -156,6 +200,15 @@ function ix.tablet.IsCommand(client)
 	local group = client.sam_getrank and client:sam_getrank() or client:GetUserGroup()
 
 	return ix.tablet.commandGroups[string.lower(tostring(group or ""))] == true
+end
+
+-- Лидер ли боец с таким званием во фракции fid (нужен leaderFrom в ix.tablet.factions[fid]).
+function ix.tablet.IsLeader(fid, rank)
+	local cfg = ix.tablet.factions[fid]
+
+	if (!cfg or !cfg.leaderFrom) then return false end
+
+	return (tonumber(rank) or 0) >= cfg.leaderFrom
 end
 
 ix.command.Add("TabletIssue", {
@@ -277,7 +330,9 @@ ix.command.Add("TabletInfo", {
 ix.util.Include("sv_tablet.lua")
 ix.util.Include("sv_migrate.lua")
 ix.util.Include("sv_payroll.lua")
+ix.util.Include("sv_staff.lua")
 ix.util.Include("cl_tabletnet.lua")
+ix.util.Include("cl_tabletstaff.lua")
 
 -- ВАЖНО: порядок загрузки плагина в Helix - libs/ -> items/ -> derma/ -> и только ПОТОМ sh_plugin.lua.
 -- Поэтому библиотека интерфейса лежит в libs/cl_tabletui.lua (она должна быть готова до derma/cl_tablet.lua),

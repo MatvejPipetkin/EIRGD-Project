@@ -40,14 +40,27 @@ local function BuildDB(saved)
 		nextID = saved.nextID or 1,
 		serial = saved.serial or 0,
 		removed = StringKeys(saved.removed),
-		rankLadder = saved.rankLadder
+		rankLadder = saved.rankLadder,
+		alerts = saved.alerts or {},
+		beacons = saved.beacons or {}
 	}
 end
 
-PLUGIN.db = BuildDB(PLUGIN.db)
+-- Подтверждения приказов хранятся по ID бойцов: после загрузки из JSON ключи снова нужно сделать строками.
+local function FixOrders(db)
+	for _, order in pairs(db.orders) do
+		if (order.acks) then
+			order.acks = StringKeys(order.acks)
+		end
+	end
+
+	return db
+end
+
+PLUGIN.db = FixOrders(BuildDB(PLUGIN.db))
 
 function PLUGIN:LoadData()
-	self.db = BuildDB(self:GetData(nil, true))
+	self.db = FixOrders(BuildDB(self:GetData(nil, true)))
 
 	-- Однократный перенос номеров званий после смены лестницы (см. sv_migrate.lua).
 	if (self.MigrateRanks) then
@@ -223,6 +236,12 @@ local function ActivePlayer(char)
 	end
 end
 
+-- Помощники для sv_staff.lua (инструменты лидеров).
+PLUGIN.util = {
+	Send = Send, Err = Err, Log = Log, Persist = Persist, NextID = NextID, Clean = Clean,
+	EachMember = EachMember, ActivePlayer = ActivePlayer, Reset = Reset
+}
+
 -- ========== Состав ==========
 
 function PLUGIN:EnsureRoster(char)
@@ -261,7 +280,8 @@ function PLUGIN:IsCommand(client, char, id, entry)
 		entry.cmd = ix.tablet.IsCommand(client)
 	end
 
-	return entry.cmd == true
+	-- Лидеры фракции (см. leaderFrom в sh_plugin.lua) всегда имеют права командования.
+	return entry.cmd == true or ix.tablet.IsLeader(entry.faction, entry.rank)
 end
 
 -- ========== Устройства (предметы "tablet") ==========
@@ -421,6 +441,12 @@ function ix.tablet.Open(client, item)
 		return
 	end
 
+	-- Допуск приостановлен командованием (вкладка «Ставка»).
+	if (entry.suspended) then
+		client:Notify("Допуск к этому планшету приостановлен командованием.")
+		return
+	end
+
 	if (!item:GetData("serial")) then
 		item:SetData("serial", NewSerial())
 	end
@@ -500,6 +526,17 @@ function PLUGIN:PlayerLoadedCharacter(client, char, lastChar)
 	end
 
 	local entry = self:EnsureRoster(char)
+
+	-- Текущая боевая готовность и сигнал сбора фракции (или сброс, если персонаж не из состава).
+	if (self.PushStaffState) then
+		local fid = entry and entry.faction
+
+		timer.Simple(2, function()
+			if (IsValid(client) and client:GetCharacter() == char) then
+				self:PushStaffState(client, fid)
+			end
+		end)
+	end
 
 	if (entry) then
 		entry.seen = os.time()
@@ -583,6 +620,7 @@ function PLUGIN:BuildSync(client, fid, id, item)
 	local db = self.db
 	local mine = db.roster[id]
 	local isCmd = self:IsCommand(client, char, id, mine)
+	local leader = ix.tablet.IsLeader(fid, mine.rank)
 
 	local out = {
 		ranks = cfg.ranks,
@@ -603,6 +641,7 @@ function PLUGIN:BuildSync(client, fid, id, item)
 			rank = mine.rank,
 			rankName = cfg.ranks[mine.rank] or "?",
 			canManage = isCmd,
+			leader = leader,
 			since = mine.since,
 			reprimands = mine.reprimands,
 			commends = mine.commends,
@@ -643,6 +682,7 @@ function PLUGIN:BuildSync(client, fid, id, item)
 				seen = entry.seen,
 				count = #entry.reprimands,
 				commendCount = #entry.commends,
+				suspended = (leader and entry.suspended) and true or nil,
 				reprimands = full and entry.reprimands or {},
 				commends = full and entry.commends or {}
 			}
@@ -675,13 +715,53 @@ function PLUGIN:BuildSync(client, fid, id, item)
 	end
 
 	for oid, order in pairs(db.orders) do
-		if (order.faction == fid) then
-			out.orders[#out.orders + 1] = {
+		-- Гриф секретности: приказ виден только бойцам со званием не ниже order.minRank.
+		if (order.faction == fid and (!order.minRank or order.minRank <= mine.rank)) then
+			local o = {
 				id = oid, title = order.title, text = order.text,
 				priority = order.priority, pinned = order.pinned,
-				by = order.by, time = order.time
+				by = order.by, time = order.time,
+				minRank = order.minRank,
+				ack = order.ack and true or nil,
+				acked = (order.ack and order.acks and order.acks[id] != nil) and true or nil
 			}
+
+			-- Лидеру показываем, кто уже принял приказ к исполнению, а кто ещё нет.
+			if (leader and order.ack) then
+				local done, total, pending = 0, 0, {}
+
+				for rid, e in pairs(db.roster) do
+					if (e.faction == fid and (e.rank or 1) >= (order.minRank or 1)) then
+						total = total + 1
+
+						if (order.acks and order.acks[rid]) then
+							done = done + 1
+						elseif (#pending < 40) then
+							pending[#pending + 1] = e.name or "?"
+						end
+					end
+				end
+
+				o.ackDone, o.ackTotal, o.ackPending = done, total, pending
+			end
+
+			out.orders[#out.orders + 1] = o
 		end
+	end
+
+	-- Боевая готовность и сигнал сбора фракции (видны всем бойцам).
+	local alert = db.alerts[fid]
+
+	out.alert = {level = alert and alert.level or 1, by = alert and alert.by, time = alert and alert.time, note = alert and alert.note}
+
+	local beacon = db.beacons[fid]
+
+	if (beacon and beacon.expire > os.time()) then
+		out.beacon = {x = beacon.x, y = beacon.y, text = beacon.text, by = beacon.by, left = beacon.expire - os.time()}
+	end
+
+	if (leader) then
+		out.clearances = cfg.clearances
 	end
 
 	for _, msg in ipairs(db.messages[id] or {}) do
@@ -743,6 +823,14 @@ function PLUGIN:HandleRequest(client, action, data)
 
 	if (!char) then
 		Reset(client)
+		Send(client, "kicked")
+		return
+	end
+
+	-- Допуск владельца планшета приостановлен командованием — закрываем сессию.
+	if (me.suspended) then
+		Reset(client)
+		client.ixTabletSession = nil
 		Send(client, "kicked")
 		return
 	end
@@ -1044,19 +1132,41 @@ function PLUGIN:HandleRequest(client, action, data)
 			db.orders[oldest] = nil
 		end
 
+		-- Гриф секретности и подтверждение — только для лидеров; от остальных эти поля игнорируются.
+		local minRank, needAck
+
+		if (ix.tablet.IsLeader(fid, me.rank)) then
+			local clear = cfg.clearances and cfg.clearances[math.floor(tonumber(data.clear) or 1)]
+
+			if (clear and clear.min > 1) then
+				minRank = clear.min
+			end
+
+			needAck = tobool(data.ack) or nil
+		end
+
 		local oid = NextID()
 
 		db.orders[oid] = {
 			faction = fid, title = title, text = text, priority = priority,
-			pinned = tobool(data.pinned), by = by, time = os.time()
+			pinned = tobool(data.pinned), by = by, time = os.time(),
+			minRank = minRank, ack = needAck,
+			acks = needAck and {[id] = os.time()} or nil
 		}
 
-		Log(fid, "order", string.format("%s издал(а) приказ: «%s».", by, title))
+		Log(fid, "order", string.format("%s издал(а) приказ: «%s»%s%s.", by, title,
+			minRank and (" [гриф: " .. (cfg.clearances[math.floor(tonumber(data.clear) or 1)].name) .. "]") or "",
+			needAck and " [с подтверждением]" or ""))
 		Persist()
 
-		if (priority == 3) then
-			EachMember(fid, function(ply)
-				ply:Notify("Срочный приказ: " .. title)
+		if (priority == 3 or needAck) then
+			EachMember(fid, function(ply, c)
+				local e = db.roster[tostring(c:GetID())]
+
+				-- Название секретного приказа не показываем тем, кому он недоступен.
+				if (minRank and (!e or e.rank < minRank)) then return end
+
+				ply:Notify((priority == 3 and "Срочный приказ: " or "Приказ на подтверждение: ") .. title)
 			end)
 		end
 
@@ -1066,7 +1176,7 @@ function PLUGIN:HandleRequest(client, action, data)
 	if (action == "orderPin" or action == "orderDel") then
 		local order = db.orders[tostring(data.id or "")]
 
-		if (!isCmd or !order or order.faction != fid) then
+		if (!isCmd or !order or order.faction != fid or (order.minRank and order.minRank > me.rank)) then
 			return Err(client, "Недостаточно прав.")
 		end
 
@@ -1245,6 +1355,14 @@ function PLUGIN:HandleRequest(client, action, data)
 		Persist()
 
 		return Sync()
+	end
+
+	-- Инструменты лидеров и подтверждение приказов (sv_staff.lua).
+	if (self.HandleStaffRequest) then
+		return self:HandleStaffRequest(client, action, data, {
+			char = char, fid = fid, id = id, me = me, item = item, cfg = cfg,
+			isCmd = isCmd, by = by, Sync = Sync
+		})
 	end
 end
 
