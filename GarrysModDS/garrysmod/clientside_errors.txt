@@ -8863,3 +8863,133 @@ Class 'metropolice_recruit' does not have a valid faction!
 [Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
 
 
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[sui] addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119: bad argument #1 to 'DrawPoly' (table must contain at least three vertices)
+  1. DrawPoly - [C]:-1
+   2. DrawCircle - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:119
+    3. OldPaint - addons/sui/lua/sui/libs/tdlib/cl_tdlib.lua:436
+     4. unknown - addons/sui/lua/sui/vgui/sui_zbutton.lua:87
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+

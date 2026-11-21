@@ -85,6 +85,37 @@ PLUGIN.ranks = {
 }
 
 
+-- Фейковые данные, которые выдаёт SAM-модуль sh_leadership.lua (только визуально).
+-- Хранятся в NW-переменных, поэтому пропадают сами, когда игрок выходит с сервера.
+local NW_GROUP = "SAMLead.FakeGroup"
+local NW_NAME  = "SAMLead.FakeName"
+local NW_PING  = "SAMLead.FakePing"
+
+-- Возвращает группу для отображения и true, если она фейковая
+function PLUGIN:GetDisplayGroup(client)
+	local fake = client:GetNWString(NW_GROUP, "")
+	if fake ~= "" then
+		return fake, true
+	end
+
+	return client:GetUserGroup(), false
+end
+
+-- Возвращает фейковое имя или nil
+function PLUGIN:GetDisplayName(client)
+	local fake = client:GetNWString(NW_NAME, "")
+	if fake ~= "" then
+		return fake
+	end
+end
+
+-- Имя в IC-чате (Helix берёт его через этот хук)
+function PLUGIN:GetCharacterName(speaker, chatType)
+	if IsValid(speaker) then
+		return self:GetDisplayName(speaker)
+	end
+end
+
 function PLUGIN:InitializedConfig()
 	local class = ix.chat.classes['ooc']
 
@@ -96,17 +127,36 @@ function PLUGIN:InitializedConfig()
 			return
 		end
 
-		icon = Material(self.ranks~=nil and self.ranks[speaker:GetUserGroup()]~= nil and self.ranks[speaker:GetUserGroup()].icon or "icon16/user.png")
-
-		local uGroup = speaker:GetUserGroup()
+		-- группа и имя берутся с учётом фейков
+		local uGroup = PLUGIN:GetDisplayGroup(speaker)
 		local find = PLUGIN.ranks[uGroup]
+		local fakeName = PLUGIN:GetDisplayName(speaker)
+
+		local icon = Material(find and find.icon or "icon16/user.png")
+
+		local args = {icon}
 
 		if find and find.chatAdd then
-			chat.AddText(icon,find.col,find.chatAdd,Color(255, 50, 50), " [OOC] ", speaker, color_white, ": "..text)
-			return
+			args[#args + 1] = find.col
+			args[#args + 1] = find.chatAdd
+			args[#args + 1] = Color(255, 50, 50)
+			args[#args + 1] = " [OOC] "
+		else
+			args[#args + 1] = Color(255, 50, 50)
+			args[#args + 1] = "[OOC] "
 		end
 
-		chat.AddText(icon, Color(255, 50, 50), "[OOC] ", speaker, color_white, ": "..text)
+		if fakeName then
+			args[#args + 1] = team.GetColor(speaker:Team())
+			args[#args + 1] = fakeName
+		else
+			args[#args + 1] = speaker
+		end
+
+		args[#args + 1] = color_white
+		args[#args + 1] = ": "..text
+
+		chat.AddText(unpack(args))
 
 	end
 	--PrintTable(ix.chat.classes['ooc'])
@@ -115,7 +165,7 @@ end
 PLUGIN:InitializedConfig()
 
 function PLUGIN:GetPlayerIcon(client)
-	local rank = client:GetUserGroup()
+	local rank = self:GetDisplayGroup(client)
 
 	if self.ranks[rank] then
 		return self.ranks[rank].icon or ""
@@ -124,28 +174,54 @@ end
 
 if CLIENT then
 	function ix.hud.PopulatePlayerTooltip(tooltip, client)
+		-- руководство (superadmin) видит настоящие данные рядом с фейковыми
+		local viewerIsStaff = IsValid(LocalPlayer()) and LocalPlayer():IsSuperAdmin()
+
+		local fakeName = PLUGIN:GetDisplayName(client)
+		local nameText = fakeName or client:SteamName()
+		if fakeName and viewerIsStaff then
+			nameText = nameText .. " (реально: " .. client:SteamName() .. ")"
+		end
+
+		-- при фейковом имени настоящая аватарка скрыта от обычных игроков
+		local showAvatar = (not fakeName) or viewerIsStaff
+
 		local name = tooltip:AddRow("name")
 		name:SetImportant()
-		name:SetText(client:SteamName())
+		name:SetText(nameText)
 		name:SetBackgroundColor(Color(44, 44, 44))
 		name:SizeToContents()
 
 		local nameHeight = name:GetTall()
-		name:SetTextInset(nameHeight + 4, 0)
-		name:SetWide(name:GetWide() + nameHeight + 4)
+		if showAvatar then
+			name:SetTextInset(nameHeight + 4, 0)
+			name:SetWide(name:GetWide() + nameHeight + 4)
 
-		local avatar = name:Add("AvatarImage")
-		avatar:Dock(LEFT)
-		avatar:SetPlayer(client, nameHeight)
-		avatar:SetSize(name:GetTall(), name:GetTall())
+			local avatar = name:Add("AvatarImage")
+			avatar:Dock(LEFT)
+			avatar:SetPlayer(client, nameHeight)
+			avatar:SetSize(name:GetTall(), name:GetTall())
+		end
 
-		if PLUGIN.ranks[client:GetUserGroup()] then
-			local rank = client:GetUserGroup()
-			local icon = Material(hook.Run("GetPlayerIcon",client) or "icon16/heart.png")
+		local realGroup = client:GetUserGroup()
+		local displayGroup, isFakeGroup = PLUGIN:GetDisplayGroup(client)
+		local rankData = PLUGIN.ranks[displayGroup]
+
+		-- фейковая группа, которой нет в списке ranks, показывается как обычная
+		if not rankData and isFakeGroup then
+			rankData = {col = Color(60,60,60,120), icon = "icon16/user.png"}
+		end
+
+		if rankData then
+			local rank = displayGroup
+			local icon = Material(hook.Run("GetPlayerIcon",client) or rankData.icon or "icon16/heart.png")
 			rank = string.gsub(rank,"^%l",string.upper)
+			if isFakeGroup and viewerIsStaff then
+				rank = rank .. " (реально: " .. realGroup .. ")"
+			end
 			local tabRank = tooltip:AddRow("rank")
 			tabRank:SetText(rank)
-			tabRank:SetBackgroundColor(PLUGIN.ranks[client:GetUserGroup()].col or Color(0,0,0))
+			tabRank:SetBackgroundColor(rankData.col or Color(0,0,0))
 			tabRank:SizeToContents()
 			local w,h = tabRank:GetSize()
 			tabRank:SetTextInset(16+4,0)
@@ -158,6 +234,11 @@ if CLIENT then
 		end
 
 		local currentPing = client:Ping()
+
+		local fakePing = client:GetNWInt(NW_PING, -1)
+		if fakePing >= 0 then
+			currentPing = fakePing
+		end
 
 		local ping = tooltip:AddRow("ping")
 		ping:SetText(L("ping", currentPing))

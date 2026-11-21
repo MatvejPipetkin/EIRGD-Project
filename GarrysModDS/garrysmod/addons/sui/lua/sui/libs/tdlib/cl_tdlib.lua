@@ -112,6 +112,9 @@ end
 local TDLibUtil = {}
 
 function TDLibUtil.DrawCircle(circle, x, y, r, color)
+	-- fix: circle with radius < 1 (or NaN) is invisible and yields < 3 vertices, which makes DrawPoly error
+	if not (r >= 1) then return end
+
 	calculate_circle(circle, x, y, r)
 
 	SetDrawColor(color)
