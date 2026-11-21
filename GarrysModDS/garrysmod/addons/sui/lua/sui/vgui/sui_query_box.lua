@@ -24,7 +24,8 @@ function PANEL:Init()
 	bottom:SetZPos(100)
 
 	local save = bottom:Add(NAME .. ".Button")
-	save:SetText("SAVE")
+	save:SetText("СОХРАНИТЬ")
+	save:SetWide(120)
 	save:Dock(RIGHT)
 	save:SetEnabled(false)
 	self.save = save
@@ -39,7 +40,8 @@ function PANEL:Init()
 	cancel:DockMargin(0, 0, 4, 0)
 	cancel:SetContained(false)
 	cancel:SetColors(GetColor("query_box_cancel"), GetColor("query_box_cancel_text"))
-	cancel:SetText("CANCEL")
+	cancel:SetText("ОТМЕНА")
+	cancel:SetWide(120)
 	self.cancel = cancel
 
 	function cancel.DoClick()

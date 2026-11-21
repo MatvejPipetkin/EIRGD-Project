@@ -24,12 +24,12 @@ local rank_menu = function(rank, data)
 
 	local edit_rank = vgui.Create("SAM.QueryBox")
 	edit_rank:SetWide(470)
-	edit_rank:SetTitle(rank and string.format("Edit Rank '%s'", rank) or "Create Rank")
+	edit_rank:SetTitle(rank and string.format("Редактирование ранга '%s'", rank) or "Создание ранга")
 
 	local new_name = rank
 	if not sam.ranks.is_default_rank(rank) then
 		local name = edit_rank:Add("SAM.LabelPanel")
-		name:SetLabel("Rank Name")
+		name:SetLabel("Название ранга")
 
 		local entry = name:Add("SAM.TextEntry")
 		entry:SetSize(210, 28)
@@ -51,7 +51,7 @@ local rank_menu = function(rank, data)
 	local new_immunity = imm
 	do
 		local immunity = edit_rank:Add("SAM.LabelPanel")
-		immunity:SetLabel("Immunity (2~99)")
+		immunity:SetLabel("Иммунитет (2~99)")
 		immunity:DockMargin(0, 5, 0, 0)
 
 		local entry = immunity:Add("SAM.TextEntry")
@@ -81,7 +81,7 @@ local rank_menu = function(rank, data)
 	local new_banlimit = banlim
 	do
 		local banlimit = edit_rank:Add("SAM.LabelPanel")
-		banlimit:SetLabel("Ban Limit (1y 1mo 1w 1d 1h 1m)")
+		banlimit:SetLabel("Лимит бана (1y 1mo 1w 1d 1h 1m)")
 		banlimit:DockMargin(0, 5, 0, 0)
 
 		local entry = banlimit:Add("SAM.TextEntry")
@@ -103,7 +103,7 @@ local rank_menu = function(rank, data)
 	local new_inherit = inherit
 	do
 		local inherits_from = edit_rank:Add("SAM.LabelPanel")
-		inherits_from:SetLabel("Inherits From")
+		inherits_from:SetLabel("Наследует от")
 		inherits_from:DockMargin(0, 5, 0, 0)
 
 		local entry = inherits_from:Add("SAM.ComboBox")
@@ -124,7 +124,7 @@ local rank_menu = function(rank, data)
 
 	edit_rank:Done()
 	edit_rank.save:SetEnabled(true)
-	edit_rank.save:SetText("SAVE")
+	edit_rank.save:SetText("СОХРАНИТЬ")
 
 	if rank then
 		edit_rank:SetCallback(function()
@@ -169,7 +169,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	title:Dock(TOP)
 	title:DockMargin(10, 10, 0, 0)
 	title:SetFont(SAM_TAB_TITLE_FONT)
-	title:SetText("Ranks")
+	title:SetText("Ранги")
 	title:SetTextColor(GetColor("menu_tabs_title"))
 	title:SizeToContents()
 
@@ -177,7 +177,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	total:Dock(TOP)
 	total:DockMargin(10, 6, 0, 0)
 	total:SetFont(SAM_TAB_DESC_FONT)
-	total:SetText(table.Count(sam.ranks.get_ranks()) .. " total ranks")
+	total:SetText(table.Count(sam.ranks.get_ranks()) .. " рангов всего")
 	total:SetTextColor(GetColor("menu_tabs_title"))
 	total:SizeToContents()
 
@@ -191,14 +191,14 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		search_entry = container:Add("SAM.TextEntry")
 		search_entry:Dock(LEFT)
 		search_entry:SetNoBar(true)
-		search_entry:SetPlaceholder("Search...")
+		search_entry:SetPlaceholder("Поиск...")
 		search_entry:SetRadius(4)
 		search_entry:SetWide(220)
 	end
 
 	local create_rank = parent:Add("SAM.Button")
 	create_rank:SetFont(CREATE_RANK)
-	create_rank:SetText("Create Rank")
+	create_rank:SetText("Создать ранг")
 	create_rank:Dock(BOTTOM)
 	create_rank:DockMargin(10, 0, 10, 10)
 
@@ -276,7 +276,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		permissions_search:Dock(TOP)
 		permissions_search:DockMargin(0, 0, 5, 10)
 		permissions_search:SetNoBar(true)
-		permissions_search:SetPlaceholder("Search...")
+		permissions_search:SetPlaceholder("Поиск...")
 		permissions_search:SetRadius(4)
 		permissions_search:SetTall(30)
 
@@ -361,15 +361,15 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		right_current_rank:Dock(BOTTOM)
 		right_current_rank:DockMargin(0, 5, 0, 0)
 		right_current_rank:SetFont(CREATE_RANK)
-		right_current_rank:SetText("Switch to Limits")
+		right_current_rank:SetText("К лимитам")
 		right_current_rank:On("DoClick", function()
 			limits_body:AnimatedToggleVisible()
 			permissions_body:AnimatedToggleVisible()
 
 			if permissions_body:AnimatedIsVisible() then
-				right_current_rank:SetText("Switch to Limits")
+				right_current_rank:SetText("К лимитам")
 			else
-				right_current_rank:SetText("Switch to Permissions")
+				right_current_rank:SetText("К правам")
 			end
 		end)
 
@@ -473,26 +473,26 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 			dmenu:SetSize(w, h)
 			dmenu:SetInternal(container)
 
-			dmenu:AddOption("Edit Rank", function()
+			dmenu:AddOption("Изменить ранг", function()
 				rank_menu(rank_name, sam.ranks.get_rank(rank_name))
 			end)
 
 			if not sam.ranks.is_default_rank(rank_name) then
 				dmenu:AddSpacer()
 
-				dmenu:AddOption("Remove Rank", function()
+				dmenu:AddOption("Удалить ранг", function()
 					local remove_rank = vgui.Create("SAM.QueryBox")
 					remove_rank:SetWide(350)
 
 					local check = remove_rank:Add("SAM.Label")
-					check:SetText("Are you sure that you want to remove '" .. rank_name .. "'?")
+					check:SetText("Вы уверены, что хотите удалить '" .. rank_name .. "'?")
 					check:SetFont("SAMLine")
 					check:SetWrap(true)
 					check:SetAutoStretchVertical(true)
 
 					remove_rank:Done()
 					remove_rank.save:SetEnabled(true)
-					remove_rank.save:SetText("REMOVE")
+					remove_rank.save:SetText("УДАЛИТЬ")
 					remove_rank.save:SetContained(false)
 					remove_rank.save:SetColors(GetColor("query_box_cancel"), GetColor("query_box_cancel_text"))
 
@@ -522,21 +522,21 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 			immunity:Dock(TOP)
 			immunity:SetTextColor(GetColor("player_list_steamid"))
 			immunity:SetFont(RANK_INFO)
-			immunity:SetText("Immunity: " .. data.immunity)
+			immunity:SetText("Иммунитет: " .. data.immunity)
 			immunity:SizeToContents()
 
 			local banlimit = container:Add("SAM.Label")
 			banlimit:Dock(TOP)
 			banlimit:SetTextColor(GetColor("player_list_steamid"))
 			banlimit:SetFont(RANK_INFO)
-			banlimit:SetText("Ban limit: " .. sam.reverse_parse_length(sam.parse_length(data.ban_limit)))
+			banlimit:SetText("Лимит бана: " .. sam.reverse_parse_length(sam.parse_length(data.ban_limit)))
 			banlimit:SizeToContents()
 
 			local inherit = container:Add("SAM.Label")
 			inherit:Dock(TOP)
 			inherit:SetTextColor(GetColor("player_list_steamid"))
 			inherit:SetFont(RANK_INFO)
-			inherit:SetText("Inherits from: " .. (sam.isstring(data.inherit) and data.inherit or "none"))
+			inherit:SetText("Наследует от: " .. (sam.isstring(data.inherit) and data.inherit or "нет"))
 			inherit:SizeToContents()
 		end
 
@@ -591,7 +591,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		local line = ranks[name]
 		if not IsValid(line) then return end
 
-		line:GetChildren()[2]:SetText("Immunity: " .. immunity)
+		line:GetChildren()[2]:SetText("Иммунитет: " .. immunity)
 		line:GetParent():SetZPos(-immunity)
 
 		-- SetZPos is kinda weird to deal with
@@ -602,14 +602,14 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	hook.Add("SAM.RankBanLimitChanged", "SAM.RefreshRanksList", function(name, new_limit)
 		local line = ranks[name]
 		if IsValid(line) then
-			line:GetChildren()[3]:SetText("Ban limit: " .. sam.reverse_parse_length(new_limit))
+			line:GetChildren()[3]:SetText("Лимит бана: " .. sam.reverse_parse_length(new_limit))
 		end
 	end)
 
 	hook.Add("SAM.ChangedInheritRank", "SAM.RefreshRanksList", function(name, new_inherit)
 		local line = ranks[name]
 		if IsValid(line) then
-			line:GetChildren()[4]:SetText("Inherits from: " .. new_inherit)
+			line:GetChildren()[4]:SetText("Наследует от: " .. new_inherit)
 		end
 	end)
 

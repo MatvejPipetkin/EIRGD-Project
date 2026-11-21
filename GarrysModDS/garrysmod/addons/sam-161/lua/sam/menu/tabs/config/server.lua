@@ -3,7 +3,7 @@ if SAM_LOADED then return end
 local sam = sam
 local config = sam.config
 
-config.add_tab("Server", function(parent)
+config.add_tab("Сервер", function(parent)
 	local server_body = parent:Add("SAM.ScrollPanel")
 	server_body:Dock(FILL)
 	server_body:LineMargin(0, 6, 0, 0)

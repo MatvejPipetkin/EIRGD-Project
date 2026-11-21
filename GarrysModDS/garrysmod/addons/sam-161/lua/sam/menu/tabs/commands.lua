@@ -7,6 +7,19 @@ local type = sam.type
 
 local Line = sui.TDLib.LibClasses.Line
 
+local CATEGORY_NAMES = {
+	["Chat"] = "Чат",
+	["Fun"] = "Развлечения",
+	["Teleport"] = "Телепорт",
+	["User Management"] = "Управление",
+	["Utility"] = "Утилиты",
+	["Voting"] = "Голосования",
+	["DarkRP"] = "DarkRP",
+	["Murder"] = "Murder",
+	["TTT"] = "TTT",
+	["other"] = "Прочее",
+}
+
 local COMMAND_HELP = SUI.CreateFont("CommandHelp", "Roboto", 14)
 local COMMAND_RUN = SUI.CreateFont("CommandRun", "Roboto Medium", 14)
 
@@ -20,7 +33,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		title:Dock(TOP)
 		title:DockMargin(10, 10, 0, 0)
 		title:SetFont(SAM_TAB_TITLE_FONT)
-		title:SetText("Commands")
+		title:SetText("Команды")
 		title:SetTextColor(SUI.GetColor("menu_tabs_title"))
 		title:SizeToContents()
 	end
@@ -38,7 +51,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	local search_entry = left_body:Add("SAM.TextEntry")
 	search_entry:Dock(TOP)
 	search_entry:SetNoBar(true)
-	search_entry:SetPlaceholder("Search...")
+	search_entry:SetPlaceholder("Поиск...")
 	search_entry:SetRadius(4)
 	search_entry:SetTall(27)
 
@@ -60,7 +73,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 				continue
 			end
 
-			local item = category_list:add_item(v.name, v.category)
+			local item = category_list:add_item(v.name, CATEGORY_NAMES[v.category] or v.category)
 			item:InvalidateParent(true)
 			item.help = v.help
 			item.command = v

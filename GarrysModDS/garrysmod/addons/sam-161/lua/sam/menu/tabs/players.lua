@@ -142,28 +142,28 @@ local button_click = function(s)
 	local dmenu = vgui.Create("SAM.Menu")
 	dmenu:SetInternal(s)
 	if v.name and v.name ~= "" then
-		dmenu:AddOption("Copy Name", function()
+		dmenu:AddOption("Копировать ник", function()
 			SetClipboardText(v.name)
 		end)
 	end
 
-	dmenu:AddOption("Copy SteamID", function()
+	dmenu:AddOption("Копировать SteamID", function()
 		SetClipboardText(v.steamid)
 	end)
 
-	dmenu:AddOption("Copy Rank", function()
+	dmenu:AddOption("Копировать ранг", function()
 		SetClipboardText(v.rank)
 	end)
 
-	dmenu:AddOption("Copy Play Time", function()
+	dmenu:AddOption("Копировать время игры", function()
 		SetClipboardText(sam.reverse_parse_length(tonumber(v.play_time) / 60))
 	end)
 
 	dmenu:AddSpacer()
 
-	dmenu:AddOption("Change Rank", function()
+	dmenu:AddOption("Сменить ранг", function()
 		local querybox = vgui.Create("SAM.QueryBox")
-		querybox:SetTitle(string.format("Change rank for '%s'", v.name or v.steamid))
+		querybox:SetTitle(string.format("Сменить ранг для '%s'", v.name or v.steamid))
 		querybox:SetWide(360)
 
 		local ranks = querybox:Add("SAM.ComboBox")
@@ -200,7 +200,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	local title = players_body:Add("SAM.Label")
 	title:Dock(TOP)
 	title:SetFont(SAM_TAB_TITLE_FONT)
-	title:SetText("Players")
+	title:SetText("Игроки")
 	title:SetTextColor(GetColor("menu_tabs_title"))
 	title:SizeToContents()
 
@@ -208,7 +208,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	total:Dock(TOP)
 	total:DockMargin(0, 6, 0, 0)
 	total:SetFont(SAM_TAB_DESC_FONT)
-	total:SetText("60 total players")
+	total:SetText("Всего игроков: 60")
 	total:SetTextColor(GetColor("menu_tabs_title"))
 	total:SetPos(10, SUI.Scale(40))
 	total:SizeToContents()
@@ -224,14 +224,13 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		sort_by:Dock(RIGHT)
 		sort_by:DockMargin(4, 0, 0, 0)
 		sort_by:SetWide(106)
-		sort_by:SetValue("Sort By (ID)")
-		sort_by:AddChoice("ID")
-		sort_by:AddChoice("Name")
-		sort_by:AddChoice("Rank")
-		sort_by:AddChoice("Play Time")
+		sort_by:SetValue("Сортировка (ID)")
+		sort_by:AddChoice("ID", "id")
+		sort_by:AddChoice("Ник", "name")
+		sort_by:AddChoice("Ранг", "rank")
+		sort_by:AddChoice("Время игры", "play_time")
 
-		function sort_by:OnSelect(_, value)
-			value = value:lower():gsub(" ", "_")
+		function sort_by:OnSelect(_, _, value)
 			if current_sort ~= value then
 				current_sort = value
 				refresh()
@@ -241,12 +240,11 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		local sort_order = container:Add("SAM.ComboBox")
 		sort_order:Dock(RIGHT)
 		sort_order:SetWide(96)
-		sort_order:SetValue("Desc")
-		sort_order:AddChoice("Desc")
-		sort_order:AddChoice("Asc")
+		sort_order:SetValue("Убыв.")
+		sort_order:AddChoice("Убыв.", "DESC")
+		sort_order:AddChoice("Возр.", "ASC")
 
-		function sort_order:OnSelect(_, value)
-			value = value:upper()
+		function sort_order:OnSelect(_, _, value)
 			if current_order ~= value then
 				current_order = value
 				refresh()
@@ -258,13 +256,12 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		column:DockMargin(0, 0, 4, 0)
 		column:SetWide(140)
 
-		column:SetValue("Search (SteamID)")
-		column:AddChoice("SteamID")
-		column:AddChoice("Name")
-		column:AddChoice("Rank")
+		column:SetValue("Поиск (SteamID)")
+		column:AddChoice("SteamID", "steamid")
+		column:AddChoice("Ник", "name")
+		column:AddChoice("Ранг", "rank")
 
-		function column:OnSelect(_, value)
-			value = value:lower()
+		function column:OnSelect(_, _, value)
 			if current_column ~= value then
 				current_column = value
 				refresh()
@@ -274,7 +271,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		search_entry = container:Add("SAM.TextEntry")
 		search_entry:Dock(LEFT)
 		search_entry:SetNoBar(true)
-		search_entry:SetPlaceholder("Search...")
+		search_entry:SetPlaceholder("Поиск...")
 		search_entry:SetRadius(4)
 		search_entry:SetWide(220)
 
@@ -300,7 +297,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		info:Dock(LEFT)
 		info:DockMargin(4, 0, 0, 0)
 		info:SetFont(COLUMN_FONT)
-		info:SetText("Player")
+		info:SetText("Игрок")
 		info:SetTextColor(GetColor("player_list_titles"))
 		info:SetWide(SUI.Scale(280) + SUI.Scale(34))
 		info:SizeToContentsY(3)
@@ -309,7 +306,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		play_time:Dock(LEFT)
 		play_time:DockMargin(-4, 0, 0, 0)
 		play_time:SetFont(COLUMN_FONT)
-		play_time:SetText("Play Time")
+		play_time:SetText("Время игры")
 		play_time:SetTextColor(GetColor("player_list_titles"))
 		play_time:SetWide(SUI.Scale(180))
 		play_time:SizeToContentsY(3)
@@ -318,7 +315,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		rank_expiry:Dock(LEFT)
 		rank_expiry:DockMargin(-4, 0, 0, 0)
 		rank_expiry:SetFont(COLUMN_FONT)
-		rank_expiry:SetText("Rank Expiry")
+		rank_expiry:SetText("Ранг истекает")
 		rank_expiry:SetTextColor(GetColor("player_list_titles"))
 		rank_expiry:SetWide(SUI.Scale(280))
 		rank_expiry:SizeToContentsY(3)
@@ -336,7 +333,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		body.VBar.Scroll = 0
 
 		local players, players_count, current_page_2 = unpack(data)
-		total:SetText(players_count .. " total players")
+		total:SetText("Всего игроков: " .. players_count)
 
 		pages = get_pages_count(players_count)
 		current_page.i = pages == 0 and 0 or current_page_2 or current_page.i
@@ -369,7 +366,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 			rank_expiry:Dock(LEFT)
 			rank_expiry:DockMargin(-3, 0, 0, 0)
 			rank_expiry:SetFont(LINE_FONT)
-			rank_expiry:SetText(expiry_date == 0 and "Never" or sam.reverse_parse_length((expiry_date - os.time()) / 60))
+			rank_expiry:SetText(expiry_date == 0 and "Никогда" or sam.reverse_parse_length((expiry_date - os.time()) / 60))
 			rank_expiry:SetTextColor(GetColor("player_list_data"))
 			rank_expiry:SetContentAlignment(4)
 			rank_expiry:SizeToContents()
@@ -413,7 +410,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	current_page:Dock(FILL)
 	current_page:SetContentAlignment(5)
 	current_page:SetFont(SAM_TAB_DESC_FONT)
-	current_page:SetText("loading...")
+	current_page:SetText("загрузка...")
 	current_page.i = 1
 
 	local next_page = bottom_panel:Add("SAM.Button")

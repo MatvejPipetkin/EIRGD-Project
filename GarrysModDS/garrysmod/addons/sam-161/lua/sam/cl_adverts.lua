@@ -34,13 +34,13 @@ local entry_OnKeyCodeTyped = function(s, code)
 	end
 end
 
-config.add_menu_setting("Adverts", function(body)
+config.add_menu_setting("Объявления", function(body)
 	local adverts_body
 
 	local adverts = body:Add("SAM.LabelPanel")
 	adverts:Dock(TOP)
 	adverts:DockMargin(8, 6, 8, 0)
-	adverts:SetLabel("Adverts\n- Random adverts print every 60 seconds\n- Timed adverts can be done like this: {1m} This advert prints every 1 minute")
+	adverts:SetLabel("Объявления\n- Случайные объявления выводятся каждые 60 секунд\n- Объявления по таймеру: {1m} Это объявление выводится каждую минуту")
 
 	local add_advert = adverts:Add("SAM.Button")
 	add_advert:SetText("+")

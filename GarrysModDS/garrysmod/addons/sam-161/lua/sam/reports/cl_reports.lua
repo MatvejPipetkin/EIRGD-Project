@@ -118,9 +118,9 @@ new_report = function(report)
 		panel:AddButton(v.name:gsub("^%l", string.upper), v.func)
 	end
 
-	local claim = panel:AddButton("Claim", function(self, ply)
+	local claim = panel:AddButton("Принять", function(self, ply)
 		if panel:HasReport() then
-			return LocalPlayer():sam_send_message("You have an active case, close it first.")
+			return LocalPlayer():sam_send_message("У вас есть активная жалоба, сначала закройте её.")
 		end
 
 		self.DoClick = function()
@@ -133,7 +133,7 @@ new_report = function(report)
 			if claimed then
 				panel:SetHasReport(ply)
 
-				self:SetText("Close")
+				self:SetText("Закрыть")
 
 				self.background = Color(231, 76, 60, 200)
 				self.hover = Color(255, 255, 255, 25)
@@ -317,11 +317,11 @@ do
 	end
 
 	function Panel:SetClaimed()
-		change_state(self, "Case clamied!")
+		change_state(self, "Жалоба принята!")
 	end
 
 	function Panel:SetClosed()
-		change_state(self, "Case closed!")
+		change_state(self, "Жалоба закрыта!")
 	end
 
 	function Panel:SetReport(report)

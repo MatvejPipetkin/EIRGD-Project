@@ -21,7 +21,7 @@ local number_entry = function(setting, config_key, default)
 	return entry
 end
 
-config.add_tab("Reports", function(parent)
+config.add_tab("Жалобы", function(parent)
 	local body = parent:Add("SAM.ScrollPanel")
 	body:Dock(FILL)
 	body:LineMargin(0, 6, 0, 0)
@@ -39,7 +39,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("Enable")
+		setting:SetLabel("Включить")
 		setting:DockMargin(8, 6, 8, 0)
 
 		local enable = setting:Add("SAM.ToggleButton")
@@ -49,7 +49,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("Commands")
+		setting:SetLabel("Команды")
 		setting:DockMargin(8, 6, 8, 0)
 
 		local entry = setting:Add("SAM.TextEntry")
@@ -69,7 +69,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("Max Reports (Number of reports that can show on your screen)")
+		setting:SetLabel("Макс. жалоб (сколько жалоб одновременно на экране)")
 		setting:DockMargin(8, 6, 8, 0)
 
 		number_entry(setting, "Reports.MaxReports", 4)
@@ -78,7 +78,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("Auto Close Time (Time to wait before automatically closing claimed reports)")
+		setting:SetLabel("Автозакрытие (через сколько закрывать принятые жалобы)")
 		setting:DockMargin(8, 6, 8, 0)
 
 		local entry = setting:Add("SAM.TextEntry")
@@ -97,7 +97,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("Always Show (Show the popups even if you are not on duty)")
+		setting:SetLabel("Всегда показывать (показывать окна, даже если вы не на дежурстве)")
 		setting:DockMargin(8, 6, 8, 0)
 
 		local enable = setting:Add("SAM.ToggleButton")
@@ -107,7 +107,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("On Duty Jobs")
+		setting:SetLabel("Работы на дежурстве")
 		setting:DockMargin(8, 6, 8, 0)
 
 		local entry = setting:Add("SAM.TextEntry")
@@ -127,7 +127,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("Position")
+		setting:SetLabel("Позиция")
 		setting:DockMargin(8, 6, 8, 0)
 
 		local combo = setting:Add("SAM.ComboBox")
@@ -140,7 +140,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("X Padding")
+		setting:SetLabel("Отступ по X")
 		setting:DockMargin(8, 6, 8, 0)
 
 		number_entry(setting, "Reports.XPadding", 5)
@@ -149,7 +149,7 @@ config.add_tab("Reports", function(parent)
 	do
 		local setting = body:Add("SAM.LabelPanel")
 		setting:Dock(TOP)
-		setting:SetLabel("Y Padding")
+		setting:SetLabel("Отступ по Y")
 		setting:DockMargin(8, 6, 8, 0)
 
 		number_entry(setting, "Reports.YPadding", 5)

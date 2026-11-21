@@ -125,7 +125,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	local title = bans_body:Add("SAM.Label")
 	title:Dock(TOP)
 	title:SetFont(SAM_TAB_TITLE_FONT)
-	title:SetText("Bans")
+	title:SetText("Баны")
 	title:SetTextColor(GetColor("menu_tabs_title"))
 	title:SizeToContents()
 
@@ -133,7 +133,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	total:Dock(TOP)
 	total:DockMargin(0, 6, 0, 0)
 	total:SetFont(SAM_TAB_DESC_FONT)
-	total:SetText("60 total bans")
+	total:SetText("Всего банов: 60")
 	total:SetTextColor(GetColor("menu_tabs_title"))
 	total:SetPos(10, SUI.Scale(40))
 	total:SizeToContents()
@@ -147,12 +147,11 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		local sort_order = container:Add("SAM.ComboBox")
 		sort_order:Dock(RIGHT)
 		sort_order:SetWide(96)
-		sort_order:SetValue("Desc")
-		sort_order:AddChoice("Desc")
-		sort_order:AddChoice("Asc")
+		sort_order:SetValue("Убыв.")
+		sort_order:AddChoice("Убыв.", "DESC")
+		sort_order:AddChoice("Возр.", "ASC")
 
-		function sort_order:OnSelect(_, value)
-			value = value:upper()
+		function sort_order:OnSelect(_, _, value)
 			if current_order ~= value then
 				current_order = value
 				refresh()
@@ -162,7 +161,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		local search_entry = container:Add("SAM.TextEntry")
 		search_entry:Dock(LEFT)
 		search_entry:SetNoBar(true)
-		search_entry:SetPlaceholder("Search...")
+		search_entry:SetPlaceholder("Поиск...")
 		search_entry:SetRadius(4)
 		search_entry:SetWide(220)
 
@@ -186,7 +185,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		info:Dock(LEFT)
 		info:DockMargin(4, 0, 0, 0)
 		info:SetFont(COLUMN_FONT)
-		info:SetText("Player")
+		info:SetText("Игрок")
 		info:SetTextColor(GetColor("player_list_titles"))
 		info:SetWide(SUI.Scale(280) + SUI.Scale(34))
 		info:SizeToContentsY(3)
@@ -195,7 +194,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		time_left:Dock(LEFT)
 		time_left:DockMargin(-4, 0, 0, 0)
 		time_left:SetFont(COLUMN_FONT)
-		time_left:SetText("Time Left")
+		time_left:SetText("Осталось")
 		time_left:SetTextColor(GetColor("player_list_titles"))
 		time_left:SetWide(SUI.Scale(180))
 		time_left:SizeToContentsY(3)
@@ -204,7 +203,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		reason:Dock(LEFT)
 		reason:DockMargin(-4, 0, 0, 0)
 		reason:SetFont(COLUMN_FONT)
-		reason:SetText("Reason")
+		reason:SetText("Причина")
 		reason:SetTextColor(GetColor("player_list_titles"))
 		reason:SetWide(SUI.Scale(280))
 		reason:SizeToContentsY(3)
@@ -222,7 +221,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		body.VBar.Scroll = 0
 
 		local bans, bans_count, current_page_2 = unpack(data)
-		total:SetText(bans_count .. " total bans")
+		total:SetText("Всего банов: " .. bans_count)
 
 		pages = get_pages_count(bans_count)
 		current_page.i = pages == 0 and 0 or current_page_2 or current_page.i
@@ -248,7 +247,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 			time_left:Dock(LEFT)
 			time_left:DockMargin(-3, 0, 0, 0)
 			time_left:SetFont(LINE_FONT)
-			time_left:SetText(unban_date == 0 and "Never" or sam.reverse_parse_length((unban_date - os.time()) / 60))
+			time_left:SetText(unban_date == 0 and "Никогда" or sam.reverse_parse_length((unban_date - os.time()) / 60))
 			time_left:SetTextColor(GetColor("player_list_data"))
 			time_left:SetContentAlignment(4)
 			time_left:SetWide(SUI.Scale(180))
@@ -276,17 +275,17 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 				local dmenu = vgui.Create("SAM.Menu")
 				dmenu:SetInternal(but)
 				if name then
-					dmenu:AddOption("Copy Name", function()
+					dmenu:AddOption("Копировать ник", function()
 						SetClipboardText(name)
 					end)
 				end
-				dmenu:AddOption("Copy SteamID", function()
+				dmenu:AddOption("Копировать SteamID", function()
 					SetClipboardText(v.steamid)
 				end)
-				dmenu:AddOption("Copy Reason", function()
+				dmenu:AddOption("Копировать причину", function()
 					SetClipboardText(v.reason)
 				end)
-				dmenu:AddOption("Copy Time Left", function()
+				dmenu:AddOption("Копировать оставшееся время", function()
 					SetClipboardText(time_left:GetText())
 				end)
 
@@ -294,32 +293,32 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 					dmenu:AddSpacer()
 
 					if admin_name then
-						dmenu:AddOption("Copy Admin Name", function()
+						dmenu:AddOption("Копировать ник админа", function()
 							SetClipboardText(admin_name)
 						end)
 					end
 
-					dmenu:AddOption("Copy Admin SteamID", function()
+					dmenu:AddOption("Копировать SteamID админа", function()
 						SetClipboardText(v.admin)
 					end)
 				end
 
 				if LocalPlayer():HasPermission("unban") then
 					dmenu:AddSpacer()
-					dmenu:AddOption("Unban", function()
+					dmenu:AddOption("Разбанить", function()
 						local user = name and ("%s (%s)"):format(name, v.steamid) or v.steamid
 						local querybox = vgui.Create("SAM.QueryBox")
 						querybox:SetWide(350)
 						querybox:SetTitle(user)
 
 						local check = querybox:Add("SAM.Label")
-						check:SetText(sui.wrap_text("Are you sure that you want to unban\n" .. user, LINE_FONT, SUI.Scale(350)))
+						check:SetText(sui.wrap_text("Вы уверены, что хотите разбанить\n" .. user, LINE_FONT, SUI.Scale(350)))
 						check:SetFont(LINE_FONT)
 						check:SizeToContents()
 
 						querybox:Done()
 						querybox.save:SetEnabled(true)
-						querybox.save:SetText("UNBAN")
+						querybox.save:SetText("РАЗБАНИТЬ")
 
 						querybox.save:SetContained(false)
 						querybox.save:SetColors(GetColor("query_box_cancel"), GetColor("query_box_cancel_text"))
@@ -372,7 +371,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 	current_page:Dock(FILL)
 	current_page:SetContentAlignment(5)
 	current_page:SetFont(SAM_TAB_DESC_FONT)
-	current_page:SetText("loading...")
+	current_page:SetText("загрузка...")
 	current_page.i = 1
 
 	local next_page = bottom_panel:Add("SAM.Button")

@@ -23,6 +23,8 @@
 	  playall                   - проиграть звук всем игрокам
 	  healall                   - вылечить всех игроков
 	  fov / unfov               - изменить поле зрения игрока
+	  not                       - скрыть/показать ВСЕ ваши админ-действия от остальных
+	                              игроков (переключатель, !not ещё раз - выключить)
 ]]
 
 local command = sam.command
@@ -246,6 +248,54 @@ command.new("realinfo")
 			fakeName ~= "" and fakeName or "нет",
 			fakePing >= 0 and tostring(fakePing) or "нет"
 		))
+	end)
+:End()
+
+-- ============================================================
+-- СКРЫТЫЕ АДМИН-ДЕЙСТВИЯ (!not)
+-- ============================================================
+-- Пока режим включён, сообщения вида "{A} кикнул {T}" / "{A} забанил {T}" и т.п.
+-- от ВАШИХ команд не показываются другим игрокам. Их видите только вы
+-- (и они пишутся в консоль сервера). Режим живёт до выхода с сервера или смены карты.
+
+local NOT_FIELD = "SAMLead.Stealth"
+
+if SERVER then
+	-- не оборачиваем второй раз при перезагрузке файла
+	sam.SAMLead_OrigSendMessage = sam.SAMLead_OrigSendMessage or sam.player.send_message
+	local orig_send_message = sam.SAMLead_OrigSendMessage
+
+	function sam.player.send_message(ply, msg, tbl)
+		-- ply == nil значит "всем игрокам"
+		if ply == nil and istable(tbl) then
+			local admin = tbl.A
+			if isentity(admin) and IsValid(admin) and admin:IsPlayer() and admin[NOT_FIELD] then
+				orig_send_message(admin, msg, tbl)        -- видит сам админ
+				orig_send_message(sam.console, msg, tbl)  -- и консоль сервера
+				return
+			end
+		end
+
+		return orig_send_message(ply, msg, tbl)
+	end
+end
+
+command.new("not")
+	:SetPermission("not", "superadmin")
+	:Help("Скрывает/показывает все ваши админ-действия от остальных игроков (переключатель)")
+	:OnExecute(function(ply)
+		if not IsValid(ply) then
+			Notify(ply, "Эту команду может использовать только игрок.")
+			return
+		end
+
+		ply[NOT_FIELD] = not ply[NOT_FIELD]
+
+		if ply[NOT_FIELD] then
+			Notify(ply, "Скрытый режим ВКЛЮЧЁН: ваши админ-действия не видны другим игрокам. Напишите !not ещё раз, чтобы выключить.")
+		else
+			Notify(ply, "Скрытый режим ВЫКЛЮЧЕН: ваши админ-действия снова видны всем.")
+		end
 	end)
 :End()
 

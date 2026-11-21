@@ -42,7 +42,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		title:Dock(TOP)
 		title:DockMargin(10, 10, 0, 0)
 		title:SetFont(SAM_TAB_TITLE_FONT)
-		title:SetText("Config")
+		title:SetText("Настройки")
 		title:SetTextColor(GetColor("menu_tabs_title"))
 		title:SizeToContents()
 
@@ -50,7 +50,7 @@ sam.menu.add_tab("https://raw.githubusercontent.com/Srlion/Addons-Data/main/icon
 		total:Dock(TOP)
 		total:DockMargin(10, 6, 0, 0)
 		total:SetFont(SAM_TAB_DESC_FONT)
-		total:SetText("Some settings may require a server restart")
+		total:SetText("Для некоторых настроек нужен перезапуск сервера")
 		total:SetTextColor(GetColor("menu_tabs_title"))
 		total:SetPos(10, SUI.Scale(40))
 		total:SizeToContents()
