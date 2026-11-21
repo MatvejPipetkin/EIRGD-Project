@@ -2318,3 +2318,5 @@ GarrysModDS/garrysmod/clientside_errors.txt
 *.cachedmsg
 *.acf
 *.rar
+/GarrysModDS/garrysmod/data/helix
+/GarrysModDS/garrysmod/data

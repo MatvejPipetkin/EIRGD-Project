@@ -25,6 +25,9 @@
 	  fov / unfov               - изменить поле зрения игрока
 	  not                       - скрыть/показать ВСЕ ваши админ-действия от остальных
 	                              игроков (переключатель, !not ещё раз - выключить)
+	  playsong / stopsong       - музыка по ссылке или из контента в радиусе вокруг вас
+	                              (!playsong 800 https://site.com/song.mp3)
+	                              Игроки могут регулировать громкость: samlead_song_volume 0..1
 ]]
 
 local command = sam.command
@@ -38,6 +41,8 @@ local NW_PING  = "SAMLead.FakePing"
 if SERVER then
 	util.AddNetworkString("SAMLead.BigMsg")
 	util.AddNetworkString("SAMLead.Sound")
+	util.AddNetworkString("SAMLead.Song")
+	util.AddNetworkString("SAMLead.SongStop")
 end
 
 -- ============================================================
@@ -380,6 +385,77 @@ command.new("unfov")
 :End()
 
 -- ============================================================
+-- МУЗЫКА В РАДИУСЕ (playsong / stopsong)
+-- ============================================================
+-- !playsong <радиус> <ссылка или путь>
+--   ссылка: прямая ссылка на аудиофайл (.mp3 / .ogg / .wav), http:// или https://
+--           (страницы YouTube, VK, Spotify и т.п. НЕ работают - нужен прямой файл)
+--   путь:   звук из контента сервера/игры, например ambient/alarms/warningbell1.wav
+-- Музыка играет из точки, где стоял админ в момент команды. Чем дальше игрок от
+-- этой точки, тем тише; за пределами радиуса звука нет.
+
+local MAX_SONGS = 5 -- одновременно играющих песен (старые останавливаются)
+local song_counter = 0
+
+local function IsValidSongURL(url)
+	return #url <= 400
+		and string.match(url, "^https?://[%w%-%._~:/%?#%[%]@!%$&'%(%)%*%+,;=%%]+$") ~= nil
+end
+
+command.new("playsong")
+	:SetPermission("playsong", "superadmin")
+	:AddArg("number", {hint = "радиус (50-10000)", min = 50, max = 10000, round = true})
+	:AddArg("text", {hint = "ссылка на mp3/ogg/wav или путь к звуку"})
+	:Help("Включает песню по ссылке или из контента в заданном радиусе вокруг вас")
+	:OnExecute(function(ply, radius, source)
+		if not IsValid(ply) then
+			Notify(ply, "Эту команду может использовать только игрок (музыка играет из вашей позиции).")
+			return
+		end
+
+		source = string.Trim(source or "")
+		local is_url = string.match(source, "^https?://") ~= nil
+
+		if is_url then
+			if not IsValidSongURL(source) then
+				Notify(ply, "Неверная ссылка. Нужна прямая ссылка на аудиофайл (http/https), без пробелов.")
+				return
+			end
+		else
+			source = string.gsub(source, "^sound/", "")
+			if not IsValidSoundPath(source) then
+				Notify(ply, "Неверный путь к звуку. Пример: ambient/alarms/warningbell1.wav")
+				return
+			end
+		end
+
+		song_counter = song_counter + 1
+
+		net.Start("SAMLead.Song")
+			net.WriteUInt(song_counter % 65536, 16)
+			net.WriteBool(is_url)
+			net.WriteString(source)
+			net.WriteVector(ply:GetPos())
+			net.WriteUInt(radius, 16)
+		net.Broadcast()
+
+		local label = is_url and (string.match(source, "^https?://([^/]+)") or source) or source
+		Announce("{A} включил музыку ({V}) в радиусе {V_2}", {A = ply, V = label, V_2 = radius})
+	end)
+:End()
+
+command.new("stopsong")
+	:SetPermission("stopsong", "superadmin")
+	:Help("Останавливает всю музыку, включённую через playsong")
+	:OnExecute(function(ply)
+		net.Start("SAMLead.SongStop")
+		net.Broadcast()
+
+		Announce("{A} остановил музыку", {A = ply})
+	end)
+:End()
+
+-- ============================================================
 -- Клиентская часть
 -- ============================================================
 if CLIENT then
@@ -439,6 +515,101 @@ if CLIENT then
 		local path = net.ReadString()
 		if path ~= "" then
 			surface.PlaySound(path)
+		end
+	end)
+
+	-- --------------------------------------------------------
+	-- Музыка в радиусе
+	-- --------------------------------------------------------
+	local songs = {}
+
+	local volume_cvar = CreateClientConVar(
+		"samlead_song_volume", "1", true, false,
+		"Громкость музыки от руководства (0 - выключить, 1 - максимум)", 0, 1
+	)
+
+	local function StopSong(song)
+		song.dead = true
+		if IsValid(song.channel) then
+			song.channel:Stop()
+		end
+	end
+
+	net.Receive("SAMLead.Song", function()
+		net.ReadUInt(16) -- id (зарезервировано)
+		local is_url = net.ReadBool()
+		local source = net.ReadString()
+		local pos = net.ReadVector()
+		local radius = net.ReadUInt(16)
+
+		if source == "" or radius <= 0 then return end
+		if volume_cvar:GetFloat() <= 0 then return end
+
+		local song = {pos = pos, radius = radius}
+		songs[#songs + 1] = song
+
+		while #songs > MAX_SONGS do
+			StopSong(table.remove(songs, 1))
+		end
+
+		local function loaded(channel, _, err)
+			if not IsValid(channel) then
+				song.dead = true
+				print("[SAM Leadership] Не удалось проиграть музыку: " .. tostring(err))
+				return
+			end
+
+			if song.dead then
+				channel:Stop()
+				return
+			end
+
+			song.channel = channel
+			channel:SetVolume(0)
+			channel:Play()
+			song.started = true
+		end
+
+		if is_url then
+			sound.PlayURL(source, "noplay", loaded)
+		else
+			sound.PlayFile("sound/" .. source, "noplay", loaded)
+		end
+	end)
+
+	net.Receive("SAMLead.SongStop", function()
+		for i = 1, #songs do
+			StopSong(songs[i])
+		end
+		table.Empty(songs)
+	end)
+
+	hook.Add("Think", "SAMLead.Songs", function()
+		local count = #songs
+		if count == 0 then return end
+
+		local lp = LocalPlayer()
+		if not IsValid(lp) then return end
+
+		local eye = lp:EyePos()
+		local base = volume_cvar:GetFloat()
+
+		for i = count, 1, -1 do
+			local song = songs[i]
+			local channel = song.channel
+
+			if song.dead then
+				table.remove(songs, i)
+			elseif IsValid(channel) then
+				if song.started and channel:GetState() == GMOD_CHANNEL_STOPPED then
+					-- песня закончилась
+					table.remove(songs, i)
+				else
+					-- полная громкость в центре (первые 20% радиуса), дальше затухание до нуля
+					local k = math.Clamp((1 - eye:Distance(song.pos) / song.radius) / 0.8, 0, 1)
+					channel:SetVolume(k * k * base)
+				end
+			end
 		end
 	end)
 end
