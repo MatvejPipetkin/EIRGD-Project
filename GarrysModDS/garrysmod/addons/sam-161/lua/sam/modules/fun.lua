@@ -594,7 +594,7 @@ do
 		:SetPermission("scale", "superadmin")
 
 		:AddArg("player")
-		:AddArg("number", {hint = "amount", optional = true, min = 0, max = 2.5, default = 1})
+		:AddArg("number", {hint = "amount", optional = true, min = 0, max = 5, default = 1})
 
 		:Help("scale_help")
 
