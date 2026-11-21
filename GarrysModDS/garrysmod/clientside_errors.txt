@@ -8439,3 +8439,23 @@ Class 'metropolice_recruit' does not have a valid faction!
 [Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
 
 
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
