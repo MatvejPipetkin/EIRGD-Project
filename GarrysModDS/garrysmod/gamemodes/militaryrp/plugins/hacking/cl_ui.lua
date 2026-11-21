@@ -1,5 +1,5 @@
--- Общий набор «кисточек» интерфейса взлома: свечение, размытие фона, стеклянные панели,
--- ЭЛТ-эффекты, дуги и кольца, кнопки. Используется терминалом, играми, досье и HUD.
+-- Общий набор «кисточек» интерфейса взлома. Стиль: минимализм - тонкие линии, много воздуха,
+-- один акцентный цвет, мягкие анимации. Используется терминалом, играми, досье и HUD.
 
 local HACK = ix.hack
 local C, S = HACK.C, HACK.S
@@ -21,11 +21,30 @@ function UI.Mul(col, k, a)
 	return Color(math.min(255, col.r * k), math.min(255, col.g * k), math.min(255, col.b * k), a or 255)
 end
 
+-- Смесь двух цветов (k = 0..1).
+function UI.Mix(a, b, k)
+	return Color(Lerp(k, a.r, b.r), Lerp(k, a.g, b.g), Lerp(k, a.b, b.b), Lerp(k, a.a or 255, b.a or 255))
+end
+
 -- Детерминированный «случайный» 0..1 (для мерцания и шума без math.random).
 function UI.Rand(a, b)
 	local v = math.sin(a * 12.9898 + (b or 0) * 78.233) * 43758.5453
 
 	return v - math.floor(v)
+end
+
+-- Плавное замедление к концу (0..1 -> 0..1).
+function UI.Ease(t)
+	t = math.Clamp(t, 0, 1)
+
+	return 1 - (1 - t) ^ 3
+end
+
+-- Плавный старт и финиш.
+function UI.EaseIO(t)
+	t = math.Clamp(t, 0, 1)
+
+	return t < 0.5 and 4 * t * t * t or 1 - ((-2 * t + 2) ^ 3) / 2
 end
 
 -- Подстрока по числу символов (кириллица занимает по 2 байта).
@@ -54,11 +73,44 @@ function UI.Text(str, font, x, y, col, ax, ay)
 	draw.SimpleText(str, font, x, y, col, ax or 0, ay or 0)
 end
 
+-- Текст с разрядкой между буквами (ax: 0 - слева, 1 - по центру, 2 - справа). Возвращает ширину.
+function UI.Track(str, font, x, y, col, space, ax, ay)
+	surface.SetFont(font)
+
+	local chars, widths, total = {}, {}, 0
+
+	for _, cp in utf8.codes(str) do
+		local ch = utf8.char(cp)
+		local cw = surface.GetTextSize(ch)
+
+		chars[#chars + 1] = ch
+		widths[#widths + 1] = cw
+		total = total + cw + space
+	end
+
+	total = math.max(0, total - space)
+
+	local px = x
+
+	if (ax == 1) then
+		px = x - total / 2
+	elseif (ax == 2) then
+		px = x - total
+	end
+
+	for i, ch in ipairs(chars) do
+		draw.SimpleText(ch, font, px, y, col, 0, ay or 0)
+		px = px + widths[i] + space
+	end
+
+	return total
+end
+
 local GLOW = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}, {-1, -1}, {1, 1}, {-1, 1}, {1, -1}}
 
--- Текст с мягким свечением.
+-- Текст с очень мягким свечением.
 function UI.Glow(str, font, x, y, col, ax, ay, power)
-	local g = Color(col.r, col.g, col.b, math.floor(30 * (power or 1)))
+	local g = Color(col.r, col.g, col.b, math.floor(16 * (power or 1)))
 
 	for _, o in ipairs(GLOW) do
 		draw.SimpleText(str, font, x + o[1], y + o[2], g, ax or 0, ay or 0)
@@ -67,14 +119,45 @@ function UI.Glow(str, font, x, y, col, ax, ay, power)
 	draw.SimpleText(str, font, x, y, col, ax or 0, ay or 0)
 end
 
--- Градиентная заливка полосками. dir - куда идёт затухание от начальной кромки:
+-- Плавная градиентная заливка. dir - куда идёт затухание от начальной кромки:
 -- "down" (сверху вниз), "up", "right" (слева направо), "left". a0 - прозрачность у кромки, a1 - на другом конце.
-function UI.Fade(x, y, w, h, dir, col, a0, a1, steps)
-	steps = steps or 12
+-- Вертикальные градиенты рисуются текстурой (без полос). Если свечение окажется с противоположной стороны,
+-- поставьте UI.GradFlip = true.
+local GRAD_D = Material("vgui/gradient-d")
+local GRAD_U = Material("vgui/gradient-u")
 
+UI.GradFlip = false
+
+function UI.Fade(x, y, w, h, dir, col, a0, a1, steps)
 	local vertical = (dir == "down" or dir == "up")
-	local len = vertical and h or w
-	local step = len / steps
+
+	if (vertical and w > 0 and h > 0) then
+		local base, delta = math.min(a0, a1), math.abs(a0 - a1)
+
+		-- Какой стороной должна быть «плотная» часть градиента: сверху или снизу.
+		local denseTop = ((dir == "down") == (a0 >= a1))
+
+		if (UI.GradFlip) then denseTop = not denseTop end
+
+		if (base > 0) then
+			surface.SetDrawColor(col.r, col.g, col.b, base)
+			surface.DrawRect(x, y, w, h)
+		end
+
+		if (delta > 0) then
+			draw.NoTexture()
+			surface.SetMaterial(denseTop and GRAD_D or GRAD_U)
+			surface.SetDrawColor(col.r, col.g, col.b, delta)
+			surface.DrawTexturedRect(x, y, w, h)
+		end
+
+		return
+	end
+
+	-- Горизонтальные: полосками, но мелкими (шаг около 3 px), чтобы не было ступенек.
+	steps = math.Clamp(math.floor(w / S(3)), 8, 96)
+
+	local step = w / steps
 
 	for i = 0, steps - 1 do
 		local p0, p1 = math.floor(i * step), math.floor((i + 1) * step)
@@ -83,11 +166,7 @@ function UI.Fade(x, y, w, h, dir, col, a0, a1, steps)
 
 		surface.SetDrawColor(col.r, col.g, col.b, a)
 
-		if (dir == "down") then
-			surface.DrawRect(x, y + p0, w, seg)
-		elseif (dir == "up") then
-			surface.DrawRect(x, y + h - p0 - seg, w, seg)
-		elseif (dir == "right") then
+		if (dir == "right") then
 			surface.DrawRect(x + p0, y, seg, h)
 		else
 			surface.DrawRect(x + w - p0 - seg, y, seg, h)
@@ -110,7 +189,7 @@ function UI.Blur(panel, passes, amount)
 	end
 end
 
--- Уголки-скобки по периметру.
+-- Уголки-скобки по периметру (в минималистичном стиле почти не используются).
 function UI.Brackets(x, y, w, h, col, len, thick)
 	len = len or S(14)
 	thick = thick or 2
@@ -126,32 +205,31 @@ function UI.Brackets(x, y, w, h, col, len, thick)
 	surface.DrawRect(x + w - thick, y + h - len, thick, len)
 end
 
--- Стеклянная панель: тёмная подложка, свечение сверху, рамка, уголки.
+-- Лёгкая панель: едва заметная подложка, тонкая рамка и короткая акцентная черта сверху слева.
 function UI.Box(x, y, w, h, accent, alpha)
 	accent = accent or C.accent
 
-	surface.SetDrawColor(5, 12, 17, alpha or 205)
+	surface.SetDrawColor(8, 18, 24, math.min(alpha or 120, 120))
 	surface.DrawRect(x, y, w, h)
-	UI.Fade(x, y, w, math.min(h, S(46)), "down", accent, 26, 0, 8)
-	UI.Frame(x, y, w, h, UI.A(accent, 90), 1)
-	UI.Brackets(x, y, w, h, accent, S(7), 1)
+	UI.Frame(x, y, w, h, UI.A(accent, 36), 1)
+
+	surface.SetDrawColor(accent)
+	surface.DrawRect(x, y, S(26), 2)
 end
 
--- Подпись-«таблетка»; возвращает её ширину.
-function UI.Chip(x, y, text, col, font)
+-- Подпись: цветная точка и текст; возвращает занятую ширину.
+function UI.Chip(x, y, text, col, font, alpha)
 	font = font or "ixHackS"
+	alpha = alpha or 1
 
 	surface.SetFont(font)
 
 	local tw, th = surface.GetTextSize(text)
-	local w, h = tw + S(18), th + S(6)
 
-	UI.Rect(x, y, w, h, Color(col.r * 0.14, col.g * 0.14, col.b * 0.14, 225))
-	UI.Frame(x, y, w, h, UI.A(col, 150), 1)
-	UI.Rect(x, y, S(3), h, col)
-	draw.SimpleText(text, font, x + S(11), y + h / 2, col, 0, 1)
+	UI.Disc(x + S(4), y + th / 2, S(3), UI.A(col, math.floor(255 * alpha)), 14)
+	draw.SimpleText(text, font, x + S(16), y, UI.A(C.text, math.floor(190 * alpha)), 0, 0)
 
-	return w
+	return tw + S(16)
 end
 
 -- ===================== Полигоны, дуги, линии =====================
@@ -251,61 +329,62 @@ function UI.Line(x1, y1, x2, y2, col, thick)
 	})
 end
 
--- Светящаяся линия: широкий слабый ореол + яркая сердцевина.
+-- Линия, «прорисованная» на долю k (0..1) от начала.
+function UI.LinePart(x1, y1, x2, y2, col, thick, k)
+	k = math.Clamp(k, 0, 1)
+
+	if (k <= 0) then return end
+
+	UI.Line(x1, y1, x1 + (x2 - x1) * k, y1 + (y2 - y1) * k, col, thick)
+end
+
+-- Светящаяся линия: слабый ореол + яркая сердцевина.
 function UI.GlowLine(x1, y1, x2, y2, col, thick)
 	thick = thick or 2
 
-	UI.Line(x1, y1, x2, y2, UI.A(col, 26), thick * 5)
-	UI.Line(x1, y1, x2, y2, UI.A(col, 70), thick * 2.6)
+	UI.Line(x1, y1, x2, y2, UI.A(col, 18), thick * 4.4)
+	UI.Line(x1, y1, x2, y2, UI.A(col, 50), thick * 2.2)
 	UI.Line(x1, y1, x2, y2, col, thick)
 end
 
 -- ===================== Элементы =====================
 
--- Шкала с сегментами и бликом.
+-- Тонкая шкала. segs оставлен для совместимости и не рисуется.
 function UI.Bar(x, y, w, h, frac, col, segs)
 	frac = math.Clamp(frac, 0, 1)
 
-	UI.Rect(x, y, w, h, Color(0, 0, 0, 170))
+	UI.Rect(x, y, w, h, Color(255, 255, 255, 14))
 
 	local fw = math.floor(w * frac)
 
 	if (fw > 0) then
-		UI.Rect(x, y, fw, h, col)
-		UI.Fade(x, y, fw, h, "down", Color(255, 255, 255), 70, 0, 4)
-		UI.Fade(x, y - S(5), fw, S(5), "up", col, 38, 0, 5)
+		UI.Rect(x, y, fw, h, UI.A(col, 230))
+		UI.Rect(math.max(x, x + fw - S(2)), y, math.min(fw, S(2)), h, Color(255, 255, 255, 120))
 	end
-
-	if (segs) then
-		surface.SetDrawColor(0, 0, 0, 170)
-
-		for i = 1, segs - 1 do
-			surface.DrawRect(x + math.floor(w * i / segs), y, 1, h)
-		end
-	end
-
-	UI.Frame(x, y, w, h, UI.A(C.line, 220), 1)
 end
 
--- Ряд ромбов-индикаторов (этапы, попытки). cur - индекс «текущего» (пульсирует).
+-- Ряд кружков-индикаторов (этапы, попытки). cur - индекс «текущего» (пульсирует).
 function UI.Pips(x, y, count, filled, size, gap, col, cur)
 	for i = 1, count do
 		local cx = x + (i - 1) * (size * 2 + gap) + size
 		local on = i <= filled
+		local r = size * 0.72
 
 		if (on) then
 			local k = (i == cur) and (0.65 + 0.35 * math.sin(SysTime() * 6)) or 1
 
-			UI.Diamond(cx, y, size + 3, UI.A(col, 40 * k))
-			UI.Diamond(cx, y, size, UI.Mul(col, k))
+			if (i == cur) then
+				UI.Disc(cx, y, r + S(3) + k * S(2), UI.A(col, 26 * k), 20)
+			end
+
+			UI.Disc(cx, y, r, UI.Mul(col, k), 20)
 		else
-			UI.Diamond(cx, y, size, C.faint)
-			UI.Diamond(cx, y, size - 2, C.bg)
+			UI.Ring(cx, y, r, UI.A(C.dim, 150), 1, 24)
 		end
 	end
 end
 
--- Столбики «шестнадцатеричного потока» для атмосферы.
+-- Столбики «шестнадцатеричного потока» для атмосферы (в новом стиле не используется, оставлено для совместимости).
 function UI.HexStream(x, y, rows, col, font)
 	font = font or "ixHackXS"
 
@@ -321,64 +400,54 @@ function UI.HexStream(x, y, rows, col, font)
 	end
 end
 
--- ===================== Окно и ЭЛТ-эффекты =====================
+-- Медленно плывущие вверх точки: тихая «жизнь» на фоне.
+function UI.Particles(w, h, count)
+	local now = SysTime()
 
--- Фон окна: размытие, затемнение, свечение, сетка, рамка.
-function UI.Window(panel, w, h)
-	UI.Blur(panel, 4, 4)
+	for i = 1, count or 36 do
+		local speed = S(7) + UI.Rand(i, 2) * S(18)
+		local x = UI.Rand(i, 1) * w + math.sin(now * 0.3 + i) * S(10)
+		local y = h - ((now * speed + UI.Rand(i, 3) * h) % h)
+		local edge = math.min(1, y / (h * 0.25), (h - y) / (h * 0.15))
+		local a = (10 + UI.Rand(i, 4) * 34) * math.max(0, edge)
+		local size = UI.Rand(i, 5) > 0.82 and 2 or 1
 
-	surface.SetDrawColor(3, 8, 12, 226)
-	surface.DrawRect(0, 0, w, h)
-
-	UI.Fade(0, 0, w, S(280), "down", C.accent, 20, 0, 14)
-	UI.Fade(0, h - S(180), w, S(180), "up", C.cyan, 12, 0, 10)
-
-	surface.SetDrawColor(C.accent.r, C.accent.g, C.accent.b, 9)
-
-	local g = S(36)
-
-	for gx = g, w, g do surface.DrawRect(gx, 0, 1, h) end
-	for gy = g, h, g do surface.DrawRect(0, gy, w, 1) end
-
-	UI.Frame(0, 0, w, h, UI.A(C.line, 230), 1)
-	UI.Brackets(0, 0, w, h, C.accent, S(22), 2)
+		surface.SetDrawColor(C.accent.r, C.accent.g, C.accent.b, a)
+		surface.DrawRect(x, y, size, size)
+	end
 end
 
--- Поверх всего: строки развёртки, бегущая полоса, виньетка, редкие помехи.
+-- ===================== Окно =====================
+
+-- Фон окна: сильное размытие, тёмная подложка, едва заметное сияние сверху и снизу, частицы, тонкая рамка.
+function UI.Window(panel, w, h)
+	UI.Blur(panel, 5, 5)
+
+	surface.SetDrawColor(2, 6, 9, 238)
+	surface.DrawRect(0, 0, w, h)
+
+	-- Свечение только у самых краёв окна, подальше от центра экрана.
+	UI.Fade(0, 0, w, h * 0.07, "down", C.cyan, 5, 0)
+	UI.Fade(0, h * 0.93, w, h * 0.07, "up", C.cyan, 9, 0)
+
+	UI.Particles(w, h, 36)
+
+	UI.Frame(0, 0, w, h, UI.A(C.line, 70), 1)
+end
+
+-- Поверх всего: мягкая виньетка по краям.
 function UI.Overlay(w, h)
-	surface.SetDrawColor(0, 0, 0, 52)
+	local e = S(170)
 
-	for y = 0, h, S(3) do
-		surface.DrawRect(0, y, w, 1)
-	end
-
-	local band = S(110)
-	local by = ((SysTime() * S(55)) % (h + band)) - band
-
-	UI.Fade(0, by, w, band, "down", C.accent, 0, 14, 10)
-
-	local e = S(90)
-
-	UI.Fade(0, 0, w, e, "down", BLACK, 120, 0, 9)
-	UI.Fade(0, h - e, w, e, "up", BLACK, 120, 0, 9)
-	UI.Fade(0, 0, e, h, "right", BLACK, 110, 0, 9)
-	UI.Fade(w - e, 0, e, h, "left", BLACK, 110, 0, 9)
-
-	local slot = math.floor(SysTime() * 3)
-
-	if (UI.Rand(slot, 1) < 0.16) then
-		local gy = math.floor(UI.Rand(slot, 2) * h)
-		local gh = S(2) + math.floor(UI.Rand(slot, 3) * S(9))
-
-		surface.SetDrawColor(C.accent.r, C.accent.g, C.accent.b, 20)
-		surface.DrawRect(0, gy, w, gh)
-		surface.SetDrawColor(255, 255, 255, 9)
-		surface.DrawRect(0, gy + gh, w, 1)
-	end
+	UI.Fade(0, 0, w, e, "down", BLACK, 80, 0)
+	UI.Fade(0, h - e, w, e, "up", BLACK, 80, 0)
+	UI.Fade(0, 0, S(120), h, "right", BLACK, 55, 0)
+	UI.Fade(w - S(120), 0, S(120), h, "left", BLACK, 55, 0)
 end
 
 -- ===================== Кнопка =====================
 
+-- Минималистичная кнопка: тонкая рамка, при наведении подсвечивается и «выезжает» линия снизу.
 function HACK.MakeButton(parent, label, fn)
 	local b = vgui.Create("DButton", parent)
 
@@ -388,31 +457,40 @@ function HACK.MakeButton(parent, label, fn)
 
 	b.DoClick = function(self)
 		surface.PlaySound("buttons/button14.wav")
+		self.pressAt = SysTime()
 		fn(self)
+	end
+
+	b.OnCursorEntered = function(self)
+		if (not self:GetDisabled()) then
+			surface.PlaySound("buttons/button15.wav")
+		end
 	end
 
 	b.Paint = function(self, w, h)
 		local disabled = self:GetDisabled()
 		local want = (self:IsHovered() and not disabled) and 1 or 0
 
-		self.hover = Lerp(math.min(1, FrameTime() * 14), self.hover, want)
+		self.hover = Lerp(math.min(1, FrameTime() * 12), self.hover, want)
 
 		local k = self.hover
+		local press = self.pressAt and math.max(0, 1 - (SysTime() - self.pressAt) / 0.25) or 0
 
-		UI.Rect(0, 0, w, h, Color(7, 16, 22, 235))
-
-		if (k > 0.02) then
-			UI.Fade(0, 0, w, h, "right", C.accent, 58 * k, 6 * k, 10)
+		if (k > 0.01 or press > 0) then
+			UI.Rect(0, 0, w, h, UI.A(C.accent, 14 * k + 40 * press))
 		end
 
-		UI.Frame(0, 0, w, h, UI.A(k > 0.5 and C.accent or C.line, 230), 1)
-		UI.Rect(0, 0, S(3), h, disabled and C.faint or C.accent)
+		UI.Frame(0, 0, w, h, UI.A(k > 0.5 and C.accent or C.line, 60 + 150 * k), 1)
 
-		if (k > 0.5) then
-			UI.Brackets(0, 0, w, h, C.accent, S(6), 1)
+		if (k > 0.01) then
+			local lw = w * k
+
+			UI.Rect((w - lw) / 2, h - 2, lw, 2, C.accent)
 		end
 
-		draw.SimpleText(self.label, "ixHackS", w / 2, h / 2, disabled and C.dim or C.text, 1, 1)
+		local col = disabled and C.faint or UI.Mix(C.dim, C.text, k)
+
+		UI.Track(self.label, "ixHackS", w / 2, h / 2, col, S(2) + k * S(1), 1, 1)
 	end
 
 	return b

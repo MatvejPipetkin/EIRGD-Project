@@ -87,24 +87,40 @@ do
 
 	local BOOT_STEP, BOOT_END = 0.3, 1.7
 
+	-- Поля и области окна (в «S»-единицах считаются при раскладке).
+	local function Pad() return S(64) end
+	local function Top() return S(206) end
+	local function Bottom() return S(96) end
+
+	-- Появление элемента с задержкой: 0..1 (плавно).
+	local function Reveal(self, delay, dur)
+		return UI.Ease((SysTime() - self.openAt - delay) / (dur or 0.45))
+	end
+
 	function PANEL:Init()
-		self:SetSize(math.min(S(1060), ScrW() - S(40)), math.min(S(720), ScrH() - S(40)))
+		self:SetSize(ScrW() - S(48), ScrH() - S(48))
 		self:Center()
 		self:MakePopup()
 		self:SetKeyboardInputEnabled(true)
 
 		self.mode = "connect"       -- connect -> game -> result
 		self.opened = CurTime()
+		self.openAt = SysTime()
 		self.stage, self.stages = 0, 1
 		self.lives, self.maxLives = 3, 3
 		self.deadline, self.total = 0, 1
 		self.finished = false
 		self.ip = "10.0.0.1"
+		self.stageAt = 0
 
 		self.area = vgui.Create("EditablePanel", self)
 		self.area.Paint = function() end
 
 		self.disc = HACK.MakeButton(self, "ОТКЛЮЧИТЬСЯ", function() self:Disconnect() end)
+
+		-- Плавное появление всего окна.
+		self:SetAlpha(0)
+		self:AlphaTo(255, 0.6, 0)
 
 		self:InvalidateLayout(true)
 	end
@@ -124,22 +140,29 @@ do
 	end
 
 	function PANEL:PerformLayout(w, h)
-		local top = S(118)
+		local pad, top, bottom = Pad(), Top(), Bottom()
+		local freeH = h - top - bottom
 
-		self.area:SetPos(S(20), top)
-		self.area:SetSize(w - S(40), h - top - S(44))
+		-- Область головоломки: по центру, не шире и не выше разумного предела.
+		local aw = math.min(w - pad * 2, S(1280))
+		local ah = math.min(freeH, S(700))
 
-		self.disc:SetSize(S(170), S(32))
-		self.disc:SetPos(w - S(170) - S(16), S(12))
+		self.area:SetSize(aw, ah)
+		self.area:SetPos((w - aw) / 2, top + (freeH - ah) / 2)
+
+		self.disc:SetSize(S(200), S(36))
+		self.disc:SetPos(w - pad - S(200), h - S(70))
+
+		local by = h - S(176)
 
 		if (IsValid(self.btnDossier)) then
-			self.btnDossier:SetSize(S(240), S(40))
-			self.btnDossier:SetPos(w / 2 - S(250), h - S(92))
+			self.btnDossier:SetSize(S(250), S(46))
+			self.btnDossier:SetPos(w / 2 - S(260), by)
 		end
 
 		if (IsValid(self.btnClose)) then
-			self.btnClose:SetSize(S(200), S(40))
-			self.btnClose:SetPos(self.btnDossier and (w / 2 + S(10)) or (w / 2 - S(100)), h - S(92))
+			self.btnClose:SetSize(S(210), S(46))
+			self.btnClose:SetPos(self.btnDossier and (w / 2 + S(10)) or (w / 2 - S(105)), by)
 		end
 	end
 
@@ -173,6 +196,7 @@ do
 		self.level = d.level
 		self.total = math.max(1, d.time or 60)
 		self.deadline = CurTime() + self.total
+		self.stageAt = SysTime()
 
 		if (IsValid(self.game)) then
 			self.game:Remove()
@@ -190,7 +214,7 @@ do
 		game:Dock(FILL)
 		game:Setup(d.puzzle or {})
 		game:SetAlpha(0)
-		game:AlphaTo(255, 0.35, 0)
+		game:AlphaTo(255, 0.5, 0.08)
 		self.game = game
 
 		if (failed) then
@@ -205,13 +229,13 @@ do
 	end
 
 	function PANEL:Banner(text, col, seconds)
-		self.banner = {text = text, col = col, start = CurTime(), untilTime = CurTime() + (seconds or 1.5)}
+		self.banner = {text = text, col = col, start = SysTime(), untilTime = SysTime() + (seconds or 1.5)}
 	end
 
 	function PANEL:ShowResult(d)
 		self.mode = "result"
 		self.result = d
-		self.resultAt = CurTime()
+		self.resultAt = SysTime()
 		self.finished = true
 		self.banner = nil
 		self.queued = nil
@@ -229,6 +253,14 @@ do
 				HACK.OpenDossier(d.dossier)
 				self:Remove()
 			end)
+		end
+
+		-- Кнопки появляются после итогового текста.
+		for _, b in ipairs({self.btnClose, self.btnDossier}) do
+			if (IsValid(b)) then
+				b:SetAlpha(0)
+				b:AlphaTo(255, 0.5, 1.3)
+			end
 		end
 
 		self.lineCache = nil
@@ -271,47 +303,58 @@ do
 
 	-- ---------------------------------------------------------------- рисование
 
+	-- Шапка: название, подзаголовок, метки. Элементы появляются по очереди.
 	function PANEL:PaintHeader(w)
 		local info = self.info or {}
 		local node = info.node or {}
 		local diff = HACK.Difficulty(node.diff or 1)
+		local pad = Pad()
 
-		-- Эмблема.
-		UI.Diamond(S(36), S(34), S(15), UI.A(C.accent, 40))
-		UI.Diamond(S(36), S(34), S(11), C.accent)
-		UI.Diamond(S(36), S(34), S(7), C.bg)
-		UI.Diamond(S(36), S(34), S(3), C.accent)
+		local a1, a2, a3 = Reveal(self, 0.10), Reveal(self, 0.22), Reveal(self, 0.34)
 
-		UI.Glow("ТЕРМИНАЛ ВЗЛОМА", "ixHackL", S(64), S(14), C.text, 0, 0, 1)
-		Text(tostring(node.name or "—") .. "  ·  " .. tostring(node.typeName or ""), "ixHackM", S(66), S(50), C.dim)
+		UI.Track("ТЕРМИНАЛ ВЗЛОМА", "ixHackS", pad, S(46) + (1 - a1) * S(10), UI.A(C.accent, math.floor(220 * a1)), S(5))
+		UI.Text(tostring(node.name or "—"), "ixHackT", pad - S(2), S(68) + (1 - a2) * S(12), UI.A(C.text, math.floor(255 * a2)))
 
-		local x = S(24)
+		local x, y = pad, S(124)
 
-		x = x + UI.Chip(x, S(80), "ЗАЩИТА: " .. diff.name, diff.color) + S(8)
-		x = x + UI.Chip(x, S(80), "ЦЕЛЬ: " .. tostring(node.owner or "—"), C.dim) + S(8)
-		UI.Chip(x, S(80), "УЗЕЛ " .. self.ip, C.cyan)
+		x = x + UI.Chip(x, y, "ЗАЩИТА · " .. diff.name, diff.color, nil, a3) + S(30)
+		x = x + UI.Chip(x, y, "ЦЕЛЬ · " .. tostring(node.owner or "—"), C.dim, nil, a3) + S(30)
 
-		-- Разделитель с бегущим бликом.
-		Rect(S(16), S(110), w - S(32), 1, UI.A(C.line, 200))
+		if (node.typeName and node.typeName ~= "") then
+			x = x + UI.Chip(x, y, tostring(node.typeName), C.dim, nil, a3) + S(30)
+		end
 
-		local k = (SysTime() * 0.3) % 1
-
-		Rect(S(16) + (w - S(32) - S(120)) * k, S(109), S(120), 3, UI.A(C.accent, 150))
+		UI.Chip(x, y, "УЗЕЛ " .. self.ip, C.cyan, nil, a3)
 	end
 
-	function PANEL:PaintStatus(w)
-		local cw, ch = S(430), S(58)
-		local x, y = w - cw - S(16), S(50)
+	-- Тонкая временная линия во всю ширину и подписи под ней.
+	function PANEL:PaintTimeline(w)
+		local pad = Pad()
+		local lw = w - pad * 2
+		local ly = S(168)
+		local a = Reveal(self, 0.30, 0.6)
 
-		UI.Box(x, y, cw, ch, C.accent, 190)
+		-- Линия «прорисовывается» от левого края.
+		local shown = lw * a
 
-		UI.Glow("ЭТАП " .. self.stage .. "/" .. self.stages, "ixHackM", x + S(14), y + S(7), C.text, 0, 0, 0.7)
-		Text(self.gameName or "", "ixHackS", x + S(124), y + S(11), C.dim)
+		UI.Rect(pad, ly, shown, 1, Color(255, 255, 255, 26))
 
-		local total = self.maxLives * (S(12) + S(6)) - S(6)
+		if (self.mode == "connect") then
+			local frac = math.Clamp((CurTime() - self.opened) / BOOT_END, 0, 1)
 
-		UI.Pips(x + cw - S(14) - total, y + S(17), self.maxLives, self.lives, S(6), S(6),
-			self.lives <= 1 and C.bad or C.good)
+			UI.Rect(pad, ly - 1, shown * UI.Ease(frac), 3, UI.A(C.accent, 230))
+
+			return
+		end
+
+		if (self.mode == "result") then
+			local col = (self.result and self.result.success) and C.good or C.bad
+			local k = UI.Ease((SysTime() - (self.resultAt or SysTime())) / 0.8)
+
+			UI.Rect(pad, ly - 1, lw * k, 3, UI.A(col, 230))
+
+			return
+		end
 
 		local left = math.max(0, self.deadline - CurTime())
 		local frac = math.Clamp(left / self.total, 0, 1)
@@ -321,143 +364,174 @@ do
 			col = UI.Mul(col, 0.6)
 		end
 
-		UI.Bar(x + S(14), y + S(38), cw - S(100), S(10), frac, col, 30)
-		Text(HACK.FormatTime(left), "ixHackM", x + cw - S(14), y + S(43), col, TEXT_ALIGN_RIGHT, 1)
+		local fw = lw * frac
+
+		UI.Rect(pad, ly - 1, fw, 3, UI.A(col, 230))
+		UI.Disc(pad + fw, ly, S(4), col, 14)
+		UI.Disc(pad + fw, ly, S(9), UI.A(col, 28), 18)
+
+		-- Подписи: этап и игра слева, время справа.
+		local ty = ly + S(16)
+
+		UI.Track(string.format("ЭТАП %02d / %02d", self.stage, self.stages), "ixHackS", pad, ty, C.dim, S(3))
+		UI.Text(tostring(self.gameName or ""), "ixHackS", pad + S(200), ty, UI.A(C.text, 200))
+		UI.Text(HACK.FormatTime(left), "ixHackM", w - pad, ty - S(4), col, TEXT_ALIGN_RIGHT)
 	end
 
+	-- Подключение: кольцо с процентами и бегущая строка текущего шага.
 	function PANEL:PaintBoot(w, h)
 		local t = CurTime() - self.opened
-		local x, y = S(64), S(170)
+		local frac = math.Clamp(t / BOOT_END, 0, 1)
+		local top, bottom = Top(), Bottom()
+		local cx, cy = w / 2, top + (h - top - bottom) / 2 - S(28)
+		local R = S(112)
+		local appear = Reveal(self, 0.15, 0.6)
+		local now = SysTime()
 
-		for i, line in ipairs(BOOT) do
-			local start = (i - 1) * BOOT_STEP
+		UI.Ring(cx, cy, R, UI.A(C.line, math.floor(70 * appear)), 1, 96)
 
-			if (t >= start) then
-				local txt = string.format(line, self.ip)
-				local done = t >= start + BOOT_STEP
-				local count = utf8.len(txt) or #txt
-				local shown = done and txt or UI.Sub(txt, math.floor((t - start) / BOOT_STEP * count))
+		-- Внешние «бегущие» дуги.
+		local rot = now * 80
 
-				Text("> " .. shown, "ixHackM", x, y, C.text)
+		UI.Arc(cx, cy, R + S(16), 1, rot, rot + 54, UI.A(C.accent, math.floor(150 * appear)), 3)
+		UI.Arc(cx, cy, R + S(16), 1, rot + 180, rot + 214, UI.A(C.accent, math.floor(70 * appear)), 3)
+		UI.Arc(cx, cy, R - S(16), 1, -rot * 1.4, -rot * 1.4 + 36, UI.A(C.cyan, math.floor(90 * appear)), 3)
 
-				if (done) then
-					Text("[ OK ]", "ixHackM", x + S(560), y, C.good)
-				end
+		-- Прогресс.
+		local pk = UI.EaseIO(frac)
 
-				y = y + S(34)
-			end
+		if (pk > 0.002) then
+			UI.Arc(cx, cy, R, 3, -90, -90 + 360 * pk, UI.A(C.accent, 240), 3)
+
+			local ea = math.rad(-90 + 360 * pk)
+
+			UI.Disc(cx + math.cos(ea) * R, cy + math.sin(ea) * R, S(5), C.accent, 14)
+			UI.Disc(cx + math.cos(ea) * R, cy + math.sin(ea) * R, S(11), UI.A(C.accent, 30), 18)
 		end
 
-		UI.HexStream(w - S(250), S(150), 24, C.accent)
+		-- Проценты.
+		local pct = math.floor(pk * 100)
 
-		-- Индикатор подключения.
-		local cx, cy = w / 2, h - S(150)
-		local frac = math.Clamp(t / BOOT_END, 0, 1)
+		UI.Text(tostring(pct), "ixHackD", cx, cy - S(4), UI.A(C.text, math.floor(255 * appear)), 1, 1)
+		UI.Track("ПОДКЛЮЧЕНИЕ", "ixHackXS", cx, cy + S(52), UI.A(C.dim, math.floor(230 * appear)), S(4), 1, 1)
 
-		UI.Ring(cx - S(190), cy, S(14), UI.A(C.line, 200), 2)
-		UI.Arc(cx - S(190), cy, S(14), 4, SysTime() * 300, SysTime() * 300 + 100, C.accent)
-		UI.Glow("УСТАНАВЛИВАЕТСЯ СОЕДИНЕНИЕ", "ixHackM", cx - S(160), cy - S(2), C.text, 0, 1, 0.8)
-		UI.Bar(cx - S(200), cy + S(24), S(400), S(8), frac, C.accent, 20)
+		-- Текущий шаг.
+		local idx = math.Clamp(math.floor(t / BOOT_STEP) + 1, 1, #BOOT)
+		local start = (idx - 1) * BOOT_STEP
+		local txt = string.format(BOOT[idx], self.ip)
+		local count = utf8.len(txt) or #txt
+		local shown = UI.Sub(txt, math.floor(math.Clamp((t - start) / (BOOT_STEP * 0.8), 0, 1) * count))
+		local sy = cy + R + S(64)
+
+		UI.Track(string.format("%02d / %02d", idx, #BOOT), "ixHackXS", cx, sy - S(26), UI.A(C.dim, 200), S(3), 1, 1)
+		UI.Text(shown, "ixHackM", cx, sy, UI.A(C.text, 230), 1, 1)
 	end
 
+	-- Итог: кольцо «прорисовывается», появляется галочка/крест, заголовок и строки по очереди.
 	function PANEL:PaintResult(w, h)
 		local d = self.result or {}
 		local col = d.success and C.good or C.bad
-		local t = CurTime() - (self.resultAt or CurTime())
-		local cx, cy = w / 2, S(190)
+		local t = SysTime() - (self.resultAt or SysTime())
+		local cx, cy = w / 2, S(300)
+		local R = S(52)
+
+		UI.Ring(cx, cy, R, UI.A(col, 40), 1, 64)
+		UI.Arc(cx, cy, R, 3, -90, -90 + 360 * UI.Ease(t / 0.8), UI.A(col, 240), 3)
 
 		if (d.success) then
-			for i = 0, 2 do
-				local k = (t * 0.55 + i / 3) % 1
+			local p1, p2, p3 = {cx - S(19), cy + S(2)}, {cx - S(6), cy + S(16)}, {cx + S(21), cy - S(14)}
 
-				UI.Ring(cx, cy, S(36) + k * S(110), UI.A(col, 130 * (1 - k)), 2)
+			UI.LinePart(p1[1], p1[2], p2[1], p2[2], col, 4, (t - 0.55) / 0.18)
+			UI.LinePart(p2[1], p2[2], p3[1], p3[2], col, 4, (t - 0.72) / 0.24)
+
+			-- Тихая рябь после завершения.
+			if (t > 0.95) then
+				local k = ((t - 0.95) * 0.5) % 1
+
+				UI.Ring(cx, cy, R + k * S(90), UI.A(col, math.floor(90 * (1 - k))), 1, 64)
 			end
-
-			UI.Ring(cx, cy, S(40), UI.A(col, 220), 3)
-			UI.Line(cx - S(18), cy + S(2), cx - S(5), cy + S(16), col, 5)
-			UI.Line(cx - S(5), cy + S(16), cx + S(20), cy - S(14), col, 5)
 		else
-			local pulse = 0.6 + 0.4 * math.sin(t * 6)
+			local a = S(15)
 
-			UI.Ring(cx, cy, S(40), UI.A(col, 220 * pulse), 3)
-			UI.Line(cx - S(15), cy - S(15), cx + S(15), cy + S(15), col, 5)
-			UI.Line(cx - S(15), cy + S(15), cx + S(15), cy - S(15), col, 5)
+			UI.LinePart(cx - a, cy - a, cx + a, cy + a, col, 4, (t - 0.55) / 0.2)
+			UI.LinePart(cx - a, cy + a, cx + a, cy - a, col, 4, (t - 0.72) / 0.2)
+
+			if (t > 0.95) then
+				local pulse = 0.5 + 0.5 * math.sin((t - 0.95) * 5)
+
+				UI.Ring(cx, cy, R + S(8) + pulse * S(6), UI.A(col, math.floor(60 * (1 - pulse * 0.5))), 1, 64)
+			end
 		end
 
-		local title = tostring(d.title or "")
-		local ty = cy + S(88)
+		-- Заголовок.
+		local ta = UI.Ease((t - 0.6) / 0.5)
+		local ty = cy + S(108) + (1 - ta) * S(14)
 
-		if (not d.success and UI.Rand(math.floor(SysTime() * 8), 3) < 0.3) then
-			local j = S(3)
+		UI.Text(tostring(d.title or ""), "ixHackT2", cx, ty, UI.A(col, math.floor(255 * ta)), 1, 1)
 
-			Text(title, "ixHackXL", cx + j, ty, UI.A(C.cyan, 120), 1, 1)
-			Text(title, "ixHackXL", cx - j, ty, UI.A(C.bad, 160), 1, 1)
-		end
-
-		UI.Glow(title, "ixHackXL", cx, ty, col, 1, 1, 1.4)
-
+		-- Строки по очереди.
 		self.lineCache = self.lineCache or {}
 
-		local pieces = {}
+		local maxw = math.min(S(900), w - Pad() * 2)
+		local y = ty + S(56)
+		local n = 0
 
 		for i, line in ipairs(d.lines or {}) do
-			self.lineCache[i] = self.lineCache[i] or Wrap(line, "ixHackM", w - S(220))
+			self.lineCache[i] = self.lineCache[i] or Wrap(line, "ixHackM", maxw)
 
-			for _, piece in ipairs(self.lineCache[i]) do pieces[#pieces + 1] = piece end
+			for _, piece in ipairs(self.lineCache[i]) do
+				n = n + 1
 
-			pieces[#pieces + 1] = false
-		end
+				local la = UI.Ease((t - 0.95 - n * 0.07) / 0.4)
 
-		local bh = S(24)
-
-		for _, piece in ipairs(pieces) do bh = bh + (piece and S(30) or S(10)) end
-
-		local bw = w - S(180)
-		local by = ty + S(46)
-
-		UI.Box(w / 2 - bw / 2, by, bw, bh, col, 190)
-
-		local y = by + S(14)
-
-		for _, piece in ipairs(pieces) do
-			if (piece) then
-				Text(piece, "ixHackM", w / 2, y, C.text, 1, 0)
+				UI.Text(piece, "ixHackM", cx, y + (1 - la) * S(8), UI.A(C.text, math.floor(225 * la)), 1, 0)
 
 				y = y + S(30)
-			else
-				y = y + S(10)
 			end
+
+			y = y + S(12)
 		end
 	end
 
 	function PANEL:PaintFooter(w, h)
-		local y = h - S(30)
-
-		Rect(S(16), y - S(4), w - S(32), 1, UI.A(C.line, 120))
+		local pad = Pad()
+		local y = h - S(52)
+		local a = Reveal(self, 0.45, 0.5)
 
 		if (self.mode == "result") then
-			Text("СЕАНС ЗАВЕРШЁН", "ixHackXS", S(24), y + S(5), C.dim)
+			UI.Track("СЕАНС ЗАВЕРШЁН", "ixHackXS", w / 2, y + S(4), UI.A(C.dim, math.floor(220 * a)), S(5), 1, 1)
 
 			return
 		end
 
+		-- Попытки.
+		UI.Track("ПОПЫТКИ", "ixHackS", pad, y + S(2), UI.A(C.dim, math.floor(230 * a)), S(3), 0, 1)
+
+		UI.Pips(pad + S(120), y + S(2), self.maxLives, self.lives, S(6), S(8),
+			self.lives <= 1 and C.bad or C.good)
+
+		-- Служебная строка посередине.
 		local ping = 14 + math.floor(UI.Rand(math.floor(SysTime() * 2), 7) * 26)
 		local packets = math.floor((CurTime() - self.opened) * 37)
 
-		Text(string.format("СЕАНС ЗАШИФРОВАН  ·  AES-256  ·  ПИНГ %d мс  ·  ПАКЕТОВ %d", ping, packets),
-			"ixHackXS", S(24), y + S(5), C.dim)
-		Text("ESC — ОТКЛЮЧИТЬСЯ", "ixHackXS", w - S(24), y + S(5), C.dim, TEXT_ALIGN_RIGHT)
+		UI.Track(string.format("AES-256  ·  %d МС  ·  %d ПАКЕТОВ", ping, packets), "ixHackXS", w / 2, y + S(4),
+			UI.A(C.dim, math.floor(170 * a)), S(3), 1, 1)
 	end
 
 	function PANEL:Paint(w, h)
 		UI.Window(self, w, h)
+
+		-- Верхняя акцентная линия «раскрывается» от центра при открытии.
+		local ok = UI.Ease((SysTime() - self.openAt) / 0.8)
+
+		UI.Rect(w / 2 - w * ok / 2, 0, w * ok, 2, UI.A(C.accent, math.floor(60 + 180 * (1 - ok))))
+
 		self:PaintHeader(w)
+		self:PaintTimeline(w)
 
 		if (self.mode == "connect") then
 			self:PaintBoot(w, h)
-		elseif (self.mode == "game") then
-			self:PaintStatus(w)
-		else
+		elseif (self.mode == "result") then
 			self:PaintResult(w, h)
 		end
 
@@ -467,27 +541,43 @@ do
 	function PANEL:PaintOver(w, h)
 		UI.Overlay(w, h)
 
+		-- Вспышка-линия при смене этапа: раскрывается над областью задания.
+		local st = SysTime() - self.stageAt
+
+		if (self.mode == "game" and st >= 0 and st < 0.7 and IsValid(self.area)) then
+			local ax, ay = self.area:GetPos()
+			local aw = self.area:GetWide()
+			local k = UI.Ease(st / 0.45)
+
+			UI.Rect(ax + aw / 2 - aw * k / 2, ay - S(6), aw * k, 1, UI.A(C.accent, math.floor(200 * (1 - st / 0.7))))
+		end
+
 		local banner = self.banner
 
 		if (not banner) then return end
 
-		if (CurTime() > banner.untilTime) then
+		local now = SysTime()
+
+		if (now > banner.untilTime) then
 			self.banner = nil
 
 			return
 		end
 
-		local k = math.min(1, (CurTime() - banner.start) / 0.18)
-		local bh = S(76) * k
-		local y = S(118) + (h - S(118)) / 2 - bh / 2
+		local k = UI.Ease((now - banner.start) / 0.28)
+		local af = math.min(1, (banner.untilTime - now) / 0.25)
+		local top, bottom = Top(), Bottom()
+		local cy = top + (h - top - bottom) / 2
+		local hh = S(46) * k
 
-		Rect(0, y, w, bh, Color(0, 0, 0, 215))
-		UI.Fade(0, y, w, bh, "down", banner.col, 40, 0, 8)
-		Rect(0, y, w, 2, banner.col)
-		Rect(0, y + bh - 2, w, 2, banner.col)
+		Rect(0, cy - hh, w, hh * 2, Color(0, 0, 0, math.floor(200 * af)))
+		Rect(w / 2 - w * k / 2, cy - hh, w * k, 1, UI.A(banner.col, math.floor(200 * af)))
+		Rect(w / 2 - w * k / 2, cy + hh - 1, w * k, 1, UI.A(banner.col, math.floor(200 * af)))
 
-		if (k >= 1) then
-			UI.Glow(banner.text, "ixHackL", w / 2, y + bh / 2, banner.col, 1, 1, 1.4)
+		if (k > 0.6) then
+			local ta = math.Clamp((k - 0.6) / 0.4, 0, 1) * af
+
+			UI.Track(banner.text, "ixHackL", w / 2, cy, UI.A(banner.col, math.floor(255 * ta)), S(6), 1, 1)
 		end
 	end
 

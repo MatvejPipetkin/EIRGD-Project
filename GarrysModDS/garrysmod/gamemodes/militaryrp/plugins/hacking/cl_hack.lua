@@ -24,18 +24,18 @@ end
 local S = HACK.S
 
 HACK.C = {
-	bg = Color(4, 9, 13),
-	panel = Color(9, 19, 26),
-	panel2 = Color(14, 30, 38),
-	line = Color(22, 104, 112),
-	text = Color(168, 255, 238),
-	dim = Color(76, 146, 148),
-	faint = Color(24, 54, 62),
-	accent = Color(0, 255, 214),
+	bg = Color(4, 8, 14),
+	panel = Color(9, 17, 27),
+	panel2 = Color(14, 26, 40),
+	line = Color(38, 96, 150),
+	text = Color(204, 230, 255),
+	dim = Color(104, 144, 182),
+	faint = Color(28, 50, 72),
+	accent = Color(92, 184, 255),
 	warn = Color(255, 196, 64),
 	bad = Color(255, 72, 84),
 	good = Color(96, 255, 160),
-	cyan = Color(90, 220, 255)
+	cyan = Color(70, 170, 255)
 }
 
 local C = HACK.C
@@ -51,6 +51,15 @@ local function CreateFonts()
 	F("ixHackL", 30, 700)
 	F("ixHackXL", 54, 800)
 	F("ixHackHUD", 18, 700)
+
+	-- Шрифты нового минималистичного интерфейса (тонкие, крупные).
+	local function T(name, size, weight)
+		surface.CreateFont(name, {font = "Roboto", size = S(size), weight = weight, extended = true, antialias = true})
+	end
+
+	T("ixHackT", 40, 300)
+	T("ixHackT2", 62, 300)
+	T("ixHackD", 96, 200)
 end
 
 CreateFonts()

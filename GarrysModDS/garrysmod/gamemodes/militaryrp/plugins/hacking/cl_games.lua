@@ -273,7 +273,7 @@ do
 	function PANEL:Geo()
 		local w, h = self:GetSize()
 
-		return w * 0.3, h * 0.5 + S(4), math.min(h * 0.44, w * 0.27)
+		return w * 0.3, h * 0.43, math.min(h * 0.34, w * 0.27)
 	end
 
 	function PANEL:Rotate(d)
@@ -287,10 +287,11 @@ do
 
 	function PANEL:ButtonRects()
 		local cx, cy, R = self:Geo()
-		local bw, bh = S(90), S(34)
+		local bw, bh = S(230), S(84)
+		local by = cy + R + S(18)
 
-		return {x = cx - R * 0.5 - bw / 2, y = cy + R + S(14), w = bw, h = bh, d = -1, label = "◄"},
-			{x = cx + R * 0.5 - bw / 2, y = cy + R + S(14), w = bw, h = bh, d = 1, label = "►"}
+		return {x = cx - R * 0.62 - bw / 2, y = by, w = bw, h = bh, d = -1, label = "◄"},
+			{x = cx + R * 0.62 - bw / 2, y = by, w = bw, h = bh, d = 1, label = "►"}
 	end
 
 	function PANEL:OnMousePressed(code)
@@ -425,7 +426,7 @@ do
 
 			Rect(b.x, b.y, b.w, b.h, hov and A(C.accent, 50) or C.panel)
 			Frame(b.x, b.y, b.w, b.h, hov and C.accent or C.line, 1)
-			Text(b.label, "ixHackM", b.x + b.w / 2, b.y + b.h / 2, C.text, 1, 1)
+			Text(b.label, "ixHackL", b.x + b.w / 2, b.y + b.h / 2, C.text, 1, 1)
 		end
 
 		-- Правая колонка: перехваченное сообщение, подсказка, ввод.
