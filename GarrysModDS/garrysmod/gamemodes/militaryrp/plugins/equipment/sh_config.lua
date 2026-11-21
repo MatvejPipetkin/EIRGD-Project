@@ -14,8 +14,14 @@
 	                         {model = "...", bonemerge = true}                              -- сращивание с костями
 	                         {model = "...", bone = "ValveBiped.Bip01_Head1",
 	                          pos = Vector(0, 0, 0), ang = Angle(0, 0, 0), scale = 1}       -- крепление к кости
+	            weapon     — класс оружия (SWEP) для слотов оружия. Для предметов с ITEM.class и ITEM.weaponCategory
+	                         слот и класс определяются сами (см. weapons.categories), вписывать их сюда не нужно;
+	                         запись в items нужна только чтобы переопределить слот/класс для конкретного оружия.
 	            Те же параметры можно задать прямо в файле предмета: ITEM.equipSlot, ITEM.equipBlocks,
-	            ITEM.equipArmor, ITEM.equipBodygroups, ITEM.equipWear. Значения из этого конфига приоритетнее.
+	            ITEM.equipArmor, ITEM.equipBodygroups, ITEM.equipWear, ITEM.equipWeapon. Значения из этого конфига приоритетнее.
+
+	Слоты оружия: в списке slots помечены weapon = true, стоят отдельным рядом под моделью персонажа.
+	weight — относительная ширина слота в ряду (основное оружие шире пистолета и ножа).
 ]]
 
 ix.equipment = ix.equipment or {}
@@ -34,7 +40,23 @@ ix.equipment.config = {
 		offsetX = 0, -- отступ панели от левого края области контента
 		preview = true, -- модель персонажа между колонками слотов
 		previewWidth = 240, -- ширина области с моделью (при высоте экрана 1080)
-		previewZoom = 2 -- масштаб модели в предпросмотре (больше — крупнее)
+		previewZoom = 2, -- масштаб модели в предпросмотре (больше — крупнее)
+		weaponHeight = 92 -- высота слотов оружия (при высоте экрана 1080)
+	},
+
+	weapons = {
+		-- Оружие определяется автоматически по полям предмета (items/weapons/sh_*.lua):
+		--   ITEM.weaponCategory — какая это пушка; ITEM.class — класс SWEP, который выдаётся игроку.
+		-- Здесь — в какой слот попадает каждая категория. Категории, которых нет в списке
+		-- (например grenade), остаются на стандартной логике base_weapons.
+		categories = {
+			primary = "primary",
+			sidearm = "secondary",
+			melee = "melee"
+		},
+
+		defaultClip = 0, -- сколько патронов в магазине, когда оружие надето впервые (0 — пустое, как в base_weapons)
+		weaponTitle = "ОРУЖИЕ" -- подпись над рядом слотов оружия
 	},
 
 	slots = {
@@ -48,7 +70,12 @@ ix.equipment.config = {
 		{id = "uniform", name = "Форма", short = "ФОРМА", description = "Куртки и камуфляж", icon = "equipment/slots/uniform.png", x = 2, y = 3},
 		{id = "rig", name = "Разгрузка", short = "РАЗГРУЗКА", description = "Разгрузочные жилеты и ремни", icon = "equipment/slots/rig.png", x = 1, y = 4},
 		{id = "legs", name = "Ноги", short = "НОГИ", description = "Штаны, наколенники", icon = "equipment/slots/legs.png", x = 1, y = 5},
-		{id = "feet", name = "Обувь", short = "ОБУВЬ", description = "Берцы и ботинки", icon = "equipment/slots/feet.png", x = 2, y = 5}
+		{id = "feet", name = "Обувь", short = "ОБУВЬ", description = "Берцы и ботинки", icon = "equipment/slots/feet.png", x = 2, y = 5},
+
+		-- слоты оружия (отдельный ряд под персонажем)
+		{id = "primary", name = "Основное оружие", short = "ОСНОВНОЕ", description = "Автоматы, дробовики, ПП, снайперские винтовки, РПГ", icon = "equipment/slots/primary.png", weapon = true, weight = 2},
+		{id = "secondary", name = "Второстепенное оружие", short = "ПИСТОЛЕТ", description = "Пистолеты и револьверы", icon = "equipment/slots/secondary.png", weapon = true, weight = 1},
+		{id = "melee", name = "Холодное оружие", short = "ХОЛОДНОЕ", description = "Ножи, топоры, мачете, дубинки", icon = "equipment/slots/melee.png", weapon = true, weight = 1}
 	},
 
 	items = {

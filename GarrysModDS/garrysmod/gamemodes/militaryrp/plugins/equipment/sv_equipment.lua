@@ -71,6 +71,74 @@ local function Sync(client)
 	client:SetNetVar("equipment", data)
 end
 
+--[[
+	ОРУЖИЕ
+	Предмет в слоте оружия (data.weapon = класс SWEP) выдаётся игроку как настоящее оружие.
+	Патроны в магазине запоминаются в entry.data.ammo и возвращаются при следующем надевании.
+]]
+local function GetWeaponClass(uid)
+	local slotID = ix.equipment.GetItemSlot(uid)
+	local slot = slotID and ix.equipment.GetSlot(slotID)
+
+	return slot and slot.weapon and ix.equipment.GetItemData(uid).weapon or nil
+end
+
+-- выдать оружие из слота (если оно уже у игрока — берём его). Возвращает entity или nil
+local function GiveWeapon(client, entry)
+	local class = GetWeaponClass(entry.uid)
+
+	if (!class) then
+		return
+	end
+
+	local weapon = client:GetWeapon(class)
+
+	if (!IsValid(weapon)) then
+		weapon = client:Give(class, true)
+
+		if (!IsValid(weapon)) then
+			return
+		end
+
+		entry.data = entry.data or {}
+
+		local clip = entry.data.ammo
+
+		if (clip == nil) then
+			clip = config.weapons and config.weapons.defaultClip or 0
+		end
+
+		local maxClip = weapon:GetMaxClip1()
+
+		if (maxClip and maxClip > 0) then
+			clip = math.min(clip, maxClip)
+		end
+
+		weapon:SetClip1(clip)
+	end
+
+	return weapon
+end
+
+-- запомнить патроны в магазинах выданного оружия
+local function CaptureAmmo(client)
+	for _, entry in pairs(ix.equipment.GetEquipped(client)) do
+		local class = GetWeaponClass(entry.uid)
+		local weapon = class and client:GetWeapon(class)
+
+		if (IsValid(weapon)) then
+			entry.data = entry.data or {}
+			entry.data.ammo = weapon:Clip1()
+		end
+	end
+end
+
+function ix.equipment.GiveWeapons(client)
+	for _, entry in pairs(ix.equipment.GetEquipped(client)) do
+		GiveWeapon(client, entry)
+	end
+end
+
 -- сохраняем надетое в данные персонажа
 local function Save(client)
 	local character = client:GetCharacter()
@@ -78,6 +146,8 @@ local function Save(client)
 	if (!character) then
 		return
 	end
+
+	CaptureAmmo(client)
 
 	local data = {}
 
@@ -131,6 +201,9 @@ function ix.equipment.Unequip(client, slotID)
 		return false, "Инвентарь персонажа недоступен."
 	end
 
+	-- патроны в магазине оружия сохраняем до того, как оно исчезнет
+	CaptureAmmo(client)
+
 	-- сначала кладём предмет в инвентарь
 	local added = inventory:Add(entry.uid, 1, entry.data)
 
@@ -139,6 +212,12 @@ function ix.equipment.Unequip(client, slotID)
 	end
 
 	ix.equipment.GetEquipped(client)[slotID] = nil
+
+	local weaponClass = GetWeaponClass(entry.uid)
+
+	if (weaponClass and client:HasWeapon(weaponClass)) then
+		client:StripWeapon(weaponClass)
+	end
 
 	SubtractArmor(client, entry.uid)
 	Save(client)
@@ -210,6 +289,13 @@ function ix.equipment.Equip(client, item)
 	-- запоминаем предмет и убираем его из инвентаря
 	local entry = {uid = item.uniqueID, data = table.Copy(item.data or {})}
 
+	entry.data.equip = nil -- флаг «надето» от base_weapons больше не нужен
+
+	-- оружие выдаём до удаления предмета: если не вышло — предмет остаётся в инвентаре
+	if (data.weapon and slot.weapon and !IsValid(GiveWeapon(client, entry))) then
+		return false, "Не удалось выдать оружие: " .. tostring(data.weapon) .. " (проверьте класс в sh_config.lua)."
+	end
+
 	item:Remove()
 
 	equipped[slotID] = entry
@@ -268,6 +354,7 @@ function ix.equipment.Rebuild(client)
 	end
 
 	ix.equipment.Refresh(client)
+	ix.equipment.GiveWeapons(client)
 end
 
 -- снять предмет из слота по запросу интерфейса.
@@ -310,4 +397,19 @@ function PLUGIN:PlayerLoadedCharacter(client, character, lastChar)
 	timer.Simple(0.25, function()
 		ix.equipment.Rebuild(client)
 	end)
+end
+
+-- патроны сохраняем при смерти (оружие ещё у игрока) и при каждом сохранении персонажа (выход, смена персонажа)
+function PLUGIN:PlayerDeath(client)
+	if (client:GetCharacter()) then
+		Save(client)
+	end
+end
+
+function PLUGIN:CharacterPreSave(character)
+	local client = character:GetPlayer()
+
+	if (IsValid(client) and client:GetCharacter() == character) then
+		Save(client)
+	end
 end

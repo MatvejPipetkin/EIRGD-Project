@@ -113,14 +113,22 @@ function SLOT:RebuildIcon(item)
 	local model = item.model or "models/props_junk/popcan01a.mdl"
 	local icon = self:Add("SpawnIcon")
 
-	icon:Dock(FILL)
-	icon:DockMargin(1, 1, 1, 1)
+	if (self.slot.weapon) then
+		-- слот оружия широкий: иконка не растягивается, а сохраняет пропорции предмета и стоит по центру
+		self.iconAspect = math.max((item.width or 1) / math.max(item.height or 1, 1), 0.2)
+	else
+		icon:Dock(FILL)
+		icon:DockMargin(1, 1, 1, 1)
+	end
+
 	icon:SetModel(model, item.skin or 0)
 	icon:SetMouseInputEnabled(false)
 	icon.Paint = function() end
 	icon.PaintOver = function() end
 
 	self.icon = icon
+
+	self:InvalidateLayout(true)
 
 	if (item.exRender and ikon) then
 		icon.Icon:SetVisible(false)
@@ -144,6 +152,22 @@ function SLOT:RebuildIcon(item)
 			cam_fov = item.iconCam.fov
 		})
 	end
+end
+
+function SLOT:PerformLayout(width, height)
+	if (!self.slot or !self.slot.weapon or !IsValid(self.icon)) then
+		return
+	end
+
+	local aspect = self.iconAspect or 1
+	local pad = S(15) -- место под подписи сверху и снизу
+	local iconHeight = height - pad * 2
+	local iconWidth = math.min(iconHeight * aspect, width - S(10))
+
+	iconHeight = iconWidth / aspect
+
+	self.icon:SetSize(iconWidth, iconHeight)
+	self.icon:SetPos((width - iconWidth) * 0.5, (height - iconHeight) * 0.5)
 end
 
 function SLOT:Think()
@@ -546,18 +570,29 @@ function PANEL:Setup(maxHeight)
 	local config = ix.equipment.config
 	local gap = S(config.ui.gap)
 	local columns, rows = 1, 1
+	local gridSlots, weaponSlots = {}, {}
 
 	for _, slot in ipairs(config.slots) do
-		columns = math.max(columns, slot.x or 1)
-		rows = math.max(rows, slot.y or 1)
+		if (slot.weapon) then
+			weaponSlots[#weaponSlots + 1] = slot
+		else
+			gridSlots[#gridSlots + 1] = slot
+			columns = math.max(columns, slot.x or 1)
+			rows = math.max(rows, slot.y or 1)
+		end
 	end
 
 	local offsetY = self.headerH + S(6)
 	local size = S(config.ui.slotSize)
 
+	-- ряд оружия под сеткой: отступ + подпись + слоты
+	local weaponH = S(config.ui.weaponHeight or 92)
+	local weaponLabelH = S(20)
+	local weaponBlock = #weaponSlots > 0 and (S(8) + weaponLabelH + weaponH) or 0
+
 	-- если панель не помещается по высоте — уменьшаем слоты
 	if (maxHeight) then
-		local fit = math.floor((maxHeight - offsetY - S(6) - gap * (rows - 1)) / rows)
+		local fit = math.floor((maxHeight - offsetY - S(6) - weaponBlock - gap * (rows - 1)) / rows)
 
 		size = math.max(math.min(size, fit), S(40))
 	end
@@ -570,7 +605,7 @@ function PANEL:Setup(maxHeight)
 	local offsetX = 4
 	local gridHeight = rows * size + gap * (rows - 1)
 
-	self:SetSize(width, offsetY + gridHeight + S(6))
+	self:SetSize(width, offsetY + gridHeight + weaponBlock + S(6))
 
 	if (previewWidth > 0) then
 		local preview = self:Add("ixEquipmentPreview")
@@ -581,7 +616,7 @@ function PANEL:Setup(maxHeight)
 		self.preview = preview
 	end
 
-	for _, slot in ipairs(config.slots) do
+	for _, slot in ipairs(gridSlots) do
 		local column = slot.x or 1
 		local panel = self:Add("ixEquipmentSlot")
 
@@ -593,6 +628,36 @@ function PANEL:Setup(maxHeight)
 		)
 
 		self.slotPanels[#self.slotPanels + 1] = panel
+	end
+
+	-- ряд слотов оружия: ширина делится по весу (weight) на всю ширину панели
+	if (#weaponSlots > 0) then
+		local totalWeight = 0
+
+		for _, slot in ipairs(weaponSlots) do
+			totalWeight = totalWeight + (slot.weight or 1)
+		end
+
+		local rowY = offsetY + gridHeight + S(8) + weaponLabelH
+		local available = width - 8 - gap * (#weaponSlots - 1)
+		local x = offsetX
+
+		self.weaponLabelY = offsetY + gridHeight + S(8)
+		self.weaponLabelH = weaponLabelH
+
+		for index, slot in ipairs(weaponSlots) do
+			local panel = self:Add("ixEquipmentSlot")
+			local slotWidth = index == #weaponSlots and (offsetX + available + gap * (#weaponSlots - 1) - x)
+				or math.floor(available * (slot.weight or 1) / totalWeight)
+
+			panel:Setup(slot)
+			panel:SetSize(slotWidth, weaponH)
+			panel:SetPos(x, rowY)
+
+			x = x + slotWidth + gap
+
+			self.slotPanels[#self.slotPanels + 1] = panel
+		end
 	end
 end
 
@@ -632,6 +697,24 @@ function PANEL:Paint(width, height)
 	end
 
 	draw.SimpleText("НАДЕТО  " .. worn .. " / " .. #ix.equipment.config.slots, "ixMenuTinyFont", width - S(10), centerY, Color(accent.r, accent.g, accent.b, 200), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+
+	-- подпись ряда слотов оружия
+	if (self.weaponLabelY) then
+		local labelY = self.weaponLabelY + math.floor(self.weaponLabelH * 0.5)
+		local title = (ix.equipment.config.weapons and ix.equipment.config.weapons.weaponTitle) or "ОРУЖИЕ"
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 230)
+		surface.DrawRect(S(4), labelY - S(5), 2, S(10))
+
+		surface.SetFont("ixMenuTinyFont")
+
+		local textWidth = surface.GetTextSize(title)
+
+		draw.SimpleText(title, "ixMenuTinyFont", S(12), labelY, Color(255, 255, 255, 150), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 40)
+		surface.DrawRect(S(12) + textWidth + S(8), labelY, width - (S(12) + textWidth + S(8)) - S(4), 1)
+	end
 
 	-- внешняя рамка
 	surface.SetDrawColor(accent.r, accent.g, accent.b, 45)

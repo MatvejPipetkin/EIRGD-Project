@@ -8519,3 +8519,211 @@ Class 'metropolice_recruit' does not have a valid faction!
 [Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
 
 
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] Couldn't include file 'militaryrp\plugins\equipment\items\equipment\sh_knife_example.lua' - File not found or is empty (@gamemodes/helix/gamemode/core/libs/sh_item.lua (line 207))
+  1. Register - gamemodes/helix/gamemode/core/libs/sh_item.lua:207
+   2. Load - gamemodes/helix/gamemode/core/libs/sh_item.lua:117
+    3. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_item.lua:275
+     4. Load - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:47
+      5. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:268
+       6. Initialize - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:256
+        7. Call - gamemodes/helix/gamemode/shared.lua:132
+         8. unknown - lua/includes/modules/gamemode.lua:33
+          9. DeriveGamemode - [C]:-1
+           10. unknown - gamemodes/militaryrp/gamemode/cl_init.lua:2
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] Couldn't include file 'militaryrp\plugins\equipment\items\equipment\sh_pistol_example.lua' - File not found or is empty (@gamemodes/helix/gamemode/core/libs/sh_item.lua (line 207))
+  1. Register - gamemodes/helix/gamemode/core/libs/sh_item.lua:207
+   2. Load - gamemodes/helix/gamemode/core/libs/sh_item.lua:117
+    3. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_item.lua:275
+     4. Load - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:47
+      5. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:268
+       6. Initialize - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:256
+        7. Call - gamemodes/helix/gamemode/shared.lua:132
+         8. unknown - lua/includes/modules/gamemode.lua:33
+          9. DeriveGamemode - [C]:-1
+           10. unknown - gamemodes/militaryrp/gamemode/cl_init.lua:2
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] Couldn't include file 'militaryrp\plugins\equipment\items\equipment\sh_rifle_example.lua' - File not found or is empty (@gamemodes/helix/gamemode/core/libs/sh_item.lua (line 207))
+  1. Register - gamemodes/helix/gamemode/core/libs/sh_item.lua:207
+   2. Load - gamemodes/helix/gamemode/core/libs/sh_item.lua:117
+    3. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_item.lua:275
+     4. Load - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:47
+      5. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:268
+       6. Initialize - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:256
+        7. Call - gamemodes/helix/gamemode/shared.lua:132
+         8. unknown - lua/includes/modules/gamemode.lua:33
+          9. DeriveGamemode - [C]:-1
+           10. unknown - gamemodes/militaryrp/gamemode/cl_init.lua:2
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] Couldn't include file 'militaryrp\plugins\equipment\items\equipment\sh_knife_example.lua' - File not found or is empty (@gamemodes/helix/gamemode/core/libs/sh_item.lua (line 207))
+  1. Register - gamemodes/helix/gamemode/core/libs/sh_item.lua:207
+   2. Load - gamemodes/helix/gamemode/core/libs/sh_item.lua:117
+    3. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_item.lua:275
+     4. Load - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:47
+      5. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:268
+       6. Initialize - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:256
+        7. Call - gamemodes/helix/gamemode/shared.lua:132
+         8. unknown - lua/includes/modules/gamemode.lua:33
+          9. DeriveGamemode - [C]:-1
+           10. unknown - gamemodes/militaryrp/gamemode/cl_init.lua:2
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+
+[ERROR] Couldn't include file 'militaryrp\plugins\equipment\items\equipment\sh_pistol_example.lua' - File not found or is empty (@gamemodes/helix/gamemode/core/libs/sh_item.lua (line 207))
+  1. Register - gamemodes/helix/gamemode/core/libs/sh_item.lua:207
+   2. Load - gamemodes/helix/gamemode/core/libs/sh_item.lua:117
+    3. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_item.lua:275
+     4. Load - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:47
+      5. LoadFromDir - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:268
+       6. Initialize - gamemodes/helix/gamemode/core/libs/sh_plugin.lua:256
+        7. Call - gamemodes/helix/gamemode/shared.lua:132
+         8. unknown - lua/includes/modules/gamemode.lua:33
+          9. DeriveGamemode - [C]:-1
+           10. unknown - gamemodes/militaryrp/gamemode/cl_init.lua:2
+
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_hatchet' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_bcd' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_chainsaw' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_spade' has a non-existent base! (base_equip_weapon)
+
+
+Тюленчик 🌊|2|STEAM_0:1:558462783
+[Helix] Item 'tfa_nmrih_fireaxe' has a non-existent base! (base_equip_weapon)
+
+

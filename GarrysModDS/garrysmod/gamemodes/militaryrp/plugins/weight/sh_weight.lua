@@ -182,12 +182,62 @@ function ix.weight.GetInventoryWeight(inventory, seen)
 	return total
 end
 
+-- вес предметов, надетых в слоты плагина equipment (они лежат не в инвентаре, а в слотах).
+-- Сервер знает данные предметов (количество, свой вес), клиент — только их uniqueID.
+function ix.weight.GetEquippedWeight(client)
+	if (!IsValid(client) or !ix.equipment or !ix.equipment.GetItemSlot) then
+		return 0
+	end
+
+	local equipped
+
+	if (SERVER and ix.equipment.GetEquipped) then
+		equipped = ix.equipment.GetEquipped(client)
+	else
+		equipped = client:GetNetVar("equipment")
+	end
+
+	local total = 0
+
+	for _, entry in pairs(equipped or {}) do
+		local uid = istable(entry) and (entry.uid or entry.uniqueID)
+		local itemTable = uid and ix.item.list[uid]
+
+		if (itemTable) then
+			local data = entry.data or {}
+
+			-- временный «экземпляр» предмета: те же поля, что у настоящего, и GetData над сохранёнными данными
+			local proxy = setmetatable({uniqueID = uid, data = data}, {__index = itemTable})
+
+			function proxy:GetData(key, default)
+				local value = self.data[key]
+
+				if (value == nil) then
+					return default
+				end
+
+				return value
+			end
+
+			total = total + ix.weight.GetItemWeight(proxy)
+
+			-- надетый рюкзак/сумка: содержимое тоже весит
+			if (itemTable.isBag and data.id) then
+				total = total + ix.weight.GetInventoryWeight(ix.item.inventories[data.id])
+			end
+		end
+	end
+
+	return total
+end
+
 function ix.weight.GetCharacterWeight(character)
 	if (!character) then
 		return 0
 	end
 
 	return ix.weight.GetInventoryWeight(character:GetInventory())
+		+ ix.weight.GetEquippedWeight(character:GetPlayer())
 end
 
 -- лимит веса игрока (кг)

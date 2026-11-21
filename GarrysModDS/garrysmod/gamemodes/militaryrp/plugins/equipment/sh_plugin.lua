@@ -37,6 +37,18 @@ function ix.equipment.GetItemData(item)
 		data.armor = itemTable.equipArmor
 		data.bodygroups = itemTable.equipBodygroups
 		data.wear = itemTable.equipWear
+		data.weapon = itemTable.equipWeapon
+	end
+
+	-- оружие: слот берётся из ITEM.weaponCategory, класс SWEP — из ITEM.class
+	if (itemTable and itemTable.class and itemTable.weaponCategory) then
+		local categories = ix.equipment.config.weapons and ix.equipment.config.weapons.categories
+		local weaponSlot = categories and categories[itemTable.weaponCategory]
+
+		if (weaponSlot) then
+			data.slot = data.slot or weaponSlot
+			data.weapon = data.weapon or itemTable.class
+		end
 	end
 
 	for key, value in pairs(ix.equipment.config.items[uniqueID] or {}) do
@@ -64,6 +76,46 @@ function ix.equipment.GetBlocker(equipped, slotID)
 
 		if (otherSlot != slotID and blocks and table.HasValue(blocks, slotID)) then
 			return otherSlot, uid
+		end
+	end
+end
+
+-- оружие из base_weapons: «Надеть» теперь кладёт его в слот оружия вместо стандартной логики
+function PLUGIN:InitializedPlugins()
+	for _, itemTable in pairs(ix.item.list) do
+		local slotID = itemTable.class and itemTable.weaponCategory and ix.equipment.GetItemSlot(itemTable)
+		local slot = slotID and ix.equipment.GetSlot(slotID)
+
+		if (slot and slot.weapon) then
+			-- свои копии функций, чтобы не затронуть базовый предмет и остальное оружие
+			itemTable.functions = table.Copy(itemTable.functions or {})
+
+			itemTable.functions.EquipUn = nil
+			itemTable.functions.Equip = {
+				name = "Надеть",
+				icon = "icon16/tick.png",
+				OnRun = function(item)
+					local client = item.player
+					local ok, reason = ix.equipment.Equip(client, item)
+
+					if (!ok and reason) then
+						client:Notify(reason)
+					end
+
+					-- предмет уже убран из инвентаря самим Equip
+					return false
+				end,
+				OnCanRun = function(item)
+					local client = item.player
+
+					return !IsValid(item.entity) and IsValid(client)
+						and ix.equipment.GetItemSlot(item) != nil
+						and hook.Run("CanEquipmentEquip", client, item) != false
+				end
+			}
+
+			-- базовое снятие оружия при удалении предмета не нужно: оружием управляет слот
+			itemTable.OnRemoved = function() end
 		end
 	end
 end

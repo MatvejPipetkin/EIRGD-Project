@@ -26,6 +26,7 @@ item:SetData("weight", 3.5)
 
 Предметы без `ITEM.weight` весят столько, сколько указано в настройке «Вес по умолчанию».
 Сумки считаются вместе с содержимым.
+Предметы, надетые в слоты плагина `equipment` (снаряжение и оружие), тоже входят в вес.
 
 ## Настройки в игре
 
@@ -43,5 +44,6 @@ F1 → Config → «Система веса» (правка доступна а�
 ## Для разработчиков
 
 - `client:GetCarryWeight()`, `client:GetMaxCarryWeight()`, `client:GetWeightSlow()`, `client:IsOverweight()`
+- `ix.weight.GetEquippedWeight(client)` — вес надетого в слотах equipment
 - `ix.weight.GetItemWeight(item)`, `ix.weight.GetInventoryWeight(inventory)`
 - хук `GetPlayerMaxWeight(client, maxWeight)` — вернуть число, чтобы поменять лимит (рюкзаки, перки и т.д.)
