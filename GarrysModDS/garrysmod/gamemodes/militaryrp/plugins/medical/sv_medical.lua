@@ -218,6 +218,11 @@ function ix.medical.AddCondition(client, id, limbID, bSilent)
 		state.cond[Key("bleed_light", limbID)] = nil
 	end
 
+	-- повторный перелом: срастание прерывается, шину нужно накладывать заново
+	if (id == "fracture") then
+		state.cond[Key("fracture_healing", limbID)] = nil
+	end
+
 	local key = Key(id, limbID)
 	local existing = state.cond[key]
 
@@ -497,6 +502,18 @@ local function ApplyMedication(client, med, limbID, quality)
 
 	for _, entry in ipairs(added) do
 		ix.medical.AddCondition(client, entry[1], entry[2], true)
+
+		-- перелом зафиксирован: чем аккуратнее наложена шина, тем быстрее срастается кость
+		if (entry[1] == "fracture_healing") then
+			local healing = state.cond[Key("fracture_healing", entry[2])]
+			local range = config.fractureHealTime or {60, 90}
+
+			if (healing) then
+				healing.left = math.Round(Lerp(quality or 1, range[2], range[1]))
+
+				client:Notify("Перелом зафиксирован. Кость срастётся примерно за " .. healing.left .. " с.")
+			end
+		end
 	end
 
 	if (med.heal and limbID) then
@@ -744,7 +761,7 @@ end
 ]]
 local function ProcessPlayer(client, interval)
 	local state = client.ixMed
-	local limbDamage, toAdd, recovered = {}, {}, {}
+	local limbDamage, limbHeal, toAdd, recovered = {}, {}, {}, {}
 	local healthDamage, hungerLoss, thirstLoss = 0, 0, 0
 
 	for key, cond in pairs(state.cond) do
@@ -771,6 +788,17 @@ local function ProcessPlayer(client, interval)
 
 			if (def.lps and cond.limb) then
 				limbDamage[cond.limb] = (limbDamage[cond.limb] or 0) + def.lps * interval * sev
+			end
+
+			-- восстановление конечности: каждый тик возвращаем долю недостающего HP так,
+			-- чтобы к концу состояния конечность была полностью здорова
+			if (def.healLimb and cond.limb) then
+				local left = math.max(cond.left or def.duration or interval, interval)
+				local missing = limbsByID[cond.limb].maxHP - ix.medical.GetLimbHP(state, cond.limb)
+
+				if (missing > 0) then
+					limbHeal[cond.limb] = (limbHeal[cond.limb] or 0) + missing * math.min(interval / left, 1)
+				end
 			end
 
 			if (def.duration) then
@@ -806,6 +834,10 @@ local function ProcessPlayer(client, interval)
 	-- изменения применяем после обхода, чтобы не менять таблицу во время pairs
 	for limbID, amount in pairs(limbDamage) do
 		ix.medical.DamageLimb(client, limbID, amount)
+	end
+
+	for limbID, amount in pairs(limbHeal) do
+		ix.medical.HealLimb(client, limbID, amount)
 	end
 
 	for _, entry in ipairs(toAdd) do

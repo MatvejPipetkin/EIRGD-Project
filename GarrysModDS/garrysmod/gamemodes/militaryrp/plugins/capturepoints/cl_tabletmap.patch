@@ -1,0 +1,32 @@
+--- a/cl_tabletmap.lua	2026-11-20 07:15:59.969238504 +0000
++++ b/cl_tabletmap.lua	2026-11-20 07:15:59.980581053 +0000
+@@ -313,6 +313,9 @@
+ 		self.nextPoll = CurTime() + 3
+ 		ix.tablet.Send("positions")
+ 	end
++
++	-- Хук для сторонних плагинов (например, точки захвата).
++	hook.Run("TabletMapThink", self)
+ end
+ 
+ -- ----- Диалог добавления метки -----
+@@ -536,6 +539,9 @@
+ 
+ 	local tipLines
+ 
++	-- Слои сторонних плагинов (рисуются под метками и бойцами).
++	hook.Run("TabletMapPaint", self, w, h)
++
+ 	-- Метки
+ 	if (self.layers.markers and st and st.markers) then
+ 		for _, m in ipairs(st.markers) do
+@@ -605,6 +611,9 @@
+ 			if (a.rank and a.rank != "") then
+ 				tipLines[#tipLines + 1] = {a.rank, C.dim}
+ 			end
++		else
++			-- Подсказка от сторонних плагинов: хук возвращает список строк {{текст, [цвет]}, ...}.
++			tipLines = hook.Run("TabletMapTooltip", self, mx, my)
+ 		end
+ 
+ 		if (tipLines) then

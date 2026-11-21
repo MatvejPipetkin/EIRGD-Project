@@ -10,6 +10,7 @@
 		perLimb   — привязано к конечности (кровотечение, перелом, ожог, заражение раны)
 		hps / lps — урон в секунду по общему здоровью / по HP своей конечности
 		duration  — через сколько секунд проходит само (нет поля — до лечения)
+		healLimb  — пока состояние идёт, HP конечности плавно восстанавливается до максимума к моменту, когда оно закончится
 		speed     — множитель скорости; noSprint / noJump — запреты
 		legSpeed, legNoSprint, legNoJump — то же, но только если состояние на ноге; armSway — тряска прицела при ране руки
 		progress  — {to = "id", after = секунды, chance = 0..1}: шанс перейти в другое состояние, если не лечить
@@ -56,6 +57,9 @@ ix.medical.config = {
 	maxIcons = 14, -- максимум плиток состояний в интерфейсе
 	showCures = true, -- показывать в подсказке состояния, чем оно лечится
 
+	-- срастание перелома после шины/гипса: время в секундах (мин — идеальная работа, макс — самая небрежная)
+	fractureHealTime = {60, 90},
+
 	-- курс лечения (поле courses у состояния, potency у препарата)
 	treatment = {
 		ease = 0.6 -- насколько полный прогресс ослабляет болезнь: урон, расход воды/сытости, замедление, шанс осложнения (0.6 = на 60%)
@@ -82,7 +86,7 @@ ix.medical.config = {
 	ambient = {
 		enabled = true,
 		interval = 600,
-		chance = 0.04,
+		chance = 0.1,
 		pool = {cold = 5, flu = 2, food_poison = 1}
 	},
 
@@ -188,9 +192,14 @@ ix.medical.config = {
 			desc = "Обильная кровопотеря. Нужен жгут или гемостатическая повязка.",
 			hps = 0.45, lps = 0.30, progress = {to = "anemia", after = 60, chance = 1}, fx = {vignette = 0.55},
 			thirstDrain = 0.03},
-		fracture = {name = "Перелом", kind = "injury", courses = 2, icon = "bone", color = C(235, 200, 120), perLimb = true,
-			desc = "Кость сломана. Нужна шина. Перелом ноги мешает бегать и прыгать, руки — сбивает прицел.",
+		fracture = {name = "Перелом", kind = "injury", icon = "bone", color = C(235, 200, 120), perLimb = true,
+			desc = "Кость сломана. Достаточно один раз наложить шину или гипс. Перелом ноги мешает бегать и прыгать, руки — сбивает прицел.",
 			legSpeed = 0.6, legNoSprint = true, legNoJump = true, armSway = true},
+		-- после шины/гипса перелом превращается в срастание: кость заживает сама, а конечность плавно
+		-- восстанавливается до полного здоровья. Время срастания — config.fractureHealTime (зависит от качества наложения)
+		fracture_healing = {name = "Срастание перелома", kind = "injury", icon = "bone", color = C(170, 215, 150), perLimb = true,
+			desc = "Шина держит кость, она срастается. Конечность восстанавливается сама, нужно немного подождать и поберечь её.",
+			duration = 75, healLimb = true, legSpeed = 0.8, legNoSprint = true, legNoJump = true},
 		burn = {name = "Ожог", kind = "injury", courses = 3, icon = "flame", color = C(255, 140, 50), perLimb = true,
 			desc = "Ожог причиняет боль и медленно разрушает ткани. Поможет противоожоговый гель.",
 			hps = 0.05, lps = 0.08, progress = {to = "infection", after = 240, chance = 0.3}},
@@ -251,9 +260,9 @@ ix.medical.config = {
 		tourniquet = {name = "Жгут", procedure = "tourniquet", desc = "Пережимает конечность и останавливает кровь. Только руки и ноги.", model = "models/props_junk/cardboard_box002a.mdl",
 			width = 1, height = 1, target = "limb", groups = {"arm", "leg"}, time = 3, uses = 1,
 			cures = {bleed_light = true, bleed_heavy = true}},
-		splint = {name = "Шина", procedure = "splint", desc = "Фиксирует сломанную руку или ногу.", model = "models/props_junk/cardboard_box001a.mdl",
+		splint = {name = "Шина", procedure = "splint", desc = "Фиксирует сломанную руку или ногу: достаточно одного применения, дальше кость срастается сама.", model = "models/props_junk/cardboard_box001a.mdl",
 			width = 1, height = 3, target = "limb", groups = {"arm", "leg"}, time = 6, uses = 1,
-			cures = {fracture = true}},
+			downgrade = {fracture = "fracture_healing"}},
 		medkit = {name = "Аптечка", desc = "Восстанавливает здоровье конечности и останавливает кровь.", model = "models/items/healthkit.mdl",
 			width = 2, height = 2, target = "limb", time = 5, uses = 3, heal = 45, healHealth = 20,
 			cures = {bleed_light = true}, downgrade = {bleed_heavy = "bleed_light"}},
@@ -300,7 +309,7 @@ ix.medical.config = {
 			cures = {bleed_light = true, bleed_heavy = true, infection = true}},
 		plaster_cast = {name = "Гипсовая повязка", procedure = "cast", potency = 2, desc = "Надёжно фиксирует перелом и помогает кости срастись. Только руки и ноги.", model = "models/props_junk/cardboard_box004a.mdl",
 			width = 1, height = 2, target = "limb", groups = {"arm", "leg"}, time = 10, uses = 1, heal = 15,
-			cures = {fracture = true}},
+			downgrade = {fracture = "fracture_healing"}},
 		ointment = {name = "Заживляющая мазь", desc = "Ускоряет заживление тканей. Кровь не останавливает.", model = "models/props_junk/garbage_metalcan002a.mdl",
 			width = 1, height = 1, target = "limb", time = 3, uses = 4, heal = 20},
 		morphine = {name = "Морфин", desc = "Сильное обезболивающее в шприц-тюбике. Действует втрое дольше обычного.", model = "models/items/flare.mdl",
@@ -336,7 +345,7 @@ ix.medical.config = {
 			dirty = {power = 0.5, cure = 0.65, risks = {infection = 0.12, tetanus = 0.05}}},
 		dirty_splint = {name = "Самодельная шина", procedure = "splint", desc = "Доски и верёвка. Фиксирует кое-как, зато ржавые гвозди и занозы в комплекте.", model = "models/props_junk/wood_crate001a.mdl",
 			width = 1, height = 3, target = "limb", groups = {"arm", "leg"}, time = 8, uses = 1,
-			cures = {fracture = true},
+			downgrade = {fracture = "fracture_healing"},
 			dirty = {power = 0.5, cure = 0.6, risks = {tetanus = 0.06, infection = 0.05}}},
 		dirty_antiseptic = {name = "Мутный антисептик", procedure = "disinfect", desc = "Жидкость из бутыли без этикетки. Может обеззаразить, а может и наоборот.", model = "models/props_junk/metal_paintcan001a.mdl",
 			width = 1, height = 1, target = "limb", time = 3, uses = 3, cures = {infection = true},

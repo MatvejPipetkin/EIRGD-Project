@@ -194,18 +194,53 @@ ICON_DRAW.pogon = function(x, y, s, spec, col)
 		end
 	end
 
+	-- Погон прапорщика: поперечная планка внизу и 1-2 небольшие звезды над ней.
+	if (spec.stripe) then
+		local sy = by + bh * 0.66
+		local r = s * 0.13
+
+		SoftLine(bx + th, sy, bx + bw - th, sy, th * 1.8, col)
+
+		if (stars == 1) then
+			Star(cx, by + bh * 0.33, r * 1.15, r * 1.15 * 0.45, 5, col)
+		else
+			Star(cx - s * 0.13, by + bh * 0.33, r, r * 0.45, 5, col)
+			Star(cx + s * 0.13, by + bh * 0.33, r, r * 0.45, 5, col)
+		end
+
+		return
+	end
+
 	-- Звёзды.
 	if (gaps == 0) then
-		local pos = stars == 1 and {0.5} or {0.28, 0.72}
-		local r = stars == 1 and 0.27 or 0.19
+		-- Генеральские погоны: 1-4 крупные звёзды вдоль залитого погона.
+		local layout = {
+			[1] = {pos = {0.5}, r = 0.27},
+			[2] = {pos = {0.28, 0.72}, r = 0.19},
+			[3] = {pos = {0.2, 0.5, 0.8}, r = 0.14},
+			[4] = {pos = {0.15, 0.38, 0.62, 0.85}, r = 0.105}
+		}
+		local lay = layout[stars] or layout[1]
 
-		for _, v in ipairs(pos) do
-			Star(cx, by + bh * v, s * r, s * r * 0.45, 5, col)
+		for _, v in ipairs(lay.pos) do
+			Star(cx, by + bh * v, s * lay.r, s * lay.r * 0.45, 5, col)
 		end
 	else
 		for _, v in ipairs(STAR_V[stars]) do
 			Star(cx, by + bh * v, s * STAR_R[stars], s * STAR_R[stars] * 0.45, 5, col)
 		end
+	end
+end
+
+-- Маршал: большая пятиконечная звезда (ring = true - в кольце).
+ICON_DRAW.star5 = function(x, y, s, spec, col)
+	local cx, cy = x + s / 2, y + s / 2
+
+	if (spec.ring) then
+		RingLine(cx, cy, s * 0.43, math.max(1.4, s * 0.07), col)
+		Star(cx, cy + s * 0.02, s * 0.32, s * 0.32 * 0.45, 5, col)
+	else
+		Star(cx, cy + s * 0.02, s * 0.46, s * 0.46 * 0.45, 5, col)
 	end
 end
 

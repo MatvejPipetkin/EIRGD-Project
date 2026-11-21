@@ -39,7 +39,8 @@ local function BuildDB(saved)
 		log = saved.log or {},
 		nextID = saved.nextID or 1,
 		serial = saved.serial or 0,
-		removed = StringKeys(saved.removed)
+		removed = StringKeys(saved.removed),
+		rankLadder = saved.rankLadder
 	}
 end
 
@@ -47,6 +48,11 @@ PLUGIN.db = BuildDB(PLUGIN.db)
 
 function PLUGIN:LoadData()
 	self.db = BuildDB(self:GetData(nil, true))
+
+	-- Однократный перенос номеров званий после смены лестницы (см. sv_migrate.lua).
+	if (self.MigrateRanks) then
+		self:MigrateRanks()
+	end
 end
 
 function PLUGIN:SaveData()

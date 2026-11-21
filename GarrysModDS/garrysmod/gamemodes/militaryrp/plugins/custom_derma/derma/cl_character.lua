@@ -8,6 +8,13 @@ local matrixZScale = Vector(1, 1, 0.0001)
 	Положите logotip.png в materials/ и добавьте на сервере resource.AddFile("materials/logotip.png").
 ]]
 local CFG = {
+	-- ===== УВЕДОМЛЕНИЕ О БЕТА-ТЕСТИРОВАНИИ =====
+	-- Когда ОБТ закончится — просто поставьте betaNotice = false
+	betaNotice = true,
+	betaTitle = "ВНИМАНИЕ  //  БЕТА-ТЕСТИРОВАНИЕ",
+	betaText = "Проект находится на стадии Бета-Тестирования и возможны недоработки/баги",
+	betaColor = Color(255, 185, 60), -- цвет рамки и заголовка уведомления
+
 	logoPaths = {"logotip.png", "logotip", "vgui/logotip.png", "vgui/logotip"},
 	logoHeight = 0.15, -- высота логотипа в долях от высоты экрана
 	ringSize = 0.19, -- радиус кольца в долях от высоты экрана
@@ -1577,6 +1584,30 @@ function PANEL:DrawForeground(width, height)
 		surface.DrawRect(bx + bw - (sx - bx) - 14, by + bh + grow, 28, 1)
 
 		draw.SimpleText("ТЕРМИНАЛ ГОТОВ  //  ОЖИДАНИЕ ОПЕРАТОРА", "ixIntroSmall", cx, by + bh + 26, Color(ar, ag, ab, (110 + 60 * pulse) * pa), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+		-- уведомление о бета-тестировании (отключается через CFG.betaNotice)
+		if (CFG.betaNotice) then
+			local bc = CFG.betaColor or Color(255, 185, 60)
+
+			surface.SetFont("ixIntroMid")
+			local titleW, titleH = surface.GetTextSize(CFG.betaTitle)
+
+			surface.SetFont("ixIntroSmall")
+			local textW, textH = surface.GetTextSize(CFG.betaText)
+
+			local nw = math.floor(math.max(titleW, textW) + 80)
+			local nh = math.floor(titleH + textH + 44)
+			local nx = math.floor(cx - nw * 0.5)
+			local ny = math.floor(height * 0.8 - nh * 0.5)
+
+			draw.NoTexture()
+			surface.SetDrawColor(bc.r, bc.g, bc.b, 14 * pa)
+			surface.DrawRect(nx, ny, nw, nh)
+			DrawBrackets(nx, ny, nw, nh, 14, bc.r, bc.g, bc.b, (170 + 60 * pulse) * pa)
+
+			draw.SimpleText(CFG.betaTitle, "ixIntroMid", cx, ny + 16 + math.floor(titleH * 0.5), Color(bc.r, bc.g, bc.b, (200 + 55 * pulse) * pa), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText(CFG.betaText, "ixIntroSmall", cx, ny + 28 + titleH + math.floor(textH * 0.5), Color(255, 255, 255, 210 * pa), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		end
 	end
 
 	local ua = self.loadUiAlpha or 0

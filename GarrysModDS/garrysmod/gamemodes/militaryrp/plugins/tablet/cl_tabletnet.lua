@@ -18,7 +18,24 @@ net.Receive("ixTablet.Open", function()
 
 	ix.tablet.state = nil
 
-	local panel = vgui.Create("ixMilTablet")
+	local panel
+
+	if (vgui.GetControlTable("ixMilTablet")) then
+		panel = vgui.Create("ixMilTablet")
+	end
+
+	-- Панель не создалась: значит, derma/cl_tablet.lua не загрузился. Объясняем причину вместо падения.
+	if (!IsValid(panel)) then
+		local reason = !ix.tablet.ui
+			and "не загружена библиотека cl_tabletui.lua (файл должен лежать в plugins/tablet/libs/cl_tabletui.lua)"
+			or "панель ixMilTablet не зарегистрирована - найдите в консоли первую ошибку про derma/cl_tablet.lua"
+
+		MsgC(Color(255, 90, 90), "[Планшет] ", color_white, reason, "\n")
+		chat.AddText(Color(255, 90, 90), "[Планшет] ", color_white, "Интерфейс не загрузился, подробности в консоли.")
+
+		return
+	end
+
 	panel.hasAccount = hasAccount
 	panel.regLogin = info and info.login
 	panel:ShowLogin()
