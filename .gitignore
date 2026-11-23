@@ -2320,3 +2320,5 @@ GarrysModDS/garrysmod/clientside_errors.txt
 *.rar
 /GarrysModDS/garrysmod/data/helix
 /GarrysModDS/garrysmod/data
+*.zip
+*.txt
