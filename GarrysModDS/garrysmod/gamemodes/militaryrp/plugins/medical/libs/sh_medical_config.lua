@@ -82,6 +82,52 @@ ix.medical.config = {
 		contusion = 10 -- урон взрывом для шанса контузии
 	},
 
+	--[[
+		СПЕЦЭФФЕКТЫ (sv_effects.lua / cl_effects.lua). Какие состояния что вызывают, задаётся полями состояния:
+			drip  = {interval = сек, pool = true/false} — кровавые следы под игроком и капли из раны
+			vomit = {min = сек, max = сек, hunger = %, thirst = %} — периодические приступы рвоты
+	]]
+	effects = {
+		enabled = true,
+		range = 1200, -- на каком расстоянии остальные игроки видят анимацию и частицы
+
+		blood = {
+			enabled = true,
+			decal = "Blood", -- декаль на земле
+			particles = true, -- капли, падающие из раны
+			moveBoost = 1.6, -- во время бега следов больше (интервал делится на это число)
+			standMul = 1.8, -- когда игрок стоит на месте, следы реже (интервал умножается)
+			maxDecalsPerSecond = 4 -- защита от спама декалей
+		},
+
+		vomit = {
+			enabled = true,
+			warnTime = 5, -- за сколько секунд до рвоты начинает мутить
+			duration = 3.6, -- длительность приступа (анимация, игрок не может двигаться)
+			decal = "YellowBlood", -- лужа
+			puddleSize = 3, -- сколько луж остаётся после приступа
+			chat = true, -- RP-сообщение рядом стоящим («/me»)
+			chatText = "сгибается пополам: его рвёт.",
+			stopAction = true, -- прервать применение лекарства/процедуру
+			viewPunch = 9,
+			-- наклон корпуса и головы (градусы); sign = -1, если на вашей модели игрок откидывается назад, а не вперёд
+			bones = {spine = 38, head = 22, sign = 1},
+			sounds = {
+				warn = {"ambient/voices/cough1.wav", "ambient/voices/cough3.wav"},
+				retch = {"npc/barnacle/barnacle_gulp1.wav", "npc/barnacle/barnacle_gulp2.wav"},
+				splash = {"physics/flesh/flesh_squishy_impact_hard1.wav", "physics/flesh/flesh_squishy_impact_hard2.wav",
+					"physics/flesh/flesh_squishy_impact_hard3.wav", "physics/flesh/flesh_squishy_impact_hard4.wav"}
+			}
+		},
+
+		-- кость, из которой капает кровь / откуда видна рана
+		woundBones = {
+			head = "ValveBiped.Bip01_Head1", chest = "ValveBiped.Bip01_Spine2", stomach = "ValveBiped.Bip01_Spine1",
+			left_arm = "ValveBiped.Bip01_L_Forearm", right_arm = "ValveBiped.Bip01_R_Forearm",
+			left_leg = "ValveBiped.Bip01_L_Calf", right_leg = "ValveBiped.Bip01_R_Calf"
+		}
+	},
+
 	-- случайные заболевания (раз в interval секунд у каждого игрока шанс chance; pool — веса)
 	ambient = {
 		enabled = true,
@@ -187,11 +233,11 @@ ix.medical.config = {
 		bleed_light = {name = "Кровотечение", kind = "injury", icon = "drop", color = C(225, 70, 70), perLimb = true,
 			desc = "Рана кровоточит. Остановите кровь повязкой, иначе возможно заражение.",
 			hps = 0.12, lps = 0.10, progress = {to = "infection", after = 180, chance = 0.35}, fx = {vignette = 0.2},
-			thirstDrain = 0.008},
+			thirstDrain = 0.008, drip = {interval = 1.6}},
 		bleed_heavy = {name = "Сильное кровотечение", kind = "injury", icon = "drop", color = C(255, 35, 35), perLimb = true,
 			desc = "Обильная кровопотеря. Нужен жгут или гемостатическая повязка.",
 			hps = 0.45, lps = 0.30, progress = {to = "anemia", after = 60, chance = 1}, fx = {vignette = 0.55},
-			thirstDrain = 0.03},
+			thirstDrain = 0.03, drip = {interval = 0.5, pool = true}},
 		fracture = {name = "Перелом", kind = "injury", icon = "bone", color = C(235, 200, 120), perLimb = true,
 			desc = "Кость сломана. Достаточно один раз наложить шину или гипс. Перелом ноги мешает бегать и прыгать, руки — сбивает прицел.",
 			legSpeed = 0.6, legNoSprint = true, legNoJump = true, armSway = true},
@@ -226,10 +272,13 @@ ix.medical.config = {
 			cough = {interval = 12}, fx = {blur = 0.15}},
 		food_poison = {name = "Пищевое отравление", kind = "disease", courses = 2, icon = "stomach", color = C(170, 200, 80),
 			desc = "Тошнота и слабость, организм теряет воду и силы. Поможет активированный уголь.", duration = 420, speed = 0.92, hps = 0.2,
-			hungerDrain = 0.02, thirstDrain = 0.03, onset = {hunger = -10, thirst = -6, text = "Вас вырвало."}},
+			hungerDrain = 0.02, thirstDrain = 0.03, onset = {hunger = -10, thirst = -6, text = "Вас вырвало."},
+			-- приступ рвоты раз в пару минут (чем дальше зашло лечение, тем реже)
+			vomit = {min = 100, max = 200, hunger = -6, thirst = -4}},
 		dysentery = {name = "Дизентерия", kind = "disease", courses = 3, icon = "stomach", color = C(200, 160, 70),
 			desc = "Сильное обезвоживание. Лечится антибиотиками и регидратацией.", duration = 1200, speed = 0.9, hps = 0.15,
-			hungerDrain = 0.02, thirstDrain = 0.045, onset = {thirst = -8, text = "Живот скрутило, организм стремительно теряет влагу."}},
+			hungerDrain = 0.02, thirstDrain = 0.045, onset = {thirst = -8, text = "Живот скрутило, организм стремительно теряет влагу."},
+			vomit = {min = 240, max = 420, hunger = -4, thirst = -6}},
 		malaria = {name = "Малярия", kind = "disease", courses = 3, icon = "mosquito", color = C(230, 190, 90),
 			desc = "Лихорадка волнами. Нужны противомалярийные препараты.", duration = 2400, speed = 0.88, hps = 0.04, thirstDrain = 0.01, hungerDrain = 0.005,
 			fx = {blur = 0.12, tint = {200, 150, 60, 0.12}}},

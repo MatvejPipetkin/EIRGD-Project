@@ -78,3 +78,22 @@ ix.command.Add("MedicalCheck", {
 		return table.concat(lines, "; ")
 	end
 })
+
+ix.command.Add("MedicalVomit", {
+	description = "Вызвать приступ рвоты (проверка спецэффектов).",
+	adminOnly = true,
+	arguments = {bit.bor(ix.type.character, ix.type.optional)},
+	OnRun = function(self, client, target)
+		local victim = target and target:GetPlayer() or client
+
+		if (!IsValid(victim) or !victim:GetCharacter()) then
+			return "Персонаж не найден."
+		end
+
+		if (!ix.medical.Vomit(victim, true)) then
+			return "Сейчас рвота невозможна (спецэффекты выключены, игрок мёртв, в транспорте или уже занят приступом)."
+		end
+
+		return "Приступ рвоты: " .. victim:GetCharacter():GetName() .. "."
+	end
+})

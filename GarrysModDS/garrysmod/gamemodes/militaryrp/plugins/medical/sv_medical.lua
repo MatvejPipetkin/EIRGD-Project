@@ -88,6 +88,10 @@ local function AddNeeds(client, hunger, thirst)
 	end
 end
 
+-- доступны спецэффектам (sv_effects.lua)
+ix.medical.StopProcedure = StopProcedure
+ix.medical.AddNeeds = AddNeeds
+
 local function Load(client, character)
 	local state = NewState(client)
 	local saved = character:GetData("medical")
@@ -260,6 +264,17 @@ function ix.medical.AddCondition(client, id, limbID, bSilent)
 		if (def.onset.text and !bSilent) then
 			client:Notify(def.onset.text)
 		end
+	end
+
+	-- при заболевании с рвотой первый приступ случается почти сразу (с анимацией; потери воды/сытости уже учтены в onset)
+	if (def.vomit and ix.medical.Vomit) then
+		local character = client:GetCharacter()
+
+		timer.Simple(math.Rand(1.5, 4), function()
+			if (IsValid(client) and client:GetCharacter() == character and state.cond[key]) then
+				ix.medical.Vomit(client, true, def)
+			end
+		end)
 	end
 
 	Dirty(client)
@@ -826,6 +841,7 @@ local function ProcessPlayer(client, interval)
 				if (cond.coughNext <= 0) then
 					cond.coughNext = def.cough.interval * math.Rand(0.7, 1.3)
 					client:EmitSound(COUGH[math.random(#COUGH)], 60)
+					client:ViewPunch(Angle(math.Rand(2, 4), math.Rand(-1.5, 1.5), 0))
 				end
 			end
 		end

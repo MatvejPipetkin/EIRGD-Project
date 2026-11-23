@@ -181,6 +181,15 @@ function PLUGIN:SetupMove(client, mv, cmd)
 		return
 	end
 
+	-- приступ рвоты: игрок согнулся и не может двигаться
+	if ((client:GetLocalVar("medVomit", 0) or 0) > CurTime()) then
+		mv:SetMaxClientSpeed(0)
+		mv:SetMaxSpeed(0)
+		mv:SetButtons(bit.band(mv:GetButtons(), bit.bnot(bit.bor(IN_JUMP, IN_DUCK))))
+
+		return
+	end
+
 	if (med.noSprint) then
 		local walk = client:GetWalkSpeed()
 
@@ -204,6 +213,7 @@ end
 
 ix.util.Include("sh_commands.lua")
 ix.util.Include("sv_medical.lua")
+ix.util.Include("sv_effects.lua")
 ix.util.Include("cl_medical.lua")
 ix.util.Include("cl_procedure.lua")
 ix.util.Include("cl_effects.lua")
