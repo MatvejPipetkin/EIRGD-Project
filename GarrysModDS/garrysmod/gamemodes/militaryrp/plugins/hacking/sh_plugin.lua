@@ -135,6 +135,18 @@ HACK.types = {
 	}
 }
 
+-- Каждый тип узла - отдельная запись во вкладке «Энтити» (Q-меню), категория «EIRGD | Сервера - хакинг».
+-- Узел создаётся со сложностью по умолчанию; изменить: /HackNodeSet difficulty <1-4>.
+for id, data in pairs(HACK.types) do
+	list.Set("SpawnableEntities", "ix_hacknode_" .. id, {
+		PrintName = data.name,
+		ClassName = "ix_hacknode",
+		Category = "EIRGD | Сервера - хакинг",
+		AdminOnly = true,
+		KeyValues = {nodetype = id}
+	})
+end
+
 -- Что даёт архив на разных сложностях.
 HACK.archiveTiers = {
 	[1] = "численность и число бойцов в сети",
