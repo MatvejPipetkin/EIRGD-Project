@@ -195,6 +195,21 @@ function PLUGIN:PlayerDisconnected(client)
 	StopCraft(client, nil, true)
 end
 
+-- Верстак из Q-меню: ставим по прицелу, лицом к игроку, и сразу сохраняем (иначе пропадёт после рестарта).
+function PLUGIN:PlayerSpawnedSENT(client, ent)
+	if (!IsValid(ent) or ent:GetClass() != "ix_workbench") then return end
+
+	local tr = client:GetEyeTrace()
+	local ang = (client:GetPos() - tr.HitPos):Angle()
+	ang.p, ang.r = 0, 0
+
+	ent:SetPos(tr.HitPos + tr.HitNormal * 4)
+	ent:SetAngles(ang)
+	ent:DropToFloor()
+
+	self:SaveData()
+end
+
 function PLUGIN:SaveData()
 	local data = {}
 

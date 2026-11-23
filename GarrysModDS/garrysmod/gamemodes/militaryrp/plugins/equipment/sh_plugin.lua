@@ -123,3 +123,5 @@ end
 ix.util.Include("sv_equipment.lua")
 ix.util.Include("cl_equipment.lua")
 ix.util.Include("cl_wear.lua")
+ix.util.Include("sv_loot.lua")
+ix.util.Include("cl_loot.lua")

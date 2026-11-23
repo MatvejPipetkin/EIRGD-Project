@@ -173,7 +173,8 @@ end
 
 -- снять предмет из слота: он возвращается в инвентарь. Если места нет — остаётся надетым.
 -- возвращает true, либо false и текст причины
-function ix.equipment.Unequip(client, slotID)
+-- receiver (необязательно) — игрок, в инвентарь которого попадёт предмет (обыск): по умолчанию сам владелец
+function ix.equipment.Unequip(client, slotID, receiver)
 	local character = IsValid(client) and client:GetCharacter()
 
 	if (!character) then
@@ -195,7 +196,8 @@ function ix.equipment.Unequip(client, slotID)
 		return false, "Снятие запрещено (хук CanEquipmentUnequip)."
 	end
 
-	local inventory = character:GetInventory()
+	local receiverCharacter = IsValid(receiver) and receiver:GetCharacter() or character
+	local inventory = receiverCharacter and receiverCharacter:GetInventory()
 
 	if (!inventory) then
 		return false, "Инвентарь персонажа недоступен."
@@ -208,7 +210,7 @@ function ix.equipment.Unequip(client, slotID)
 	local added = inventory:Add(entry.uid, 1, entry.data)
 
 	if (!added) then
-		return false, string.format("Нет места в инвентаре, чтобы снять: %s.", itemTable and itemTable.name or entry.uid)
+		return false, string.format("Нет места в инвентаре, чтобы забрать: %s.", itemTable and itemTable.name or entry.uid)
 	end
 
 	ix.equipment.GetEquipped(client)[slotID] = nil
@@ -413,3 +415,9 @@ function PLUGIN:CharacterPreSave(character)
 		Save(client)
 	end
 end
+
+-- доступ к локальным функциям для системы обыска (sv_loot.lua)
+ix.equipment.SaveState = Save
+ix.equipment.CaptureAmmo = CaptureAmmo
+ix.equipment.SubtractArmor = SubtractArmor
+ix.equipment.GetWeaponClass = GetWeaponClass

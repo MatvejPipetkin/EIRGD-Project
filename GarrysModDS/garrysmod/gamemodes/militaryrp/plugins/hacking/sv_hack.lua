@@ -1055,6 +1055,22 @@ function HACK.CreateNodeAtTrace(client, typeId, diff, owner)
 	return node
 end
 
+-- Узел из Q-меню: ставим по прицелу, лицом к игроку, выдаём имя и сразу сохраняем (иначе пропадёт после рестарта).
+function PLUGIN:PlayerSpawnedSENT(client, node)
+	if (not IsValid(node) or node:GetClass() ~= "ix_hacknode") then return end
+
+	local tr = client:GetEyeTrace()
+
+	node:SetAngles(Angle(0, client:EyeAngles().y + 180, 0))
+	node:SetPos(tr.HitPos + Vector(0, 0, -node:OBBMins().z))
+
+	if (node:GetNodeName() == "") then
+		node:SetNodeName(HACK.NextNodeName())
+	end
+
+	self:SaveData()
+end
+
 -- Позиции храним обычными числами: так они гарантированно переживают JSON.
 local function PackVec(v) return {v.x, v.y, v.z} end
 local function PackAng(a) return {a.p, a.y, a.r} end

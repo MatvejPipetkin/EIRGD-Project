@@ -71,8 +71,10 @@ function SLOT:Init()
 	self:Receiver(RECEIVER_NAME, self.OnItemDragged)
 end
 
-function SLOT:Setup(slotData)
+function SLOT:Setup(slotData, source)
 	self.slot = slotData
+	self.source = source -- источник снаряжения (обыск); nil — снаряжение самого игрока
+	self.loot = source and source.loot or false
 
 	if (slotData.icon) then
 		local material = Material(slotData.icon, "smooth mips")
@@ -171,7 +173,7 @@ function SLOT:PerformLayout(width, height)
 end
 
 function SLOT:Think()
-	local equipment = GetEquipment()
+	local equipment = self.source and self.source.getEquipment() or GetEquipment()
 	local entry = equipment[self.slot.id]
 	local item = entry and ix.item.list[entry.uid]
 	local id = item and item.uniqueID
@@ -179,6 +181,13 @@ function SLOT:Think()
 	if (self.shownID != id) then
 		self.shownID = id
 		self:RebuildIcon(item)
+	end
+
+	-- при обыске перекрытие не важно: забрать можно любой предмет
+	if (self.loot) then
+		self.blockedBy = nil
+
+		return
 	end
 
 	-- слот может быть перекрыт другим надетым предметом
@@ -190,6 +199,10 @@ end
 
 -- перетаскивание предмета из сетки инвентаря на слот
 function SLOT:OnItemDragged(panels, bDropped, command, x, y)
+	if (self.loot) then
+		return
+	end
+
 	local panel = panels[1]
 
 	if (!IsValid(panel) or !panel.GetItemTable) then
@@ -234,6 +247,16 @@ function SLOT:OnItemDragged(panels, bDropped, command, x, y)
 end
 
 function SLOT:OnMousePressed(code)
+	if (self.loot) then
+		-- обыск: любой клик по предмету забирает его
+		if ((code == MOUSE_LEFT or code == MOUSE_RIGHT) and self.item) then
+			surface.PlaySound("ui/buttonclick.wav")
+			RunConsoleCommand("ix_equipment_take", self.slot.id)
+		end
+
+		return
+	end
+
 	if (code == MOUSE_RIGHT) then
 		self:DoRightClick()
 	end
@@ -275,7 +298,7 @@ function SLOT:PopulateTooltip(tooltip)
 
 	if (item) then
 		local hint = tooltip:AddRow("equipHint")
-		hint:SetText("ПКМ — снять")
+		hint:SetText(self.loot and "ЛКМ / ПКМ — забрать" or "ПКМ — снять")
 		hint:SizeToContents()
 	end
 end
@@ -328,7 +351,7 @@ function SLOT:PaintOver(width, height)
 
 	local dragging = dragndrop.GetDroppable()
 	local dragPanel = dragging and dragging[1]
-	local dragItem = IsValid(dragPanel) and dragPanel.GetItemTable and dragPanel:GetItemTable()
+	local dragItem = !self.loot and IsValid(dragPanel) and dragPanel.GetItemTable and dragPanel:GetItemTable()
 
 	if (self.dragHover and RealTime() - self.dragHover < 0.1) then
 		-- предмет над слотом: зелёный — подходит, красный — нет
@@ -375,6 +398,14 @@ function SLOT:PaintOver(width, height)
 
 		draw.SimpleText(label, "ixMenuTinyFont", S(4) + 1, height - S(3) + 1, COLOR_SHADOW, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 		draw.SimpleText(label, "ixMenuTinyFont", S(4), height - S(3), Color(accent.r, accent.g, accent.b, 220), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+
+		-- при обыске: подсказка действия на наведённом предмете
+		if (self.loot and self:IsHovered()) then
+			surface.SetDrawColor(accent.r, accent.g, accent.b, 215)
+			surface.DrawRect(1, height - S(18), width - 2, S(17))
+
+			draw.SimpleText("ЗАБРАТЬ", "ixMenuTinyFont", width * 0.5, height - S(9), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		end
 	end
 end
 
@@ -387,6 +418,18 @@ vgui.Register("ixEquipmentSlot", SLOT, "DPanel")
 ]]
 local PREVIEW = {}
 local BasePreview = baseclass.Get("DModelPanel")
+
+-- чьё тело показывать: у обыска — цель (труп/игрок), иначе сам игрок
+function PREVIEW:GetSourceEntity()
+	local source = self.source
+	local entity = source and source.getEntity and source.getEntity()
+
+	return IsValid(entity) and entity or LocalPlayer()
+end
+
+function PREVIEW:GetEquipment()
+	return self.source and self.source.getEquipment() or GetEquipment()
+end
 
 function PREVIEW:Init()
 	self.yaw = 0
@@ -426,7 +469,7 @@ end
 
 -- подгружаем модель игрока, если она сменилась (смена персонажа)
 function PREVIEW:Think()
-	local model = LocalPlayer():GetModel()
+	local model = self:GetSourceEntity():GetModel()
 
 	if (self.modelName != model) then
 		self.modelName = model
@@ -451,7 +494,7 @@ function PREVIEW:Think()
 end
 
 function PREVIEW:LayoutEntity(ent)
-	local client = LocalPlayer()
+	local client = self:GetSourceEntity()
 
 	if (self.dragging) then
 		local x = gui.MouseX()
@@ -472,7 +515,7 @@ function PREVIEW:LayoutEntity(ent)
 end
 
 function PREVIEW:PostDrawModel(ent)
-	ix.equipment.DrawWear(ent, self.wearStore, GetEquipment())
+	ix.equipment.DrawWear(ent, self.wearStore, self:GetEquipment())
 end
 
 function PREVIEW:OnMousePressed(code)
@@ -556,6 +599,33 @@ end
 
 vgui.Register("ixEquipmentPreview", PREVIEW, "DModelPanel")
 
+-- кнопка в шапке панели обыска
+local function HeaderButton(parent, text, width, onClick)
+	local button = parent:Add("DButton")
+
+	button:SetText("")
+	button:SetSize(width, S(22))
+	button:SetCursor("hand")
+	button.DoClick = function()
+		surface.PlaySound("ui/buttonclick.wav")
+		onClick()
+	end
+	button.Paint = function(this, w, h)
+		local accent = GetAccent()
+		local hovered = this:IsHovered()
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, hovered and 70 or 28)
+		surface.DrawRect(0, 0, w, h)
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, hovered and 255 or 120)
+		surface.DrawOutlinedRect(0, 0, w, h, 1)
+
+		draw.SimpleText(text, "ixMenuTinyFont", w * 0.5, h * 0.5, Color(255, 255, 255, hovered and 255 or 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	end
+
+	return button
+end
+
 --[[
 	ПАНЕЛЬ СНАРЯЖЕНИЯ
 ]]
@@ -566,7 +636,14 @@ function PANEL:Init()
 	self.slotPanels = {}
 end
 
-function PANEL:Setup(maxHeight)
+function PANEL:Setup(maxHeight, source)
+	self.source = source
+
+	-- компактный режим: все слоты в одну строку (для обыска рядом с хранилищем)
+	if (source and source.compact) then
+		return self:SetupCompact(source)
+	end
+
 	local config = ix.equipment.config
 	local gap = S(config.ui.gap)
 	local columns, rows = 1, 1
@@ -610,6 +687,8 @@ function PANEL:Setup(maxHeight)
 	if (previewWidth > 0) then
 		local preview = self:Add("ixEquipmentPreview")
 
+		preview.source = source
+
 		preview:SetPos(offsetX + size + gap, offsetY)
 		preview:SetSize(previewWidth, gridHeight)
 
@@ -620,7 +699,7 @@ function PANEL:Setup(maxHeight)
 		local column = slot.x or 1
 		local panel = self:Add("ixEquipmentSlot")
 
-		panel:Setup(slot)
+		panel:Setup(slot, source)
 		panel:SetSize(size, size)
 		panel:SetPos(
 			offsetX + (column - 1) * (size + gap) + (column > 1 and previewShift or 0),
@@ -650,7 +729,7 @@ function PANEL:Setup(maxHeight)
 			local slotWidth = index == #weaponSlots and (offsetX + available + gap * (#weaponSlots - 1) - x)
 				or math.floor(available * (slot.weight or 1) / totalWeight)
 
-			panel:Setup(slot)
+			panel:Setup(slot, source)
 			panel:SetSize(slotWidth, weaponH)
 			panel:SetPos(x, rowY)
 
@@ -658,6 +737,124 @@ function PANEL:Setup(maxHeight)
 
 			self.slotPanels[#self.slotPanels + 1] = panel
 		end
+	end
+
+	if (source and source.loot) then
+		self.closeButton = HeaderButton(self, "X", S(26), function()
+			if (source.onClose) then
+				source.onClose()
+			end
+		end)
+
+		self.takeAllButton = HeaderButton(self, "ЗАБРАТЬ ВСЁ", S(104), function()
+			RunConsoleCommand("ix_equipment_takeall")
+		end)
+
+		self:InvalidateLayout(true)
+	end
+end
+
+-- размеры компактной панели при заданном размере слота: возвращает ширину и высоту
+function ix.equipment.GetCompactMetrics(size)
+	local config = ix.equipment.config
+	local gap = S(config.ui.gap)
+	local grid, weapons, units = 0, 0, 0
+
+	for _, slot in ipairs(config.slots) do
+		if (slot.weapon) then
+			weapons = weapons + 1
+			units = units + (slot.weight or 1)
+		else
+			grid = grid + 1
+		end
+	end
+
+	local width = S(20) + (grid + units) * size + math.max(grid + weapons - 2, 0) * gap + (weapons > 0 and S(18) or 0)
+	local height = S(34) + S(8) + size + S(10)
+
+	return width, height
+end
+
+function PANEL:SetupCompact(source)
+	local config = ix.equipment.config
+	local gap = S(config.ui.gap)
+	local size = source.size or S(config.ui.slotSize)
+	local gridSlots, weaponSlots = {}, {}
+
+	for _, slot in ipairs(config.slots) do
+		if (slot.weapon) then
+			weaponSlots[#weaponSlots + 1] = slot
+		else
+			gridSlots[#gridSlots + 1] = slot
+		end
+	end
+
+	-- порядок «сверху вниз, слева направо» по сетке из конфига
+	table.sort(gridSlots, function(a, b)
+		if ((a.y or 1) != (b.y or 1)) then
+			return (a.y or 1) < (b.y or 1)
+		end
+
+		return (a.x or 1) < (b.x or 1)
+	end)
+
+	local width, height = ix.equipment.GetCompactMetrics(size)
+	local offsetY = self.headerH + S(8)
+	local x = S(10)
+
+	self:SetSize(width, height)
+
+	for _, slot in ipairs(gridSlots) do
+		local panel = self:Add("ixEquipmentSlot")
+
+		panel:Setup(slot, source)
+		panel:SetSize(size, size)
+		panel:SetPos(x, offsetY)
+
+		x = x + size + gap
+
+		self.slotPanels[#self.slotPanels + 1] = panel
+	end
+
+	if (#weaponSlots > 0) then
+		-- разделитель между снаряжением и оружием
+		self.dividerX = x - gap + S(9)
+		self.dividerY = offsetY
+		self.dividerH = size
+
+		x = x - gap + S(18)
+
+		for _, slot in ipairs(weaponSlots) do
+			local panel = self:Add("ixEquipmentSlot")
+			local slotWidth = math.floor(size * (slot.weight or 1))
+
+			panel:Setup(slot, source)
+			panel:SetSize(slotWidth, size)
+			panel:SetPos(x, offsetY)
+
+			x = x + slotWidth + gap
+
+			self.slotPanels[#self.slotPanels + 1] = panel
+		end
+	end
+
+	self.closeButton = HeaderButton(self, "X", S(26), function()
+		if (source.onClose) then
+			source.onClose()
+		end
+	end)
+
+	self.takeAllButton = HeaderButton(self, "ЗАБРАТЬ ВСЁ", S(104), function()
+		RunConsoleCommand("ix_equipment_takeall")
+	end)
+
+	self:InvalidateLayout(true)
+end
+
+function PANEL:PerformLayout(width, height)
+	if (self.closeButton) then
+		self.closeButton:SetPos(width - self.closeButton:GetWide() - S(8), math.floor((self.headerH - self.closeButton:GetTall()) * 0.5))
+		self.takeAllButton:SetPos(self.closeButton.x - self.takeAllButton:GetWide() - S(6), self.closeButton.y)
 	end
 end
 
@@ -688,15 +885,21 @@ function PANEL:Paint(width, height)
 	surface.DrawRect(S(8), headerH - 2, S(40), 3)
 	surface.DrawRect(S(8), centerY - S(7), 2, S(14))
 
-	draw.SimpleText(ix.equipment.config.title or "СНАРЯЖЕНИЕ", "ixMenuTabFontSmall", S(20), centerY, Color(255, 255, 255, 210), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	local source = self.source
+	local loot = source and source.loot
+
+	draw.SimpleText(loot and (source.title or "ОБЫСК") or ix.equipment.config.title or "СНАРЯЖЕНИЕ", "ixMenuTabFontSmall", S(20), centerY, Color(255, 255, 255, 210), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 
 	local worn = 0
 
-	for _ in pairs(GetEquipment()) do
+	for _ in pairs(source and source.getEquipment() or GetEquipment()) do
 		worn = worn + 1
 	end
 
-	draw.SimpleText("НАДЕТО  " .. worn .. " / " .. #ix.equipment.config.slots, "ixMenuTinyFont", width - S(10), centerY, Color(accent.r, accent.g, accent.b, 200), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+	-- при обыске справа кнопки, счётчик ставим левее них
+	local countX = loot and (self.takeAllButton.x - S(10)) or (width - S(10))
+
+	draw.SimpleText((loot and "НА ЦЕЛИ  " or "НАДЕТО  ") .. worn .. " / " .. #ix.equipment.config.slots, "ixMenuTinyFont", countX, centerY, Color(accent.r, accent.g, accent.b, 200), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
 
 	-- подпись ряда слотов оружия
 	if (self.weaponLabelY) then
@@ -714,6 +917,17 @@ function PANEL:Paint(width, height)
 
 		surface.SetDrawColor(accent.r, accent.g, accent.b, 40)
 		surface.DrawRect(S(12) + textWidth + S(8), labelY, width - (S(12) + textWidth + S(8)) - S(4), 1)
+	end
+
+	-- разделитель компактной панели
+	if (self.dividerX) then
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 70)
+		surface.DrawRect(math.floor(self.dividerX), self.dividerY + S(6), 1, self.dividerH - S(12))
+	end
+
+	-- на цели ничего нет
+	if (loot and worn == 0) then
+		draw.SimpleText("СНАРЯЖЕНИЯ НЕТ", "ixMenuTinyFont", width * 0.5, centerY, Color(255, 255, 255, 90), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 
 	-- внешняя рамка

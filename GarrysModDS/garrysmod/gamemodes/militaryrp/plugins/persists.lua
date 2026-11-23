@@ -22,7 +22,12 @@ and then add `ITEM.bDropOnDeath = true` to any item that you want to be placed i
 
 ## Searching
 Pressing USE on a corpse starts an interactive search. Markers are shown on the body (jacket, belt, pockets, pouch) and the
-player has to hold the left mouse button on each of them. Once every part is searched, the corpse inventory opens.
+player has to hold the left mouse button on each of them. Once every part is searched, the corpse inventory opens together
+with the equipment panel (plugin "Equipment"): the equipped items can be taken with a click.
+
+## Searching living players
+A player that is helpless (restricted/handcuffed or knocked down) can be searched with USE in the same way; only the
+equipment can be taken from them. Override `ShouldAllowPlayerSearch` (client, target) to change who can be searched.
 ]]
 
 PLUGIN.hardCorpseMax = 64
@@ -42,8 +47,8 @@ PLUGIN.searchZones = {
 
 ix.lang.AddTable("english", {
 	corpseSearchTitle = "ОБЫСК ТЕЛА",
-	corpseSearchSubtitle = "Зажмите левую кнопку мыши на отмеченных участках",
-	corpseSearchHint = "ЛКМ (удерживать) — обыскать     ПКМ / ESC — прекратить",
+	corpseSearchSubtitle = "Зажмите ЛКМ и ведите по отмеченным участкам",
+	corpseSearchHint = "ЛКМ (удерживать) — обыскать     ПКМ / ESC — прекратить     Найденное снаряжение можно снять кликом",
 	corpseSearchProgress = "Осмотрено %d из %d",
 	corpseZoneJacket = "Куртка",
 	corpseZoneBelt = "Пояс",
@@ -52,7 +57,9 @@ ix.lang.AddTable("english", {
 	corpseStage1 = "Нащупываете застёжку...",
 	corpseStage2 = "Расстёгиваете...",
 	corpseStage3 = "Перебираете содержимое...",
-	corpseBusy = "Это тело уже кто-то обыскивает."
+	corpseBusy = "Это тело уже кто-то обыскивает.",
+	corpseBeingSearched = "Вас обыскивают.",
+	corpseSearchContinue = "Осмотр продолжается с того места, где вы остановились."
 })
 
 ix.config.Add("corpseMax", 8, "Maximum number of corpses that are allowed to be spawned.", nil, {
@@ -65,8 +72,17 @@ ix.config.Add("corpseDecayTime", 60, "How long it takes for a corpse to decay in
 	category = "Persistent Corpses"
 })
 
-ix.config.Add("corpseSearchTime", 1.5, "How long it takes to search each part of a corpse, in seconds.", nil, {
+ix.config.Add("corpseSearchTime", 1.0, "How long it takes to search each part of a corpse, in seconds.", nil, {
 	data = {min = 0, max = 10, decimals = 1},
+	category = "Persistent Corpses"
+})
+
+ix.config.Add("corpseSearchRemember", 120, "How long (in seconds) a finished or partial search is remembered for the searcher, so the body doesn't have to be searched again. Set to 0 to disable.", nil, {
+	data = {min = 0, max = 1800},
+	category = "Persistent Corpses"
+})
+
+ix.config.Add("corpseSearchAlive", true, "Allow searching any living player (not only restrained or knocked down ones). His equipment panel is shown the same way as for a corpse.", nil, {
 	category = "Persistent Corpses"
 })
 
@@ -248,78 +264,15 @@ if (SERVER) then
 		end
 	end
 
-	-- moves one equipped item into the corpse inventory
-	function PLUGIN:DropEquippedItem(client, equipInventory, inventory, item)
-		local x, y = inventory:FindEmptySlot(item.width, item.height)
-
-		if (!x) then
-			return
-		end
-
-		self:RemoveEquippableItem(client, item)
-
-		item.gridX, item.gridY = x, y
-		item.invID = inventory:GetID()
-
-		if (item.equip_slot_id) then
-			equipInventory.slots[item.equip_slot_id] = nil
-		end
-
-		item.equip_slot_id = nil
-
-		local query = mysql:Update("ix_items")
-			query:Update("inventory_id", 0)
-			query:Where("item_id", item.id)
-			query:Limit(1)
-		query:Execute()
-
-		for x2 = 0, item.width - 1 do
-			for y2 = 0, item.height - 1 do
-				inventory.slots[x + x2] = inventory.slots[x + x2] or {}
-				inventory.slots[x + x2][y + y2] = item
-			end
-		end
-	end
-
-	-- gives a small chance to lose equipped items
-	function PLUGIN:DropEquippedItems(client, character, inventory)
-		local equipInventory = character.GetEquipInventory and character:GetEquipInventory()
-
-		if (!equipInventory) then
-			return
-		end
-
-		local equipped = {}
-
-		-- collect first, the inventory is modified while dropping
-		local ok, err = pcall(function()
-			for _, item in equipInventory:Iter() do
-				equipped[#equipped + 1] = item
-			end
-		end)
-
-		if (!ok) then
-			ErrorNoHalt("[Corpses] failed to read equipment: " .. tostring(err) .. "\n")
-			return
-		end
-
-		for _, item in ipairs(equipped) do
-			if (math.random(1, 100) <= 5) then
-				local dropped, dropErr = pcall(self.DropEquippedItem, self, client, equipInventory, inventory, item)
-
-				if (!dropped) then
-					ErrorNoHalt("[Corpses] failed to drop equipped item: " .. tostring(dropErr) .. "\n")
-				end
-			end
-		end
-	end
-
 	function PLUGIN:OnPlayerCorpseCreated(client, entity)
 		local character = client:GetCharacter()
 
 		if (!character) then
 			return
 		end
+
+		-- the name is shown in the headers of the search windows
+		entity.ixCorpseName = character:GetName()
 
 		-- create the corpse inventory first, so the body can be searched even if dropping items fails
 		self.inventorySeq = self.inventorySeq + 1
@@ -341,11 +294,7 @@ if (SERVER) then
 			ErrorNoHalt("[Corpses] failed to drop backpack items: " .. tostring(err) .. "\n")
 		end
 
-		ok, err = pcall(self.DropEquippedItems, self, client, character, inventory)
-
-		if (!ok) then
-			ErrorNoHalt("[Corpses] failed to drop equipped items: " .. tostring(err) .. "\n")
-		end
+		-- equipped items are moved to the corpse by the Equipment plugin (OnPlayerCorpseCreated there)
 	end
 
 	-- interactive search
@@ -353,19 +302,110 @@ if (SERVER) then
 		return client:GetShootPos():DistToSqr(entity:WorldSpaceCenter()) <= (self.searchRange + 32) ^ 2
 	end
 
+	-- who is being searched: a corpse (ragdoll with an inventory) or a living player (also while he is a ragdoll)
+	function PLUGIN:GetSearchTarget(entity)
+		if (!IsValid(entity)) then
+			return
+		end
+
+		if (entity:IsPlayer()) then
+			return entity
+		end
+
+		if (entity:GetClass() == "prop_ragdoll") then
+			if (entity.ixInventory) then
+				return entity
+			end
+
+			if (IsValid(entity.ixPlayer) and entity.ixPlayer:IsPlayer()) then
+				return entity.ixPlayer
+			end
+		end
+	end
+
+	-- a living player can be searched only when he can't resist
+	function PLUGIN:IsPlayerSearchable(client, target)
+		if (target == client or !target:Alive() or !target:GetCharacter()) then
+			return false
+		end
+
+		local result = hook.Run("ShouldAllowPlayerSearch", client, target)
+
+		if (result != nil) then
+			return result
+		end
+
+		return target:IsRestricted() or IsValid(target.ixRagdoll) or ix.config.Get("corpseSearchAlive", true)
+	end
+
+	function PLUGIN:IsSearchAllowed(client, target)
+		if (target:IsPlayer()) then
+			return self:IsPlayerSearchable(client, target)
+		end
+
+		return true
+	end
+
+	-- remembered progress of a searcher: the zones he already searched on this body
+	function PLUGIN:GetSearchMemory(client, entity)
+		local memory = entity.ixSearchMemory and entity.ixSearchMemory[client:SteamID64() or client:EntIndex()]
+
+		if (memory and memory.expires > CurTime()) then
+			return memory
+		end
+	end
+
+	function PLUGIN:SaveSearchMemory(client, entity, done, finished)
+		local ttl = ix.config.Get("corpseSearchRemember", 120)
+
+		if (ttl <= 0) then
+			return
+		end
+
+		entity.ixSearchMemory = entity.ixSearchMemory or {}
+		entity.ixSearchMemory[client:SteamID64() or client:EntIndex()] = {
+			done = table.Copy(done),
+			finished = finished,
+			expires = CurTime() + ttl
+		}
+	end
+
 	function PLUGIN:StartCorpseSearch(client, entity)
+		local memory = self:GetSearchMemory(client, entity)
+		local done, count = {}, 0
+
+		if (memory and !memory.finished) then
+			for index in pairs(memory.done) do
+				if (self.searchZones[index]) then
+					done[index] = true
+					count = count + 1
+				end
+			end
+		end
+
 		client.ixCorpseSearch = {
 			entity = entity,
-			done = {},
-			count = 0,
+			done = done,
+			count = count,
 			last = CurTime()
 		}
 
 		entity.ixSearcher = client
 		entity:EmitSound("physics/body/body_medium_impact_soft" .. math.random(1, 7) .. ".wav", 55, math.random(92, 108))
 
+		local target = self:GetSearchTarget(entity)
+
+		if (IsValid(target) and target:IsPlayer() and (target.ixSearchNotify or 0) < CurTime()) then
+			target.ixSearchNotify = CurTime() + 5
+			target:NotifyLocalized("corpseBeingSearched")
+		end
+
 		net.Start("ixCorpseSearchBegin")
 			net.WriteEntity(entity)
+
+			for i = 1, #self.searchZones do
+				net.WriteBool(done[i] == true)
+			end
 		net.Send(client)
 	end
 
@@ -378,8 +418,15 @@ if (SERVER) then
 
 		client.ixCorpseSearch = nil
 
-		if (IsValid(search.entity) and search.entity.ixSearcher == client) then
-			search.entity.ixSearcher = nil
+		if (IsValid(search.entity)) then
+			if (search.entity.ixSearcher == client) then
+				search.entity.ixSearcher = nil
+			end
+
+			-- an interrupted search keeps its progress
+			if (search.count > 0 and search.count < #self.searchZones) then
+				self:SaveSearchMemory(client, search.entity, search.done, false)
+			end
 		end
 
 		if (tellClient and IsValid(client)) then
@@ -388,21 +435,85 @@ if (SERVER) then
 		end
 	end
 
+	-- the search is over: open the corpse inventory and/or the equipment of the target
 	function PLUGIN:FinishCorpseSearch(client, entity)
-		local inventory = entity.ixInventory
+		local target = self:GetSearchTarget(entity)
 
 		self:StopCorpseSearch(client, false)
 
-		if (!inventory or ix.storage.InUse(inventory)) then
-			client:NotifyLocalized("corpseBusy")
+		if (!IsValid(target)) then
 			return
 		end
 
-		ix.storage.Open(client, inventory, {
-			entity = entity,
-			name = "Corpse",
-			searchTime = 0
-		})
+		if (target:IsPlayer() and !self:IsSearchAllowed(client, target)) then
+			return
+		end
+
+		self:SaveSearchMemory(client, entity, {}, true)
+
+		local inventory = !target:IsPlayer() and entity.ixInventory
+		local hasEquipment = ix.equipment and ix.equipment.OpenLoot
+
+		if (inventory) then
+			if (ix.storage.InUse(inventory)) then
+				client:NotifyLocalized("corpseBusy")
+				return
+			end
+
+			ix.storage.Open(client, inventory, {
+				entity = entity,
+				name = entity.ixCorpseName or "Corpse",
+				searchTime = 0
+			})
+		end
+
+		-- the equipment panel is always opened (with empty slots if the body has nothing on it)
+		if (hasEquipment) then
+			ix.equipment.OpenLoot(client, target, entity, function(searcher, loot)
+				return !loot:IsPlayer() or self:IsSearchAllowed(searcher, loot)
+			end)
+		end
+	end
+
+	-- begin searching an entity (corpse or helpless player), returns false if it can't be done now
+	function PLUGIN:BeginSearch(client, entity)
+		local target = self:GetSearchTarget(entity)
+
+		if (!IsValid(target) or client.ixCorpseSearch or !client:Alive()) then
+			return false
+		end
+
+		if (target:IsPlayer() and !self:IsSearchAllowed(client, target)) then
+			return false
+		end
+
+		local searcher = entity.ixSearcher
+		local inUse = !target:IsPlayer() and ix.storage.InUse(entity.ixInventory)
+
+		if (inUse or (IsValid(searcher) and searcher != client and searcher.ixCorpseSearch)) then
+			if ((client.ixCorpseBusyNotify or 0) < CurTime()) then
+				client.ixCorpseBusyNotify = CurTime() + 1
+				client:NotifyLocalized("corpseBusy")
+			end
+
+			return false
+		end
+
+		-- already searched by this person recently: no need to do it again
+		local memory = self:GetSearchMemory(client, entity)
+
+		if (memory and memory.finished) then
+			client.ixCorpseSearch = {entity = entity, done = {}, count = 0, last = CurTime()}
+			entity.ixSearcher = client
+
+			self:FinishCorpseSearch(client, entity)
+
+			return true
+		end
+
+		self:StartCorpseSearch(client, entity)
+
+		return true
 	end
 
 	function PLUGIN:OnCorpseZoneSearched(client, index)
@@ -424,7 +535,7 @@ if (SERVER) then
 		end
 
 		-- a zone can't be finished faster than the time it takes to search it
-		local zoneTime = math.max(ix.config.Get("corpseSearchTime", 1.5), 0.05)
+		local zoneTime = math.max(ix.config.Get("corpseSearchTime", 1.0), 0.05)
 
 		if (CurTime() - search.last < zoneTime * 0.8) then
 			return
@@ -457,6 +568,7 @@ if (SERVER) then
 		PLUGIN:StopCorpseSearch(client, false)
 	end)
 
+	-- corpses: USE on the body
 	function PLUGIN:PlayerUse(client, entity)
 		if (entity:GetClass() != "prop_ragdoll" or !entity.ixInventory) then
 			return
@@ -466,20 +578,45 @@ if (SERVER) then
 			return false
 		end
 
-		local searcher = entity.ixSearcher
-
-		if (ix.storage.InUse(entity.ixInventory) or (IsValid(searcher) and searcher != client and searcher.ixCorpseSearch)) then
-			if ((client.ixCorpseBusyNotify or 0) < CurTime()) then
-				client.ixCorpseBusyNotify = CurTime() + 1
-				client:NotifyLocalized("corpseBusy")
-			end
-
-			return false
-		end
-
-		self:StartCorpseSearch(client, entity)
+		self:BeginSearch(client, entity)
 
 		return false
+	end
+
+	-- living players: USE on a helpless player (players aren't "usable" entities, so use KeyPress)
+	function PLUGIN:KeyPress(client, key)
+		if (key != IN_USE or client.ixCorpseSearch or !client:Alive() or (client.ixSearchUseNext or 0) > CurTime()) then
+			return
+		end
+
+		client.ixSearchUseNext = CurTime() + 0.5
+
+		if (client:IsRestricted() or IsValid(client.ixRagdoll)) then
+			return
+		end
+
+		local start = client:GetShootPos()
+		local trace = util.TraceLine({
+			start = start,
+			endpos = start + client:GetAimVector() * self.searchRange,
+			filter = client,
+			mask = MASK_SHOT
+		})
+
+		local entity = trace.Entity
+
+		if (!IsValid(entity) or (entity:GetClass() == "prop_ragdoll" and entity.ixInventory)) then
+			return
+		end
+
+		local target = self:GetSearchTarget(entity)
+
+		if (!IsValid(target) or !target:IsPlayer()) then
+			return
+		end
+
+		-- a knocked down player is represented by his ragdoll
+		self:BeginSearch(client, IsValid(target.ixRagdoll) and target.ixRagdoll or target)
 	end
 end
 
@@ -601,15 +738,21 @@ if (CLIENT) then
 		self.nextRustle = 0
 	end
 
-	function PANEL:Setup(entity)
+	function PANEL:Setup(entity, doneFlags)
 		self.entity = entity
 
 		for i, zone in ipairs(PLUGIN.searchZones) do
+			local done = doneFlags and doneFlags[i] or false
+
+			if (done) then
+				self.doneCount = self.doneCount + 1
+			end
+
 			self.zones[i] = {
 				name = L(zone.name),
-				progress = 0,
-				done = false,
-				scale = 0.6,
+				progress = done and 1 or 0,
+				done = done,
+				scale = done and 0.85 or 0.6,
 				x = 0,
 				y = 0,
 				radius = 24,
@@ -689,7 +832,7 @@ if (CLIENT) then
 		local eyePos = client:EyePos()
 		local scale = ScrH() / 1080
 		local cursorX, cursorY = self:CursorPos()
-		local zoneTime = math.max(ix.config.Get("corpseSearchTime", 1.5), 0.05)
+		local zoneTime = math.max(ix.config.Get("corpseSearchTime", 1.0), 0.05)
 
 		-- marker positions follow the corpse bones
 		for i, zone in ipairs(PLUGIN.searchZones) do
@@ -698,7 +841,7 @@ if (CLIENT) then
 			local screen = pos:ToScreen()
 
 			state.x, state.y, state.visible = screen.x, screen.y, screen.visible
-			state.radius = math.Clamp(120 / math.max(eyePos:Distance(pos), 1), 0.65, 1.35) * 26 * scale
+			state.radius = math.Clamp(120 / math.max(eyePos:Distance(pos), 1), 0.65, 1.35) * 32 * scale
 		end
 
 		-- the marker under the cursor
@@ -709,7 +852,7 @@ if (CLIENT) then
 			if (state.visible and !state.done) then
 				local dist = (state.x - cursorX) ^ 2 + (state.y - cursorY) ^ 2
 
-				if (dist < (state.radius * 1.15) ^ 2 and dist < best) then
+				if (dist < (state.radius * 1.5) ^ 2 and dist < best) then
 					best = dist
 					self.hover = i
 				end
@@ -721,7 +864,8 @@ if (CLIENT) then
 		-- holding the left mouse button
 		local down = input.IsMouseDown(MOUSE_LEFT)
 
-		if (down and !self.wasDown and self.hover) then
+		-- holding the button: the search moves on to the next marker the cursor slides over
+		if (down and self.hover and self.active != self.hover) then
 			self.active = self.hover
 		end
 
@@ -736,7 +880,7 @@ if (CLIENT) then
 			local dist = (state.x - cursorX) ^ 2 + (state.y - cursorY) ^ 2
 
 			-- the hand slipped off the spot, the search is interrupted
-			if (!state.visible or dist > (state.radius * 2) ^ 2) then
+			if (!state.visible or dist > (state.radius * 3) ^ 2) then
 				self.active = nil
 			else
 				state.progress = math.min(state.progress + dt / zoneTime, 1)
@@ -759,7 +903,7 @@ if (CLIENT) then
 		for i, state in ipairs(self.zones) do
 			-- unfinished progress slowly fades away
 			if (!state.done and i != self.active) then
-				state.progress = math.max(state.progress - dt * 1.5 / zoneTime, 0)
+				state.progress = math.max(state.progress - dt * 0.6 / zoneTime, 0)
 			end
 
 			local target = 1
@@ -942,6 +1086,11 @@ if (CLIENT) then
 
 	net.Receive("ixCorpseSearchBegin", function()
 		local entity = net.ReadEntity()
+		local doneFlags = {}
+
+		for i = 1, #PLUGIN.searchZones do
+			doneFlags[i] = net.ReadBool()
+		end
 
 		if (!IsValid(entity)) then
 			return
@@ -953,7 +1102,7 @@ if (CLIENT) then
 
 		PLUGIN.viewEntity = entity
 		PLUGIN.searchPanel = vgui.Create("ixCorpseSearch")
-		PLUGIN.searchPanel:Setup(entity)
+		PLUGIN.searchPanel:Setup(entity, doneFlags)
 	end)
 
 	net.Receive("ixCorpseSearchStop", function()
