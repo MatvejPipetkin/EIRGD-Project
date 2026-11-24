@@ -718,6 +718,13 @@ if (SERVER) then
 				searchTime = 0
 			})
 
+			-- снаряжение скованного (оружие, броня и т.п.): полоска слотов над хранилищем, как у трупа
+			if (ix.equipment and ix.equipment.OpenLoot) then
+				ix.equipment.OpenLoot(client, target, target, function(searcher, loot)
+					return !IsValid(loot) or !loot:IsPlayer() or loot:IsCuffed()
+				end)
+			end
+
 			return
 		end
 

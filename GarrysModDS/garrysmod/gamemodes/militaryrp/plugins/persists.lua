@@ -26,8 +26,9 @@ player has to hold the left mouse button on each of them. Once every part is sea
 with the equipment panel (plugin "Equipment"): the equipped items can be taken with a click.
 
 ## Searching living players
-A player that is helpless (restricted/handcuffed or knocked down) can be searched with USE in the same way; only the
-equipment can be taken from them. Override `ShouldAllowPlayerSearch` (client, target) to change who can be searched.
+Only a handcuffed (restricted) player can be searched with USE in the same way; only the equipment can be taken
+from them. Whenever the inventory of a handcuffed player is opened by another plugin, his equipment slots are shown too.
+Override `ShouldAllowPlayerSearch` (client, target) to change who can be searched.
 ]]
 
 PLUGIN.hardCorpseMax = 64
@@ -79,10 +80,6 @@ ix.config.Add("corpseSearchTime", 1.0, "How long it takes to search each part of
 
 ix.config.Add("corpseSearchRemember", 120, "How long (in seconds) a finished or partial search is remembered for the searcher, so the body doesn't have to be searched again. Set to 0 to disable.", nil, {
 	data = {min = 0, max = 1800},
-	category = "Persistent Corpses"
-})
-
-ix.config.Add("corpseSearchAlive", true, "Allow searching any living player (not only restrained or knocked down ones). His equipment panel is shown the same way as for a corpse.", nil, {
 	category = "Persistent Corpses"
 })
 
@@ -335,7 +332,8 @@ if (SERVER) then
 			return result
 		end
 
-		return target:IsRestricted() or IsValid(target.ixRagdoll) or ix.config.Get("corpseSearchAlive", true)
+		-- only a handcuffed (restricted) player can be searched; the dead are searched as corpses
+		return target:IsRestricted()
 	end
 
 	function PLUGIN:IsSearchAllowed(client, target)
@@ -435,6 +433,38 @@ if (SERVER) then
 		end
 	end
 
+	-- Any plugin that opens the inventory of a handcuffed player (ix.storage.Open with the player as owner)
+	-- gets the equipment panel of that player as well, so his weapons and armor are visible.
+	if (ix.storage and ix.storage.Open) then
+		ix.storage.ixOpenOriginal = ix.storage.ixOpenOriginal or ix.storage.Open
+
+		function ix.storage.Open(client, inventory, info, ...)
+			local result = ix.storage.ixOpenOriginal(client, inventory, info, ...)
+
+			timer.Simple(0, function()
+				if (!IsValid(client) or !ix.equipment or !ix.equipment.OpenLoot) then
+					return
+				end
+
+				local target = istable(info) and IsValid(info.entity) and info.entity:IsPlayer() and info.entity
+
+				if (!target and inventory and inventory.GetOwner) then
+					local owner = inventory:GetOwner()
+
+					target = IsValid(owner) and owner:IsPlayer() and owner
+				end
+
+				if (target and target != client and PLUGIN:IsPlayerSearchable(client, target)) then
+					ix.equipment.OpenLoot(client, target, target, function(searcher, loot)
+						return !loot:IsPlayer() or PLUGIN:IsSearchAllowed(searcher, loot)
+					end)
+				end
+			end)
+
+			return result
+		end
+	end
+
 	-- the search is over: open the corpse inventory and/or the equipment of the target
 	function PLUGIN:FinishCorpseSearch(client, entity)
 		local target = self:GetSearchTarget(entity)
@@ -451,7 +481,19 @@ if (SERVER) then
 
 		self:SaveSearchMemory(client, entity, {}, true)
 
-		local inventory = !target:IsPlayer() and entity.ixInventory
+		local inventory, inventoryName
+
+		if (target:IsPlayer()) then
+			-- handcuffed player: his own inventory is searched together with the equipment
+			local character = target:GetCharacter()
+
+			inventory = character and character:GetInventory()
+			inventoryName = character and character:GetName()
+		else
+			inventory = entity.ixInventory
+			inventoryName = entity.ixCorpseName
+		end
+
 		local hasEquipment = ix.equipment and ix.equipment.OpenLoot
 
 		if (inventory) then
@@ -462,7 +504,7 @@ if (SERVER) then
 
 			ix.storage.Open(client, inventory, {
 				entity = entity,
-				name = entity.ixCorpseName or "Corpse",
+				name = inventoryName or "Corpse",
 				searchTime = 0
 			})
 		end
@@ -615,8 +657,11 @@ if (SERVER) then
 			return
 		end
 
-		-- a knocked down player is represented by his ragdoll
-		self:BeginSearch(client, IsValid(target.ixRagdoll) and target.ixRagdoll or target)
+		if (!self:IsSearchAllowed(client, target)) then
+			return
+		end
+
+		self:BeginSearch(client, target)
 	end
 end
 

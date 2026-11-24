@@ -740,12 +740,6 @@ function PANEL:Setup(maxHeight, source)
 	end
 
 	if (source and source.loot) then
-		self.closeButton = HeaderButton(self, "X", S(26), function()
-			if (source.onClose) then
-				source.onClose()
-			end
-		end)
-
 		self.takeAllButton = HeaderButton(self, "ЗАБРАТЬ ВСЁ", S(104), function()
 			RunConsoleCommand("ix_equipment_takeall")
 		end)
@@ -838,12 +832,6 @@ function PANEL:SetupCompact(source)
 		end
 	end
 
-	self.closeButton = HeaderButton(self, "X", S(26), function()
-		if (source.onClose) then
-			source.onClose()
-		end
-	end)
-
 	self.takeAllButton = HeaderButton(self, "ЗАБРАТЬ ВСЁ", S(104), function()
 		RunConsoleCommand("ix_equipment_takeall")
 	end)
@@ -852,9 +840,8 @@ function PANEL:SetupCompact(source)
 end
 
 function PANEL:PerformLayout(width, height)
-	if (self.closeButton) then
-		self.closeButton:SetPos(width - self.closeButton:GetWide() - S(8), math.floor((self.headerH - self.closeButton:GetTall()) * 0.5))
-		self.takeAllButton:SetPos(self.closeButton.x - self.takeAllButton:GetWide() - S(6), self.closeButton.y)
+	if (self.takeAllButton) then
+		self.takeAllButton:SetPos(width - self.takeAllButton:GetWide() - S(8), math.floor((self.headerH - self.takeAllButton:GetTall()) * 0.5))
 	end
 end
 
@@ -919,10 +906,18 @@ function PANEL:Paint(width, height)
 		surface.DrawRect(S(12) + textWidth + S(8), labelY, width - (S(12) + textWidth + S(8)) - S(4), 1)
 	end
 
-	-- разделитель компактной панели
+	-- компактная панель: мягкое свечение снизу, разделитель и подписи групп
 	if (self.dividerX) then
-		surface.SetDrawColor(accent.r, accent.g, accent.b, 70)
-		surface.DrawRect(math.floor(self.dividerX), self.dividerY + S(6), 1, self.dividerH - S(12))
+		for i = 1, S(26) do
+			surface.SetDrawColor(accent.r, accent.g, accent.b, 26 * (1 - i / S(26)) ^ 2)
+			surface.DrawRect(1, height - 1 - i, width - 2, 1)
+		end
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 90)
+		surface.DrawRect(math.floor(self.dividerX), self.dividerY + S(4), 1, self.dividerH - S(8))
+
+		surface.SetDrawColor(accent.r, accent.g, accent.b, 160)
+		surface.DrawRect(math.floor(self.dividerX) - 2, self.dividerY + math.floor(self.dividerH * 0.5) - 3, 5, 5)
 	end
 
 	-- на цели ничего нет
